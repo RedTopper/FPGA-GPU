@@ -3,8 +3,6 @@
 -- Department of Electrical and Computer Engineering
 -- Iowa State University
 -------------------------------------------------------------------------
-
-
 -- mvmac.vhd
 -------------------------------------------------------------------------
 -- DESCRIPTION: This file contains the top level design for the matrix-
@@ -14,106 +12,95 @@
 -- NOTES:
 -- 12/16/20 by JAZ::Design created.
 ------------------------------------------------------------------------
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
+ENTITY mvmac IS
+  PORT (
+    clk100 : IN STD_LOGIC;
+    sys_rst_n : IN STD_LOGIC;
+    LED0 : OUT STD_LOGIC;
+    UART_RxD : IN STD_LOGIC;
+    UART_TxD : OUT STD_LOGIC);
+END mvmac;
 
-
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-
-
-entity mvmac is
-  port(clk100     : in std_logic;
-       sys_rst_n  : in std_logic;
-       LED0       : out std_logic;
-	   UART_RxD   : in std_logic;
-	   UART_TxD   : out std_logic);
-end mvmac;
-
-architecture mixed of mvmac is
+ARCHITECTURE mixed OF mvmac IS
 
   -- component declarations
-  component fixed_logic
-    port(i_CLK    : in std_logic;
-         i_RST    : in std_logic;
-         i_DONE   : in std_logic;
-         i_Y0     : in std_logic_vector(63 downto 0);
-		 i_Y1     : in std_logic_vector(63 downto 0);
-		 i_Y2     : in std_logic_vector(63 downto 0);
-		 i_Y3     : in std_logic_vector(63 downto 0);		
-		 RxD      : in std_logic;
-		 TxD      : out std_logic);
-  end component;
+  COMPONENT fixed_logic
+    PORT (
+      i_CLK : IN STD_LOGIC;
+      i_RST : IN STD_LOGIC;
+      i_DONE : IN STD_LOGIC;
+      i_Y0 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+      i_Y1 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+      i_Y2 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+      i_Y3 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+      RxD : IN STD_LOGIC;
+      TxD : OUT STD_LOGIC);
+  END COMPONENT;
 
-  component user_logic
-    port(i_CLK    : in std_logic;
-         i_RST    : in std_logic;
-         o_DONE   : out std_logic;
-         o_Y0     : out std_logic_vector(63 downto 0);
-		 o_Y1     : out std_logic_vector(63 downto 0);
-		 o_Y2     : out std_logic_vector(63 downto 0);
-		 o_Y3     : out std_logic_vector(63 downto 0));
-  end component;
-
-
+  COMPONENT user_logic
+    PORT (
+      i_CLK : IN STD_LOGIC;
+      i_RST : IN STD_LOGIC;
+      o_DONE : OUT STD_LOGIC;
+      o_Y0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+      o_Y1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+      o_Y2 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+      o_Y3 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
+  END COMPONENT;
   -- Signals for connection wires
-  signal s_RST, s_DONE : std_logic;
+  SIGNAL s_RST, s_DONE : STD_LOGIC;
 
   -- For the result vector. Currently s_Yx is stored to s_Yx_reg
   -- every cycle, which does not necessarily need to be changed.
-  signal s_Y0, s_Y1, s_Y2, s_Y3 : std_logic_vector(63 downto 0);
-  signal s_Y0_reg, s_Y1_reg : std_logic_vector(63 downto 0);
-  signal s_Y2_reg, s_Y3_reg : std_logic_vector(63 downto 0);
-
-
-begin
+  SIGNAL s_Y0, s_Y1, s_Y2, s_Y3 : STD_LOGIC_VECTOR(63 DOWNTO 0);
+  SIGNAL s_Y0_reg, s_Y1_reg : STD_LOGIC_VECTOR(63 DOWNTO 0);
+  SIGNAL s_Y2_reg, s_Y3_reg : STD_LOGIC_VECTOR(63 DOWNTO 0);
+BEGIN
 
   -- Invert the button signal for an active high reset
-  s_RST <= not sys_rst_n;
+  s_RST <= NOT sys_rst_n;
 
   -- Let's light up an LED when we are done
   LED0 <= s_DONE;
-
-
   -- User logic component - you may want to change this mapping to use
   -- a faster clock (if possible)
-  U1: user_logic
-    port map(i_CLK   => clk100,
-             i_RST   => s_RST,
-             o_DONE  => s_DONE,
-		     o_Y0    => s_Y0,
-             o_Y1    => s_Y1,	
-             o_Y2    => s_Y2,
-             o_Y3    => s_Y3);			 
-
-
+  U1 : user_logic
+  PORT MAP(
+    i_CLK => clk100,
+    i_RST => s_RST,
+    o_DONE => s_DONE,
+    o_Y0 => s_Y0,
+    o_Y1 => s_Y1,
+    o_Y2 => s_Y2,
+    o_Y3 => s_Y3);
   -- Fixed logic component - don't change this port mapping
-  U2: fixed_logic
-    port map(i_CLK   => clk100,
-             i_RST   => s_RST,
-             i_DONE  => s_DONE,
-             i_Y0    => s_Y0_reg,
-             i_Y1    => s_Y1_reg,
-             i_Y2    => s_Y2_reg,
-             i_Y3    => s_Y3_reg,
-				 RxD     => UART_RxD,
-				 TxD     => UART_TxD);
-
-
+  U2 : fixed_logic
+  PORT MAP(
+    i_CLK => clk100,
+    i_RST => s_RST,
+    i_DONE => s_DONE,
+    i_Y0 => s_Y0_reg,
+    i_Y1 => s_Y1_reg,
+    i_Y2 => s_Y2_reg,
+    i_Y3 => s_Y3_reg,
+    RxD => UART_RxD,
+    TxD => UART_TxD);
   -- This process implements the Y vector result registers. 
-  P1: process(clk100, s_RST)
-  begin
-    if (s_RST = '1') then
-      s_Y0_reg <= (others => '0');
-      s_Y1_reg <= (others => '0');
-      s_Y2_reg <= (others => '0');
-      s_Y3_reg <= (others => '0');
-	 elsif (rising_edge(clk100)) then
+  P1 : PROCESS (clk100, s_RST)
+  BEGIN
+    IF (s_RST = '1') THEN
+      s_Y0_reg <= (OTHERS => '0');
+      s_Y1_reg <= (OTHERS => '0');
+      s_Y2_reg <= (OTHERS => '0');
+      s_Y3_reg <= (OTHERS => '0');
+    ELSIF (rising_edge(clk100)) THEN
       s_Y0_reg <= s_Y0;
       s_Y1_reg <= s_Y1;
       s_Y2_reg <= s_Y2;
       s_Y3_reg <= s_Y3;
-	 end if;
-  end process;
-
-
-end mixed;
+    END IF;
+  END PROCESS;
+END mixed;
