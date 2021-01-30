@@ -1,0 +1,17 @@
+0.7
+2020.1
+May 27 2020
+20:09:33
+E:/HW/480/Mp-0/hw/proj/mvmac.sim/sim_1/behav/xsim/glbl.v,1590624368,verilog,,,,glbl,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd,1611800496,vhdl,,,,bin_to_ascii,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd,1611800496,vhdl,,,,fixed_logic,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/outmem.v,1611800496,verilog,,E:/HW/480/Mp-0/hw/src/fixed/uart_Controller.v,,outmem,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/uart/baud_cnt.vhd,1611800496,vhdl,,,,baud_cnt,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/uart/fifo/fifo_sim_netlist.v,1611879135,verilog,,E:/HW/480/Mp-0/hw/src/user/dmem.v,,fifo;fifo_blk_mem_gen_generic_cstr;fifo_blk_mem_gen_prim_width;fifo_blk_mem_gen_prim_wrapper;fifo_blk_mem_gen_top;fifo_blk_mem_gen_v8_4_4;fifo_blk_mem_gen_v8_4_4_synth;fifo_clk_x_pntrs;fifo_compare;fifo_compare_0;fifo_fifo_generator_ramfifo;fifo_fifo_generator_top;fifo_fifo_generator_v13_2_5;fifo_fifo_generator_v13_2_5_synth;fifo_memory;fifo_rd_bin_cntr;fifo_rd_handshaking_flags;fifo_rd_logic;fifo_rd_status_flags_as;fifo_reset_blk_ramfifo;fifo_wr_bin_cntr;fifo_wr_logic;fifo_wr_status_flags_as;fifo_xpm_cdc_gray;fifo_xpm_cdc_gray__parameterized1,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd,1611800496,vhdl,,,,mmu_uart_top,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/uart/rx.vhd,1611800496,vhdl,,,,rx,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/uart/tx.vhd,1611800496,vhdl,,,,tx,,,,,,,,
+E:/HW/480/Mp-0/hw/src/fixed/uart_Controller.v,1611800496,verilog,,,,uart_Controller,,,,,,,,
+E:/HW/480/Mp-0/hw/src/mvmac.vhd,1611800496,vhdl,,,,mvmac,,,,,,,,
+E:/HW/480/Mp-0/hw/src/user/dmem.v,1611800496,verilog,,E:/HW/480/Mp-0/hw/src/fixed/outmem.v,,dmem,,,,,,,,
+E:/HW/480/Mp-0/hw/src/user/user_logic.vhd,1611800496,vhdl,,,,user_logic,,,,,,,,

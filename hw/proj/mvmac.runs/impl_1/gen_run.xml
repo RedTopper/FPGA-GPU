@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="impl_1" LaunchPart="xc7a200tsbg484-1" LaunchTime="1611879072">
+  <File Type="BITSTR-BMM" Name="mvmac_bd.bmm"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="mvmac_methodology_drc_opted.rpt"/>
+  <File Type="INIT-TIMING" Name="mvmac_timing_summary_init.rpt"/>
+  <File Type="ROUTE-PWR" Name="mvmac_power_routed.rpt"/>
+  <File Type="PA-TCL" Name="mvmac.tcl"/>
+  <File Type="OPT-TIMING" Name="mvmac_timing_summary_opted.rpt"/>
+  <File Type="OPT-DCP" Name="mvmac_opt.dcp"/>
+  <File Type="ROUTE-PWR-SUM" Name="mvmac_power_summary_routed.pb"/>
+  <File Type="REPORTS-TCL" Name="mvmac_reports.tcl"/>
+  <File Type="OPT-DRC" Name="mvmac_drc_opted.rpt"/>
+  <File Type="OPT-HWDEF" Name="mvmac.hwdef"/>
+  <File Type="PWROPT-DCP" Name="mvmac_pwropt.dcp"/>
+  <File Type="PWROPT-DRC" Name="mvmac_drc_pwropted.rpt"/>
+  <File Type="PWROPT-TIMING" Name="mvmac_timing_summary_pwropted.rpt"/>
+  <File Type="PLACE-DCP" Name="mvmac_placed.dcp"/>
+  <File Type="PLACE-IO" Name="mvmac_io_placed.rpt"/>
+  <File Type="PLACE-CLK" Name="mvmac_clock_utilization_placed.rpt"/>
+  <File Type="PLACE-UTIL" Name="mvmac_utilization_placed.rpt"/>
+  <File Type="PLACE-UTIL-PB" Name="mvmac_utilization_placed.pb"/>
+  <File Type="PLACE-CTRL" Name="mvmac_control_sets_placed.rpt"/>
+  <File Type="PLACE-SIMILARITY" Name="mvmac_incremental_reuse_placed.rpt"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="mvmac_incremental_reuse_pre_placed.rpt"/>
+  <File Type="PLACE-TIMING" Name="mvmac_timing_summary_placed.rpt"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="mvmac_postplace_pwropt.dcp"/>
+  <File Type="BG-BIN" Name="mvmac.bin"/>
+  <File Type="POSTPLACE-PWROPT-TIMING" Name="mvmac_timing_summary_postplace_pwropted.rpt"/>
+  <File Type="PHYSOPT-DCP" Name="mvmac_physopt.dcp"/>
+  <File Type="PHYSOPT-DRC" Name="mvmac_drc_physopted.rpt"/>
+  <File Type="BITSTR-MSK" Name="mvmac.msk"/>
+  <File Type="PHYSOPT-TIMING" Name="mvmac_timing_summary_physopted.rpt"/>
+  <File Type="ROUTE-ERROR-DCP" Name="mvmac_routed_error.dcp"/>
+  <File Type="ROUTE-DCP" Name="mvmac_routed.dcp"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="mvmac_routed_bb.dcp"/>
+  <File Type="ROUTE-DRC" Name="mvmac_drc_routed.rpt"/>
+  <File Type="ROUTE-DRC-PB" Name="mvmac_drc_routed.pb"/>
+  <File Type="ROUTE-DRC-RPX" Name="mvmac_drc_routed.rpx"/>
+  <File Type="BITSTR-MMI" Name="mvmac.mmi"/>
+  <File Type="ROUTE-METHODOLOGY-DRC" Name="mvmac_methodology_drc_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="mvmac_methodology_drc_routed.rpx"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="mvmac_methodology_drc_routed.pb"/>
+  <File Type="ROUTE-PWR-RPX" Name="mvmac_power_routed.rpx"/>
+  <File Type="ROUTE-STATUS" Name="mvmac_route_status.rpt"/>
+  <File Type="ROUTE-STATUS-PB" Name="mvmac_route_status.pb"/>
+  <File Type="ROUTE-TIMINGSUMMARY" Name="mvmac_timing_summary_routed.rpt"/>
+  <File Type="ROUTE-TIMING-PB" Name="mvmac_timing_summary_routed.pb"/>
+  <File Type="ROUTE-TIMING-RPX" Name="mvmac_timing_summary_routed.rpx"/>
+  <File Type="ROUTE-SIMILARITY" Name="mvmac_incremental_reuse_routed.rpt"/>
+  <File Type="ROUTE-CLK" Name="mvmac_clock_utilization_routed.rpt"/>
+  <File Type="ROUTE-BUS-SKEW" Name="mvmac_bus_skew_routed.rpt"/>
+  <File Type="ROUTE-BUS-SKEW-PB" Name="mvmac_bus_skew_routed.pb"/>
+  <File Type="ROUTE-BUS-SKEW-RPX" Name="mvmac_bus_skew_routed.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="mvmac_postroute_physopt.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="mvmac_postroute_physopt_bb.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="mvmac_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="mvmac_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="mvmac_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="mvmac_bus_skew_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="mvmac_bus_skew_postroute_physopted.pb"/>
+  <File Type="BG-BIT" Name="mvmac.bit"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="mvmac_bus_skew_postroute_physopted.rpx"/>
+  <File Type="BITSTR-RBT" Name="mvmac.rbt"/>
+  <File Type="BITSTR-NKY" Name="mvmac.nky"/>
+  <File Type="PDI-FILE" Name="mvmac.pdi"/>
+  <File Type="RCFI_FILE" Name="mvmac.rcfi"/>
+  <File Type="CFI_FILE" Name="mvmac.cfi"/>
+  <File Type="RNPI_FILE" Name="mvmac.rnpi"/>
+  <File Type="NPI_FILE" Name="mvmac.npi"/>
+  <File Type="RBD_FILE" Name="mvmac.rbd"/>
+  <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
+  <File Type="BITSTR-LTX" Name="mvmac.ltx"/>
+  <File Type="BITSTR-SYSDEF" Name="mvmac.sysdef"/>
+  <File Type="BG-BGN" Name="mvmac.bgn"/>
+  <File Type="BG-DRC" Name="mvmac.drc"/>
+  <File Type="RDI-RDI" Name="mvmac.vdi"/>
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PPRDIR/../src/user/dmem.v">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/outmem.v">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/uart_Controller.v">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/uart/baud_cnt.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/bin_to_ascii.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/fixed_logic.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/uart/mmu_uart_top.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/uart/rx.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/fixed/uart/tx.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/user/user_logic.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../src/mvmac.vhd">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../sw/dmem.dat">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PPRDIR/../../sw/outmem.dat">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="mvmac"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <File Path="$PPRDIR/../constrs/NexysVideo_Master.xdc">
+      <FileInfo>
+        <Attr Name="Library" Val="xil_defaultlib"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
+    <Filter Type="Utils"/>
+    <Config>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020">
+      <Desc>Default settings for Implementation.</Desc>
+    </StratHandle>
+    <Step Id="init_design"/>
+    <Step Id="opt_design"/>
+    <Step Id="power_opt_design"/>
+    <Step Id="place_design"/>
+    <Step Id="post_place_power_opt_design"/>
+    <Step Id="phys_opt_design"/>
+    <Step Id="route_design"/>
+    <Step Id="post_route_phys_opt_design"/>
+    <Step Id="write_bitstream"/>
+  </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="fifo"/>
+</GenRun>

@@ -1,0 +1,16 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/fixed/uart/baud_cnt.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'baud_cnt'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'bin_to_ascii'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'fixed_logic'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'mmu_uart_top'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/fixed/uart/rx.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'RX'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/fixed/uart/tx.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'tx'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/user/user_logic.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'user_logic'
+INFO: [VRFC 10-163] Analyzing VHDL file "E:/HW/480/Mp-0/hw/src/mvmac.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'mvmac'

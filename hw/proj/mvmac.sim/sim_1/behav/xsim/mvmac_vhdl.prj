@@ -1,0 +1,13 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../../src/fixed/uart/baud_cnt.vhd" \
+"../../../../../src/fixed/bin_to_ascii.vhd" \
+"../../../../../src/fixed/fixed_logic.vhd" \
+"../../../../../src/fixed/uart/mmu_uart_top.vhd" \
+"../../../../../src/fixed/uart/rx.vhd" \
+"../../../../../src/fixed/uart/tx.vhd" \
+"../../../../../src/user/user_logic.vhd" \
+"../../../../../src/mvmac.vhd" \
+
+# Do not sort compile order
+nosort

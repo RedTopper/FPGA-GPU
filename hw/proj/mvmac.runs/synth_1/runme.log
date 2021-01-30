@@ -1,0 +1,419 @@
+
+*** Running vivado
+    with args -log mvmac.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source mvmac.tcl
+
+
+
+****** Vivado v2020.1 (64-bit)
+  **** SW Build 2902540 on Wed May 27 19:54:49 MDT 2020
+  **** IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+    ** Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+
+source mvmac.tcl -notrace
+Command: synth_design -top mvmac -part xc7a200tsbg484-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a200t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a200t'
+INFO: [Device 21-403] Loading part xc7a200tsbg484-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 25000
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1012.777 ; gain = 0.000
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'mvmac' [E:/HW/480/Mp-0/hw/src/mvmac.vhd:32]
+INFO: [Synth 8-3491] module 'user_logic' declared at 'E:/HW/480/Mp-0/hw/src/user/user_logic.vhd:24' bound to instance 'U1' of component 'user_logic' [E:/HW/480/Mp-0/hw/src/mvmac.vhd:79]
+INFO: [Synth 8-638] synthesizing module 'user_logic' [E:/HW/480/Mp-0/hw/src/user/user_logic.vhd:38]
+INFO: [Synth 8-3491] module 'dmem' declared at 'E:/HW/480/Mp-0/hw/src/user/dmem.v:20' bound to instance 'U1' of component 'dmem' [E:/HW/480/Mp-0/hw/src/user/user_logic.vhd:79]
+INFO: [Synth 8-6157] synthesizing module 'dmem' [E:/HW/480/Mp-0/hw/src/user/dmem.v:20]
+	Parameter data_width bound to: 32 - type: integer 
+	Parameter addr_width bound to: 15 - type: integer 
+INFO: [Synth 8-3876] $readmem data file 'dmem.dat' is read successfully [E:/HW/480/Mp-0/hw/src/user/dmem.v:37]
+INFO: [Synth 8-6155] done synthesizing module 'dmem' (1#1) [E:/HW/480/Mp-0/hw/src/user/dmem.v:20]
+INFO: [Synth 8-256] done synthesizing module 'user_logic' (2#1) [E:/HW/480/Mp-0/hw/src/user/user_logic.vhd:38]
+INFO: [Synth 8-3491] module 'fixed_logic' declared at 'E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:24' bound to instance 'U2' of component 'fixed_logic' [E:/HW/480/Mp-0/hw/src/mvmac.vhd:90]
+INFO: [Synth 8-638] synthesizing module 'fixed_logic' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:38]
+INFO: [Synth 8-3491] module 'outmem' declared at 'E:/HW/480/Mp-0/hw/src/fixed/outmem.v:20' bound to instance 'U1' of component 'outmem' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:97]
+INFO: [Synth 8-6157] synthesizing module 'outmem' [E:/HW/480/Mp-0/hw/src/fixed/outmem.v:20]
+	Parameter data_width bound to: 64 - type: integer 
+	Parameter addr_width bound to: 5 - type: integer 
+INFO: [Synth 8-3876] $readmem data file 'outmem.dat' is read successfully [E:/HW/480/Mp-0/hw/src/fixed/outmem.v:37]
+INFO: [Synth 8-6155] done synthesizing module 'outmem' (3#1) [E:/HW/480/Mp-0/hw/src/fixed/outmem.v:20]
+INFO: [Synth 8-3491] module 'uart_Controller' declared at 'E:/HW/480/Mp-0/hw/src/fixed/uart_Controller.v:18' bound to instance 'U2' of component 'uart_Controller' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:111]
+INFO: [Synth 8-6157] synthesizing module 'uart_Controller' [E:/HW/480/Mp-0/hw/src/fixed/uart_Controller.v:18]
+INFO: [Synth 8-638] synthesizing module 'mmu_uart_top' [E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd:100]
+INFO: [Synth 8-3491] module 'baud_cnt' declared at 'E:/HW/480/Mp-0/hw/src/fixed/uart/baud_cnt.vhd:37' bound to instance 'baud_cnt_u0' of component 'baud_cnt' [E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd:174]
+INFO: [Synth 8-638] synthesizing module 'baud_cnt' [E:/HW/480/Mp-0/hw/src/fixed/uart/baud_cnt.vhd:47]
+INFO: [Synth 8-256] done synthesizing module 'baud_cnt' (4#1) [E:/HW/480/Mp-0/hw/src/fixed/uart/baud_cnt.vhd:47]
+INFO: [Synth 8-3491] module 'tx' declared at 'E:/HW/480/Mp-0/hw/src/fixed/uart/tx.vhd:40' bound to instance 'tx_u0' of component 'tx' [E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd:181]
+INFO: [Synth 8-638] synthesizing module 'tx' [E:/HW/480/Mp-0/hw/src/fixed/uart/tx.vhd:53]
+INFO: [Synth 8-256] done synthesizing module 'tx' (5#1) [E:/HW/480/Mp-0/hw/src/fixed/uart/tx.vhd:53]
+INFO: [Synth 8-3491] module 'RX' declared at 'E:/HW/480/Mp-0/hw/src/fixed/uart/rx.vhd:39' bound to instance 'rx_u0' of component 'rx' [E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd:191]
+INFO: [Synth 8-638] synthesizing module 'RX' [E:/HW/480/Mp-0/hw/src/fixed/uart/rx.vhd:52]
+INFO: [Synth 8-256] done synthesizing module 'RX' (6#1) [E:/HW/480/Mp-0/hw/src/fixed/uart/rx.vhd:52]
+INFO: [Synth 8-256] done synthesizing module 'mmu_uart_top' (7#1) [E:/HW/480/Mp-0/hw/src/fixed/uart/mmu_uart_top.vhd:100]
+INFO: [Synth 8-638] synthesizing module 'fifo' [E:/HW/480/Mp-0/hw/proj/mvmac.runs/synth_1/.Xil/Vivado-22492-Bens-Desktop/realtime/fifo_stub.vhdl:23]
+INFO: [Synth 8-6155] done synthesizing module 'uart_Controller' (8#1) [E:/HW/480/Mp-0/hw/src/fixed/uart_Controller.v:18]
+	Parameter N bound to: 64 - type: integer 
+INFO: [Synth 8-3491] module 'bin_to_ascii' declared at 'E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:22' bound to instance 'U3_0' of component 'bin_to_ascii' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:120]
+INFO: [Synth 8-638] synthesizing module 'bin_to_ascii' [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:28]
+	Parameter N bound to: 64 - type: integer 
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-256] done synthesizing module 'bin_to_ascii' (9#1) [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:28]
+	Parameter N bound to: 64 - type: integer 
+INFO: [Synth 8-3491] module 'bin_to_ascii' declared at 'E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:22' bound to instance 'U3_1' of component 'bin_to_ascii' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:125]
+	Parameter N bound to: 64 - type: integer 
+INFO: [Synth 8-3491] module 'bin_to_ascii' declared at 'E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:22' bound to instance 'U3_2' of component 'bin_to_ascii' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:130]
+	Parameter N bound to: 64 - type: integer 
+INFO: [Synth 8-3491] module 'bin_to_ascii' declared at 'E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:22' bound to instance 'U3_3' of component 'bin_to_ascii' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:135]
+	Parameter N bound to: 32 - type: integer 
+INFO: [Synth 8-3491] module 'bin_to_ascii' declared at 'E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:22' bound to instance 'U3_4' of component 'bin_to_ascii' [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:140]
+INFO: [Synth 8-638] synthesizing module 'bin_to_ascii__parameterized2' [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:28]
+	Parameter N bound to: 32 - type: integer 
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-226] default block is never used [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:40]
+INFO: [Synth 8-256] done synthesizing module 'bin_to_ascii__parameterized2' (9#1) [E:/HW/480/Mp-0/hw/src/fixed/bin_to_ascii.vhd:28]
+INFO: [Synth 8-256] done synthesizing module 'fixed_logic' (10#1) [E:/HW/480/Mp-0/hw/src/fixed/fixed_logic.vhd:38]
+INFO: [Synth 8-256] done synthesizing module 'mvmac' (11#1) [E:/HW/480/Mp-0/hw/src/mvmac.vhd:32]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1012.777 ; gain = 0.000
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1012.777 ; gain = 0.000
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1012.777 ; gain = 0.000
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.048 . Memory (MB): peak = 1012.777 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [e:/HW/480/Mp-0/hw/src/fixed/uart/fifo/fifo/fifo_in_context.xdc] for cell 'U2/U2/MSG_BUFFER'
+Finished Parsing XDC File [e:/HW/480/Mp-0/hw/src/fixed/uart/fifo/fifo/fifo_in_context.xdc] for cell 'U2/U2/MSG_BUFFER'
+Parsing XDC File [E:/HW/480/Mp-0/hw/constrs/NexysVideo_Master.xdc]
+Finished Parsing XDC File [E:/HW/480/Mp-0/hw/constrs/NexysVideo_Master.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [E:/HW/480/Mp-0/hw/constrs/NexysVideo_Master.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/mvmac_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/mvmac_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1075.633 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.012 . Memory (MB): peak = 1075.633 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a200tsbg484-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property DONT_TOUCH = true for U2/U2/MSG_BUFFER. (constraint file  auto generated constraint, line ).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'cur_state_reg' in module 'user_logic'
+INFO: [Synth 8-802] inferred FSM for state register 'CS_reg' in module 'RX'
+INFO: [Synth 8-802] inferred FSM for state register 'cur_state_reg' in module 'fixed_logic'
+INFO: [Synth 8-3971] The signal "dmem:/ram_reg" was recognized as a true dual port RAM template.
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      s0 |                             0001 |                              000
+                      s1 |                             0010 |                              001
+                      s2 |                             0100 |                              010
+                      s3 |                             1000 |                              011
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'cur_state_reg' using encoding 'one-hot' in module 'user_logic'
+INFO: [Synth 8-3971] The signal "outmem:/ram_reg" was recognized as a true dual port RAM template.
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                    idle |     0000000000000000000000000001 |                            00000
+             start_start |     0000000000000000000000000010 |                            00001
+               start_end |     0000000000000000000000000100 |                            00010
+                b0_start |     0000000000000000000000001000 |                            00011
+               b0_sample |     0000000000000000000000010000 |                            00100
+                  b0_end |     0000000000000000000000100000 |                            00101
+                b1_start |     0000000000000000000001000000 |                            00110
+               b1_sample |     0000000000000000000010000000 |                            00111
+                  b1_end |     0000000000000000000100000000 |                            01000
+                b2_start |     0000000000000000001000000000 |                            01001
+               b2_sample |     0000000000000000010000000000 |                            01010
+                  b2_end |     0000000000000000100000000000 |                            01011
+                b3_start |     0000000000000001000000000000 |                            01100
+               b3_sample |     0000000000000010000000000000 |                            01101
+                  b3_end |     0000000000000100000000000000 |                            01110
+                b4_start |     0000000000001000000000000000 |                            01111
+               b4_sample |     0000000000010000000000000000 |                            10000
+                  b4_end |     0000000000100000000000000000 |                            10001
+                b5_start |     0000000001000000000000000000 |                            10010
+               b5_sample |     0000000010000000000000000000 |                            10011
+                  b5_end |     0000000100000000000000000000 |                            10100
+                b6_start |     0000001000000000000000000000 |                            10101
+               b6_sample |     0000010000000000000000000000 |                            10110
+                  b6_end |     0000100000000000000000000000 |                            10111
+                b7_start |     0001000000000000000000000000 |                            11000
+               b7_sample |     0010000000000000000000000000 |                            11001
+                  b7_end |     0100000000000000000000000000 |                            11010
+                    stop |     1000000000000000000000000000 |                            11011
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'CS_reg' using encoding 'one-hot' in module 'RX'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                      s0 |                              000 |                              000
+                      s1 |                              001 |                              001
+                      s2 |                              010 |                              010
+                      s3 |                              011 |                              011
+                      s4 |                              100 |                              100
+                      s5 |                              101 |                              101
+                      s6 |                              110 |                              110
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'cur_state_reg' using encoding 'sequential' in module 'fixed_logic'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:13 ; elapsed = 00:00:14 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   32 Bit       Adders := 1     
+	   2 Input   15 Bit       Adders := 1     
+	   2 Input    5 Bit       Adders := 1     
+	   2 Input    4 Bit       Adders := 1     
+	   2 Input    3 Bit       Adders := 2     
+	   2 Input    2 Bit       Adders := 1     
++---Registers : 
+	               64 Bit    Registers := 12    
+	               32 Bit    Registers := 3     
+	               15 Bit    Registers := 1     
+	               10 Bit    Registers := 1     
+	                8 Bit    Registers := 1     
+	                5 Bit    Registers := 2     
+	                4 Bit    Registers := 1     
+	                3 Bit    Registers := 2     
+	                2 Bit    Registers := 1     
+	                1 Bit    Registers := 11    
++---RAMs : 
+	            1024K Bit	(32768 X 32 bit)          RAMs := 1     
+	               2K Bit	(32 X 64 bit)          RAMs := 1     
++---Muxes : 
+	   7 Input   64 Bit        Muxes := 2     
+	  28 Input   28 Bit        Muxes := 1     
+	   2 Input   28 Bit        Muxes := 1     
+	   4 Input   15 Bit        Muxes := 1     
+	   2 Input   10 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 2     
+	   7 Input    5 Bit        Muxes := 2     
+	   2 Input    4 Bit        Muxes := 2     
+	   2 Input    3 Bit        Muxes := 6     
+	   4 Input    3 Bit        Muxes := 2     
+	   7 Input    3 Bit        Muxes := 1     
+	   2 Input    2 Bit        Muxes := 2     
+	   2 Input    1 Bit        Muxes := 7     
+	   4 Input    1 Bit        Muxes := 4     
+	  28 Input    1 Bit        Muxes := 2     
+	   7 Input    1 Bit        Muxes := 4     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 740 (col length:100)
+BRAMs: 730 (col length: RAMB18 100 RAMB36 50)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+INFO: [Synth 8-3971] The signal "mvmac/U2/U1/ram_reg" was recognized as a true dual port RAM template.
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:17 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping	Report (see note below)
++------------+---------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name | RTL Object    | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------+---------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|mvmac       | U2/U1/ram_reg | 32 x 64(READ_FIRST)    | W | R | 32 x 64(READ_FIRST)    | W |   | Port A and B     | 0      | 2      | 
++------------+---------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:22 ; elapsed = 00:00:23 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:22 ; elapsed = 00:00:23 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping	Report
++------------+---------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name | RTL Object    | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------+---------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|mvmac       | U2/U1/ram_reg | 32 x 64(READ_FIRST)    | W | R | 32 x 64(READ_FIRST)    | W |   | Port A and B     | 0      | 2      | 
++------------+---------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance U2/U1/ram_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance U2/U1/ram_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:22 ; elapsed = 00:00:24 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+--------------+----------+
+|      |BlackBox name |Instances |
++------+--------------+----------+
+|1     |fifo          |         1|
++------+--------------+----------+
+
+Report Cell Usage: 
++------+----------+------+
+|      |Cell      |Count |
++------+----------+------+
+|1     |fifo_bbox |     1|
+|2     |BUFG      |     1|
+|3     |CARRY4    |    64|
+|4     |LUT1      |     3|
+|5     |LUT2      |    32|
+|6     |LUT3      |    56|
+|7     |LUT4      |    32|
+|8     |LUT5      |    33|
+|9     |LUT6      |    45|
+|10    |RAMB36E1  |     2|
+|12    |FDCE      |   253|
+|13    |FDPE      |    11|
+|14    |FDRE      |    33|
+|15    |IBUF      |     2|
+|16    |OBUF      |     2|
++------+----------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:25 ; elapsed = 00:00:26 . Memory (MB): peak = 1075.633 ; gain = 62.855
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:16 ; elapsed = 00:00:24 . Memory (MB): peak = 1075.633 ; gain = 0.000
+Synthesis Optimization Complete : Time (s): cpu = 00:00:25 ; elapsed = 00:00:27 . Memory (MB): peak = 1075.633 ; gain = 62.855
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.015 . Memory (MB): peak = 1075.633 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 66 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1075.633 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+INFO: [Common 17-83] Releasing license: Synthesis
+90 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:31 ; elapsed = 00:00:33 . Memory (MB): peak = 1075.633 ; gain = 62.855
+INFO: [Common 17-1381] The checkpoint 'E:/HW/480/Mp-0/hw/proj/mvmac.runs/synth_1/mvmac.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file mvmac_utilization_synth.rpt -pb mvmac_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Thu Jan 28 18:12:54 2021...

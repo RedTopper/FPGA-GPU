@@ -1,0 +1,73 @@
+Vivado Simulator 2020.1
+Copyright 1986-1999, 2001-2020 Xilinx, Inc. All Rights Reserved.
+Running: F:/Xilinx/Vivado/2020.1/bin/unwrapped/win64.o/xelab.exe -wto 76c9bfd8c85147878647f14096bee5dd --incr --debug typical --relax --mt 2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot mvmac_behav xil_defaultlib.mvmac xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package std.standard
+Compiling package std.textio
+Compiling package ieee.std_logic_1164
+Compiling package ieee.numeric_std
+Compiling package ieee.std_logic_arith
+Compiling package ieee.std_logic_unsigned
+Compiling package vl.vl_types
+Compiling module xil_defaultlib.glbl
+Compiling module xil_defaultlib.dmem(data_width=32,addr_width=15...
+Compiling architecture mixed of entity xil_defaultlib.user_logic [user_logic_default]
+Compiling module xil_defaultlib.outmem(data_width=64,addr_width=...
+Compiling architecture rtl of entity xil_defaultlib.baud_cnt [baud_cnt_default]
+Compiling architecture rtl of entity xil_defaultlib.tx [tx_default]
+Compiling architecture rtl of entity xil_defaultlib.RX [rx_default]
+Compiling architecture rtl of entity xil_defaultlib.mmu_uart_top [mmu_uart_top_default]
+Compiling module unisims_ver.GND
+Compiling module unisims_ver.VCC
+Compiling module unisims_ver.LUT6
+Compiling module unisims_ver.LUT4
+Compiling module unisims_ver.x_lut2_mux4
+Compiling module unisims_ver.LUT2
+Compiling module unisims_ver.LUT5
+Compiling module unisims_ver.FDRE_default
+Compiling module unisims_ver.x_lut3_mux8
+Compiling module unisims_ver.LUT3
+Compiling module xil_defaultlib.fifo_xpm_cdc_gray__parameterized...
+Compiling module xil_defaultlib.fifo_xpm_cdc_gray
+Compiling module xil_defaultlib.fifo_clk_x_pntrs
+Compiling module unisims_ver.CARRY4
+Compiling module xil_defaultlib.fifo_compare
+Compiling module xil_defaultlib.fifo_compare_0
+Compiling module unisims_ver.FDPE_default
+Compiling module xil_defaultlib.fifo_rd_status_flags_as
+Compiling module unisims_ver.FDCE_default
+Compiling module xil_defaultlib.fifo_rd_handshaking_flags
+Compiling module unisims_ver.x_lut1_mux2
+Compiling module unisims_ver.LUT1
+Compiling module xil_defaultlib.fifo_rd_bin_cntr
+Compiling module xil_defaultlib.fifo_rd_logic
+Compiling module xil_defaultlib.fifo_wr_status_flags_as
+Compiling module xil_defaultlib.fifo_wr_bin_cntr
+Compiling module xil_defaultlib.fifo_wr_logic
+Compiling module unisims_ver.RB36_INTERNAL_VLOG(RAM_MODE="SDP...
+Compiling module unisims_ver.RAMB36E1(RAM_MODE="SDP",READ_WID...
+Compiling module xil_defaultlib.fifo_blk_mem_gen_prim_wrapper
+Compiling module xil_defaultlib.fifo_blk_mem_gen_prim_width
+Compiling module xil_defaultlib.fifo_blk_mem_gen_generic_cstr
+Compiling module xil_defaultlib.fifo_blk_mem_gen_top
+Compiling module xil_defaultlib.fifo_blk_mem_gen_v8_4_4_synth
+Compiling module xil_defaultlib.fifo_blk_mem_gen_v8_4_4
+Compiling module xil_defaultlib.fifo_memory
+Compiling module xil_defaultlib.fifo_reset_blk_ramfifo
+Compiling module xil_defaultlib.fifo_fifo_generator_ramfifo
+Compiling module xil_defaultlib.fifo_fifo_generator_top
+Compiling module xil_defaultlib.fifo_fifo_generator_v13_2_5_synt...
+Compiling module xil_defaultlib.fifo_fifo_generator_v13_2_5
+Compiling module xil_defaultlib.fifo
+Compiling module xil_defaultlib.uart_Controller
+Compiling architecture dataflow of entity xil_defaultlib.bin_to_ascii [\bin_to_ascii(n=64)\]
+Compiling architecture dataflow of entity xil_defaultlib.bin_to_ascii [bin_to_ascii_default]
+Compiling architecture mixed of entity xil_defaultlib.fixed_logic [fixed_logic_default]
+Compiling architecture mixed of entity xil_defaultlib.mvmac
+Built simulation snapshot mvmac_behav

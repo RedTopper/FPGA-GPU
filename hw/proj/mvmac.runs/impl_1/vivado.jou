@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2020.1 (64-bit)
+# SW Build 2902540 on Wed May 27 19:54:49 MDT 2020
+# IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+# Start of session at: Thu Jan 28 18:13:02 2021
+# Process ID: 19272
+# Current directory: E:/HW/480/Mp-0/hw/proj/mvmac.runs/impl_1
+# Command line: vivado.exe -log mvmac.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source mvmac.tcl -notrace
+# Log file: E:/HW/480/Mp-0/hw/proj/mvmac.runs/impl_1/mvmac.vdi
+# Journal file: E:/HW/480/Mp-0/hw/proj/mvmac.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source mvmac.tcl -notrace
