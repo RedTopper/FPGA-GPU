@@ -7,7 +7,7 @@ ENTITY Math_4CH IS
     PORT (
         i_CLK : IN STD_LOGIC;
         i_A : uint16_4x4array;
-        i_X : STD_LOGIC_VECTOR(31 DOWNTO 0);
+        i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
         o_Y0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
         o_Y1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
@@ -21,7 +21,7 @@ ARCHITECTURE theArchitect OF Math_4CH IS
         PORT (
             i_A : uint16_1x4array;
             i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
-            o_Y : STD_LOGIC_VECTOR(63 DOWNTO 0));
+            o_Y : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
     END COMPONENT;
     --intermediary signals
     SIGNAL s_A : uint16_4x4array;
