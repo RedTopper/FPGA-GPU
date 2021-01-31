@@ -72,7 +72,7 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_Y3a, s_Y3b, s_Y3c, s_Y3d : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
 	SIGNAL s_Y0_Summing, s_Y1_Summing, s_Y2_Summing, s_Y3_Summing : STD_LOGIC_VECTOR(63 DOWNTO 0);
-	SIGNAL s_Y0_SUM_TOTAL, s_Y1_SUM_TOTAL, s_Y2_SUM_TOTAL, s_Y3_SUM_TOTAL : unsigned(128 DOWNTO 0);
+	SIGNAL s_Y0_SUM_TOTAL, s_Y1_SUM_TOTAL, s_Y2_SUM_TOTAL, s_Y3_SUM_TOTAL : unsigned(63 DOWNTO 0);
 
 	-- Signals to hold the array values
 	SIGNAL s_Amatrix : uint16_4x4array;
@@ -268,6 +268,10 @@ BEGIN
 					END IF;
 
 				WHEN S4 =>
+					o_Y0 <= STD_LOGIC_VECTOR(s_Y0_SUM_TOTAL);
+					o_Y1 <= STD_LOGIC_VECTOR(s_Y1_SUM_TOTAL);
+					o_Y2 <= STD_LOGIC_VECTOR(s_Y2_SUM_TOTAL);
+					o_Y3 <= STD_LOGIC_VECTOR(s_Y3_SUM_TOTAL);
 					s_DONE <= '1';
 
 				WHEN OTHERS =>
