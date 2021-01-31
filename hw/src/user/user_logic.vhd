@@ -13,6 +13,7 @@
 -- 12/16/20 by JAZ::Design created.
 ------------------------------------------------------------------------
 LIBRARY IEEE;
+USE Work.Common.ALL;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 ENTITY user_logic IS
@@ -74,8 +75,6 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_Y0_SUM_TOTAL, s_Y1_SUM_TOTAL, s_Y2_SUM_TOTAL, s_Y3_SUM_TOTAL : unsigned(128 DOWNTO 0);
 
 	-- Signals to hold the array values
-	TYPE uint16_1x4array IS ARRAY(0 TO 3) OF unsigned(15 DOWNTO 0);
-	TYPE uint16_4x4array IS ARRAY(0 TO 3) OF uint16_1x4array;
 	SIGNAL s_Amatrix : uint16_4x4array;
 	SIGNAL s_XVECTa, s_XVECTb, s_XVECTc, s_XVECTd : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
@@ -87,7 +86,7 @@ ARCHITECTURE mixed OF user_logic IS
 		PORT (
 			i_CLK : IN STD_LOGIC;
 			i_A : uint16_4x4array;
-			i_X : STD_LOGIC_VECTOR(31 DOWNTO 0);
+			i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
 			o_Y0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
 			o_Y1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
