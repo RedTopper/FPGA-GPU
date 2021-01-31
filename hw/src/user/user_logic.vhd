@@ -44,8 +44,10 @@ ARCHITECTURE mixed OF user_logic IS
 			i_ADDRf : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			i_ADDRg : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			i_ADDRh : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
+
 			i_WDATAa : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 			i_WDATAb : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+
 			o_RDATAa : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAb : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAc : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -106,11 +108,15 @@ BEGIN
 		i_WDATAb => (OTHERS => '0'),
 		o_RDATAa => s_RDATAa,
 		o_RDATAb => OPEN);
+
+
 	-- Temporary logic - set the result vector to arbitrary values. 
 	o_Y0 <= x"1a1a1a1a2b2b2b2b";
 	o_Y1 <= x"3c3c3c3c4d4d4d4d";
 	o_Y2 <= x"5e5e5e5e6f6f6f6f";
 	o_Y3 <= x"7070707081818181";
+
+
 	-- Temporary process - this waits for 200001 clock cycles and then sets 
 	-- s_DONE. You will need to replace this with your own s_DONE calculation
 	-- logic
@@ -128,6 +134,7 @@ BEGIN
 			END IF;
 		END IF;
 	END PROCESS;
+	
 	-- Temporary process - this creates a simple FSM to load the 16 values of A
 	-- by reading from dmem at the appropriate addresses. You may be able to 
 	-- resuse / extend this code depending on your design strategy. 
