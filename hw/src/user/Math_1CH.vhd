@@ -9,13 +9,18 @@ ENTITY Math_1CH IS
         i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
         o_Y : STD_LOGIC_VECTOR(63 DOWNTO 0);
     );
+
 END Math_1CH
-architecture myArchitecture OF Math_1CH IS
+ARCHITECTURE myArchitecture OF Math_1CH IS
+    SIGNAL s_Mult0, s_Mult1, s_Mult2, s_Mult3 : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+BEGIN
+    -- Multiply * 4
+    s_Mult0 <= STD_LOGIC_VECTOR(unsigned(i_A(0)) * unsigned(i_X(15 DOWNTO 0)));
+    s_Mult1 <= STD_LOGIC_VECTOR(unsigned(i_A(1)) * unsigned(i_X(31 DOWNTO 16)));
+    s_Mult2 <= STD_LOGIC_VECTOR(unsigned(i_A(2)) * unsigned(i_X(47 DOWNTO 32)));
+    s_Mult3 <= STD_LOGIC_VECTOR(unsigned(i_A(3)) * unsigned(i_X(63 DOWNTO 48)));
 
-begin
-
---
-
-
-end MyArchitcture
+    -- Add
+    o_Y <= unsigned(s_Mult0) + unsigned(s_Mult1) + unsigned(s_Mult2) + unsigned(s_Mult3);
+END myArchitcture;
