@@ -98,18 +98,6 @@ module dmem (i_CLKa,
 	end
 	
 	always @ (posedge i_CLKa) begin
-		if (i_ENc) begin
-			o_RDATAc <= ram[i_ADDRc];
-		end
-	end
-	
-	always @ (posedge i_CLKb) begin
-		if (i_ENd) begin
-			o_RDATAd <= ram[i_ADDRd];
-		end
-	end
-	
-	always @ (posedge i_CLKa) begin
 		if (i_ENe) begin
 			o_RDATAe <= ram[i_ADDRe];
 		end
