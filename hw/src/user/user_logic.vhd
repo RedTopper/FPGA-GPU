@@ -72,7 +72,7 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_Y3a, s_Y3b, s_Y3c, s_Y3d : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
 	SIGNAL s_Y0_Summing, s_Y1_Summing, s_Y2_Summing, s_Y3_Summing : STD_LOGIC_VECTOR(63 DOWNTO 0);
-	SIGNAL s_Y0_SUM_TOTAL, s_Y1_SUM_TOTAL, s_Y2_SUM_TOTAL, s_Y3_SUM_TOTAL : unsigned(63 DOWNTO 0);
+	SIGNAL s_Y0_SUM_TOTAL, s_Y1_SUM_TOTAL, s_Y2_SUM_TOTAL, s_Y3_SUM_TOTAL : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
 	-- Signals to hold the array values
 	SIGNAL s_Amatrix : uint16_4x4array;
@@ -88,10 +88,10 @@ ARCHITECTURE mixed OF user_logic IS
 			i_A : uint16_4x4array;
 			i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
-			o_Y0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-			o_Y1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-			o_Y2 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-			o_Y3 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
+			o_MY0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+			o_MY1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+			o_MY2 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+			o_MY3 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
 	END COMPONENT;
 
 BEGIN
@@ -139,21 +139,6 @@ BEGIN
 	-- o_Y2 <= x"5e5e5e5e6f6f6f6f";
 	-- o_Y3 <= x"7070707081818181";
 
-	-- Temporary process - this waits for 200001 clock cycles and then sets 
-	-- s_DONE. You will need to replace this with your own s_DONE calculation
-	-- logic
-	P1 : PROCESS (i_CLK, i_RST)
-	BEGIN
-		IF (i_RST = '1') THEN
-			s_DONE <= '0';
-			s_CNT <= (OTHERS => '0');
-		ELSIF (rising_edge(i_CLK)) THEN
-			IF (s_DONE = '0') THEN
-				s_CNT <= s_CNT + 1;
-			END IF;
-		END IF;
-	END PROCESS;
-
 	-- Temporary process - this creates a simple FSM to load the 16 values of A
 	-- by reading from dmem at the appropriate addresses. You may be able to 
 	-- resuse / extend this code depending on your design strategy. 
@@ -161,8 +146,13 @@ BEGIN
 	BEGIN
 		IF (i_RST = '1') THEN
 			cur_state <= S0;
+			s_DONE <= '0';
+			s_CNT <= (OTHERS => '0');
 
 		ELSIF (rising_edge(i_CLK)) THEN
+			IF (s_DONE = '0') THEN
+				s_CNT <= s_CNT + 1;
+			END IF;
 
 			CASE cur_state IS
 					-- When we've reset, we can initialize the s_ADDRa signal
@@ -254,12 +244,10 @@ BEGIN
 					s_ADDRg <= STD_LOGIC_VECTOR(unsigned(s_ADDRg) + 8);
 					s_ADDRh <= STD_LOGIC_VECTOR(unsigned(s_ADDRh) + 8);
 
-					cur_state <= S4;
-
-					s_Y0_SUM_TOTAL <= s_Y0_SUM_TOTAL + unsigned(s_Y0_Summing);
-					s_Y1_SUM_TOTAL <= s_Y1_SUM_TOTAL + unsigned(s_Y1_Summing);
-					s_Y2_SUM_TOTAL <= s_Y2_SUM_TOTAL + unsigned(s_Y2_Summing);
-					s_Y3_SUM_TOTAL <= s_Y3_SUM_TOTAL + unsigned(s_Y3_Summing);
+					s_Y0_SUM_TOTAL <= STD_LOGIC_VECTOR(unsigned(s_Y0_SUM_TOTAL) + unsigned(s_Y0_Summing));
+					s_Y1_SUM_TOTAL <= STD_LOGIC_VECTOR(unsigned(s_Y1_SUM_TOTAL) + unsigned(s_Y1_Summing));
+					s_Y2_SUM_TOTAL <= STD_LOGIC_VECTOR(unsigned(s_Y2_SUM_TOTAL) + unsigned(s_Y2_Summing));
+					s_Y3_SUM_TOTAL <= STD_LOGIC_VECTOR(unsigned(s_Y3_SUM_TOTAL) + unsigned(s_Y3_Summing));
 
 					IF (s_vectorsRead = x"3E8") THEN
 						cur_state <= S4;
@@ -268,10 +256,10 @@ BEGIN
 					END IF;
 
 				WHEN S4 =>
-					o_Y0 <= STD_LOGIC_VECTOR(s_Y0_SUM_TOTAL);
-					o_Y1 <= STD_LOGIC_VECTOR(s_Y1_SUM_TOTAL);
-					o_Y2 <= STD_LOGIC_VECTOR(s_Y2_SUM_TOTAL);
-					o_Y3 <= STD_LOGIC_VECTOR(s_Y3_SUM_TOTAL);
+					o_Y0 <= s_Y0_SUM_TOTAL;
+					o_Y1 <= s_Y1_SUM_TOTAL;
+					o_Y2 <= s_Y2_SUM_TOTAL;
+					o_Y3 <= s_Y3_SUM_TOTAL;
 					s_DONE <= '1';
 
 				WHEN OTHERS =>
@@ -284,51 +272,51 @@ BEGIN
 
 	Math_4CHa : Math_4CH
 	PORT MAP(
-	i_CLK => i_CLK,
-	i_A => s_Amatrix,
-	i_X => s_XVECTa,
+		i_CLK => i_CLK,
+		i_A => s_Amatrix,
+		i_X => s_XVECTa,
 
-	o_Y0 =>	s_Y0a,
-	o_Y1 =>	s_Y1a,
-	o_Y2 => s_Y2a,
-	o_Y3 => s_Y3a);
+		o_MY0 => s_Y0a,
+		o_MY1 => s_Y1a,
+		o_MY2 => s_Y2a,
+		o_MY3 => s_Y3a);
 
 	Math_4CHb : Math_4CH
 	PORT MAP(
-	i_CLK => i_CLK,
-	i_A => s_Amatrix,
-	i_X => s_XVECTb,
+		i_CLK => i_CLK,
+		i_A => s_Amatrix,
+		i_X => s_XVECTb,
 
-	o_Y0 =>	s_Y0b,
-	o_Y1 =>	s_Y1b,
-	o_Y2 => s_Y2b,
-	o_Y3 => s_Y3b);
+		o_MY0 => s_Y0b,
+		o_MY1 => s_Y1b,
+		o_MY2 => s_Y2b,
+		o_MY3 => s_Y3b);
 
 	Math_4CHc : Math_4CH
 	PORT MAP(
-	i_CLK => i_CLK,
-	i_A => s_Amatrix,
-	i_X => s_XVECTc,
+		i_CLK => i_CLK,
+		i_A => s_Amatrix,
+		i_X => s_XVECTc,
 
-	o_Y0 =>	s_Y0c,
-	o_Y1 =>	s_Y1c,
-	o_Y2 => s_Y2c,
-	o_Y3 => s_Y3c);
+		o_MY0 => s_Y0c,
+		o_MY1 => s_Y1c,
+		o_MY2 => s_Y2c,
+		o_MY3 => s_Y3c);
 
 	Math_4CHd : Math_4CH
 	PORT MAP(
-	i_CLK => i_CLK,
-	i_A => s_Amatrix,
-	i_X => s_XVECTd,
+		i_CLK => i_CLK,
+		i_A => s_Amatrix,
+		i_X => s_XVECTd,
 
-	o_Y0 =>	s_Y0d,
-	o_Y1 =>	s_Y1d,
-	o_Y2 => s_Y2d,
-	o_Y3 => s_Y3d);
+		o_MY0 => s_Y0d,
+		o_MY1 => s_Y1d,
+		o_MY2 => s_Y2d,
+		o_MY3 => s_Y3d);
 
-	s_Y0_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y0a) + unsigned(s_Y0d) + unsigned(s_Y0c) + unsigned(s_Y0d));
-	s_Y1_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y1a) + unsigned(s_Y1d) + unsigned(s_Y1c) + unsigned(s_Y1d));
-	s_Y2_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y2a) + unsigned(s_Y2d) + unsigned(s_Y2c) + unsigned(s_Y2d));
-	s_Y3_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y3a) + unsigned(s_Y3d) + unsigned(s_Y3c) + unsigned(s_Y3d));
+	s_Y0_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y0a) + unsigned(s_Y0b) + unsigned(s_Y0c) + unsigned(s_Y0d));
+	s_Y1_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y1a) + unsigned(s_Y1b) + unsigned(s_Y1c) + unsigned(s_Y1d));
+	s_Y2_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y2a) + unsigned(s_Y2b) + unsigned(s_Y2c) + unsigned(s_Y2d));
+	s_Y3_Summing <= STD_LOGIC_VECTOR(unsigned(s_Y3a) + unsigned(s_Y3b) + unsigned(s_Y3c) + unsigned(s_Y3d));
 
 END mixed;

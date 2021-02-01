@@ -9,10 +9,10 @@ ENTITY Math_4CH IS
         i_A : uint16_4x4array;
         i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
-        o_Y0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-        o_Y1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-        o_Y2 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
-        o_Y3 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
+        o_MY0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        o_MY1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        o_MY2 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
+        o_MY3 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
 END Math_4CH;
 
 ARCHITECTURE theArchitect OF Math_4CH IS
@@ -32,10 +32,10 @@ BEGIN
 
     s_A <= i_A;
     s_X <= i_X;
-    o_Y0 <= s_Y0;
-    o_Y1 <= s_Y1;
-    o_Y2 <= s_Y2;
-    o_Y3 <= s_Y3;  
+    o_MY0 <= s_Y0;
+    o_MY1 <= s_Y1;
+    o_MY2 <= s_Y2;
+    o_MY3 <= s_Y3;
     --reminder to populate the signals
     --generate with the components
     Math_A0 : Math_1CH
