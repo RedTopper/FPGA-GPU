@@ -69,6 +69,10 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_Amatrix : uint16_4x4array;
 	SIGNAL s_XVECT : std64_1x4array;
 
+	--Signals for the DMEM -> Math Pipeline
+	SIGNAL s_XVECTaMath,s_XVECTbMath,s_XVECTcMath,s_XVECTdMath : STD_LOGIC_VECTOR(63 DOWNTO 0);
+	SIGNAL s_doneMath : STD_LOGIC;
+
 	-- Finite State Machine signals
 	TYPE state_type IS (S0, S1, S2, S3, S4);
 	SIGNAL cur_state : state_type;
@@ -267,11 +271,30 @@ BEGIN
 		END IF;
 	END PROCESS;
 
+	DmemMathPipe : PROCESS(i_CLK, i_RST) BEGIN
+		IF (rising_edge(i_CLK)) THEN
+			s_XVECTaMath <= s_XVECT(0);
+			s_XVECTbMath <= s_XVECT(1);
+			s_XVECTcMath <= s_XVECT(2);
+			s_XVECTdMath <= s_XVECT(3);
+			s_doneMath <= s_done;
+		END IF;
+	END PROCESS;
+	--signals to pipeline in read -> 4CH Phase
+		--s_done
+		--Read A->H
+
+
+	--signals to pipeline in 4CH -> 4x2 adder
+		--Will this phase even exist?
+
+
+
 	Math_4CHa : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
 		i_A => s_Amatrix,
-		i_X => s_XVECT(0),
+		i_X => s_XVECTaMath,
 
 		o_MY0 => s_Y(0)(0),
 		o_MY1 => s_Y(0)(1),
@@ -282,7 +305,7 @@ BEGIN
 	PORT MAP(
 		i_CLK => i_CLK,
 		i_A => s_Amatrix,
-		i_X => s_XVECT(1),
+		i_X => s_XVECTbMath,
 
 		o_MY0 => s_Y(1)(0),
 		o_MY1 => s_Y(1)(1),
@@ -293,7 +316,7 @@ BEGIN
 	PORT MAP(
 		i_CLK => i_CLK,
 		i_A => s_Amatrix,
-		i_X => s_XVECT(2),
+		i_X => s_XVECTcMath,
 
 		o_MY0 => s_Y(2)(0),
 		o_MY1 => s_Y(2)(1),
@@ -304,7 +327,7 @@ BEGIN
 	PORT MAP(
 		i_CLK => i_CLK,
 		i_A => s_Amatrix,
-		i_X => s_XVECT(3),
+		i_X => s_XVECTdMath,
 
 		o_MY0 => s_Y(3)(0),
 		o_MY1 => s_Y(3)(1),
