@@ -35,8 +35,6 @@ ARCHITECTURE mixed OF user_logic IS
 	COMPONENT dmem
 		PORT (
 			i_CLKa, i_CLKb : IN STD_LOGIC;
-			i_ENa, i_ENb, i_ENc, i_ENd, i_ENe, i_ENf, i_ENg, i_ENh : IN STD_LOGIC;
-			i_WEa, i_WEb : IN STD_LOGIC;
 			i_ADDRa : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			i_ADDRb : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			i_ADDRc : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
@@ -45,8 +43,6 @@ ARCHITECTURE mixed OF user_logic IS
 			i_ADDRf : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			i_ADDRg : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			i_ADDRh : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_WDATAa : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-			i_WDATAb : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAa : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAb : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAc : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -104,16 +100,6 @@ BEGIN
 	PORT MAP(
 		i_CLKa => i_CLK,
 		i_CLKb => i_CLK,
-		i_ENa => '1',
-		i_ENb => '1',
-		i_ENc => '1',
-		i_ENd => '1',
-		i_ENe => '1',
-		i_ENf => '1',
-		i_ENg => '1',
-		i_ENh => '1',
-		i_WEa => '0',
-		i_WEb => '0',
 		i_ADDRa => s_ADDRa,
 		i_ADDRb => s_ADDRb,
 		i_ADDRc => s_ADDRc,
@@ -122,8 +108,6 @@ BEGIN
 		i_ADDRf => s_ADDRf,
 		i_ADDRg => s_ADDRg,
 		i_ADDRh => s_ADDRh,
-		i_WDATAa => (OTHERS => '0'),
-		i_WDATAb => (OTHERS => '0'),
 		o_RDATAa => s_RDATAa,
 		o_RDATAb => s_RDATAb,
 		o_RDATAc => s_RDATAc,
