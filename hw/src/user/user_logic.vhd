@@ -71,7 +71,7 @@ ARCHITECTURE mixed OF user_logic IS
 
 	--Signals for the DMEM -> Math Pipeline
 	SIGNAL s_XVECTaMath,s_XVECTbMath,s_XVECTcMath,s_XVECTdMath : STD_LOGIC_VECTOR(63 DOWNTO 0);
-	SIGNAL s_doneMath,s_doneMathEXT : STD_LOGIC;
+	SIGNAL s_doneMath : STD_LOGIC;
 
 	-- Finite State Machine signals
 	TYPE state_type IS (S0, S1, S2, S3, S4);
@@ -92,7 +92,7 @@ ARCHITECTURE mixed OF user_logic IS
 BEGIN
 
 	-- Set o_DONE as s_DONE
-	o_DONE <= s_doneMathEXT;
+	o_DONE <= s_DONE;
 	-- Currently, we are just instantiating a single-port, read-only version
 	-- of the dmem. You will want to improve upon this mapping.
 	U1 : dmem
@@ -278,12 +278,6 @@ BEGIN
 			s_XVECTcMath <= s_XVECT(2);
 			s_XVECTdMath <= s_XVECT(3);
 			s_doneMath <= s_done;
-		END IF;
-	END PROCESS;
-
-	MathExtDonePipe : PROCESS(i_CLK) begin
-		IF (rising_edge(i_CLK)) THEN
-			s_doneMathEXT <= s_doneMath;
 		END IF;
 	END PROCESS;
 	--signals to pipeline in read -> 4CH Phase
