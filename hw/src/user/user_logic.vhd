@@ -148,6 +148,24 @@ BEGIN
 					s_ADDR(5) <= "000000000000101";
 					s_ADDR(6) <= "000000000000110";
 					s_ADDR(7) <= "000000000000111";
+
+					s_Y_TOTAL(0)(0) <= (OTHERS => '0');
+					s_Y_TOTAL(0)(1) <= (OTHERS => '0');
+					s_Y_TOTAL(0)(2) <= (OTHERS => '0');
+					s_Y_TOTAL(0)(3) <= (OTHERS => '0');
+					s_Y_TOTAL(1)(0) <= (OTHERS => '0');
+					s_Y_TOTAL(1)(1) <= (OTHERS => '0');
+					s_Y_TOTAL(1)(2) <= (OTHERS => '0');
+					s_Y_TOTAL(1)(3) <= (OTHERS => '0');
+					s_Y_TOTAL(2)(0) <= (OTHERS => '0');
+					s_Y_TOTAL(2)(1) <= (OTHERS => '0');
+					s_Y_TOTAL(2)(2) <= (OTHERS => '0');
+					s_Y_TOTAL(2)(3) <= (OTHERS => '0');
+					s_Y_TOTAL(3)(0) <= (OTHERS => '0');
+					s_Y_TOTAL(3)(1) <= (OTHERS => '0');
+					s_Y_TOTAL(3)(2) <= (OTHERS => '0');
+					s_Y_TOTAL(3)(3) <= (OTHERS => '0');
+
 					cur_state <= S1;
 					s_vectorsRead <= x"000";
 
@@ -243,7 +261,9 @@ BEGIN
 					s_Y_TOTAL(3)(2) <= s_Y_TOTAL(3)(2) + unsigned(s_Y(3)(2));
 					s_Y_TOTAL(3)(3) <= s_Y_TOTAL(3)(3) + unsigned(s_Y(3)(3));
 					
-					IF (s_vectorsRead = x"3E8") THEN
+					-- Wait until the next state to finalize, since the Math Pipeline delays the outputs by one cycle.
+					-- This also delays the done signal
+					IF (s_vectorsRead = x"3E8" + x"004") THEN
 						cur_state <= S4;
 					ELSE
 						s_vectorsRead <= s_vectorsRead + x"004";
