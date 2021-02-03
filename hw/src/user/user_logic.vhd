@@ -55,23 +55,24 @@ ARCHITECTURE mixed OF user_logic IS
 
 	-- Glue logic signals.
 	SIGNAL s_DONE : STD_LOGIC;
+	SIGNAL s_MATH_EN : STD_LOGIC;
 	SIGNAL s_CNT : unsigned(128 DOWNTO 0);
 
 	-- Signals to interface with the dmem component
 	SIGNAL s_ADDR : addr15_8array;
 	SIGNAL s_RDATA : addr32_8array;
-	SIGNAL s_vectorsRead : unsigned(11 DOWNTO 0);
+	SIGNAL s_vectorsRead : unsigned(15 DOWNTO 0);
 
 	SIGNAL s_Y : std64_4x4array;
 	SIGNAL s_Y_TOTAL : uint64_4x4array;
 
 	-- Signals to hold the array values
 	SIGNAL s_Amatrix : uint16_4x4array;
-	SIGNAL s_XVECT : std64_1x4array;
+	SIGNAL s_XVECT : uint16_4x4array;
 
 	--Signals for the DMEM -> Math Pipeline
-	SIGNAL s_XVECTaMath,s_XVECTbMath,s_XVECTcMath,s_XVECTdMath : STD_LOGIC_VECTOR(63 DOWNTO 0);
-	SIGNAL s_doneMath : STD_LOGIC;
+	SIGNAL s_XVECTMath : uint16_4x4array;
+	SIGNAL s_MATH_ENDmemMath : STD_LOGIC;
 
 	-- Finite State Machine signals
 	TYPE state_type IS (S0, S1, S2, S3, S4);
@@ -80,9 +81,9 @@ ARCHITECTURE mixed OF user_logic IS
 	COMPONENT Math_4CH
 		PORT (
 			i_CLK : IN STD_LOGIC;
-			i_RST : IN STD_LOGIC;
+			i_MATH_EN : IN STD_LOGIC;
 			i_A : uint16_4x4array;
-			i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
+			i_X : uint16_1x4array;
 
 			o_MY0 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
 			o_MY1 : OUT STD_LOGIC_VECTOR(63 DOWNTO 0);
@@ -131,6 +132,7 @@ BEGIN
 		IF (i_RST = '1') THEN
 			cur_state <= S0;
 			s_DONE <= '0';
+			s_MATH_EN <= '0';
 			s_CNT <= (OTHERS => '0');
 
 		ELSIF (rising_edge(i_CLK)) THEN
@@ -168,7 +170,7 @@ BEGIN
 					s_Y_TOTAL(3)(3) <= (OTHERS => '0');
 
 					cur_state <= S1;
-					s_vectorsRead <= x"000";
+					s_vectorsRead <= x"0000";
 
 					-- The prev s_ADDRa takes a cycle to be latched by the BRAM, so 
 					-- we wait a cycle to start our reading.
@@ -216,25 +218,22 @@ BEGIN
 					cur_state <= S3;
 
 				WHEN S3 =>
-					s_XVECT(0)(63 DOWNTO 48) <= s_RDATA(0)(31 DOWNTO 16);
-					s_XVECT(0)(47 DOWNTO 32) <= s_RDATA(0)(15 DOWNTO 0);
-					s_XVECT(0)(31 DOWNTO 16) <= s_RDATA(1)(31 DOWNTO 16);
-					s_XVECT(0)(15 DOWNTO 0)  <= s_RDATA(1)(15 DOWNTO 0);
-
-					s_XVECT(1)(63 DOWNTO 48) <= s_RDATA(2)(31 DOWNTO 16);
-					s_XVECT(1)(47 DOWNTO 32) <= s_RDATA(2)(15 DOWNTO 0);
-					s_XVECT(1)(31 DOWNTO 16) <= s_RDATA(3)(31 DOWNTO 16);
-					s_XVECT(1)(15 DOWNTO 0)  <= s_RDATA(3)(15 DOWNTO 0);
-
-					s_XVECT(2)(63 DOWNTO 48) <= s_RDATA(4)(31 DOWNTO 16);
-					s_XVECT(2)(47 DOWNTO 32) <= s_RDATA(4)(15 DOWNTO 0);
-					s_XVECT(2)(31 DOWNTO 16) <= s_RDATA(5)(31 DOWNTO 16);
-					s_XVECT(2)(15 DOWNTO 0)  <= s_RDATA(5)(15 DOWNTO 0);
-
-					s_XVECT(3)(63 DOWNTO 48) <= s_RDATA(6)(31 DOWNTO 16);
-					s_XVECT(3)(47 DOWNTO 32) <= s_RDATA(6)(15 DOWNTO 0);
-					s_XVECT(3)(31 DOWNTO 16) <= s_RDATA(7)(31 DOWNTO 16);
-					s_XVECT(3)(15 DOWNTO 0)  <= s_RDATA(7)(15 DOWNTO 0);
+					s_XVECT(0)(0) <= unsigned(s_RDATA(0)(31 DOWNTO 16));
+					s_XVECT(0)(1) <= unsigned(s_RDATA(0)(15 DOWNTO 0));
+					s_XVECT(0)(2) <= unsigned(s_RDATA(1)(31 DOWNTO 16));
+					s_XVECT(0)(3) <= unsigned(s_RDATA(1)(15 DOWNTO 0));
+					s_XVECT(1)(0) <= unsigned(s_RDATA(2)(31 DOWNTO 16));
+					s_XVECT(1)(1) <= unsigned(s_RDATA(2)(15 DOWNTO 0));
+					s_XVECT(1)(2) <= unsigned(s_RDATA(3)(31 DOWNTO 16));
+					s_XVECT(1)(3) <= unsigned(s_RDATA(3)(15 DOWNTO 0));
+					s_XVECT(2)(0) <= unsigned(s_RDATA(4)(31 DOWNTO 16));
+					s_XVECT(2)(1) <= unsigned(s_RDATA(4)(15 DOWNTO 0));
+					s_XVECT(2)(2) <= unsigned(s_RDATA(5)(31 DOWNTO 16));
+					s_XVECT(2)(3) <= unsigned(s_RDATA(5)(15 DOWNTO 0));
+					s_XVECT(3)(0) <= unsigned(s_RDATA(6)(31 DOWNTO 16));
+					s_XVECT(3)(1) <= unsigned(s_RDATA(6)(15 DOWNTO 0));
+					s_XVECT(3)(2) <= unsigned(s_RDATA(7)(31 DOWNTO 16));
+					s_XVECT(3)(3) <= unsigned(s_RDATA(7)(15 DOWNTO 0));
 
 					s_ADDR(0) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(0)) + 8);
 					s_ADDR(1) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(1)) + 8);
@@ -261,10 +260,12 @@ BEGIN
 					s_Y_TOTAL(3)(1) <= s_Y_TOTAL(3)(1) + unsigned(s_Y(3)(1));
 					s_Y_TOTAL(3)(2) <= s_Y_TOTAL(3)(2) + unsigned(s_Y(3)(2));
 					s_Y_TOTAL(3)(3) <= s_Y_TOTAL(3)(3) + unsigned(s_Y(3)(3));
-					
+
+					s_MATH_EN <= '1';
+
 					-- Wait until the next state to finalize, since the Math Pipeline delays the outputs by one cycle.
 					-- This also delays the done signal
-					IF (s_vectorsRead = x"3E8" + x"004") THEN
+					IF (s_vectorsRead = x"0004" + x"008") THEN
 						cur_state <= S4;
 					ELSE
 						s_vectorsRead <= s_vectorsRead + x"004";
@@ -292,31 +293,24 @@ BEGIN
 		END IF;
 	END PROCESS;
 
-	DmemMathPipe : PROCESS(i_CLK, i_RST) BEGIN
+	DmemMathPipe : PROCESS (i_CLK, i_RST) BEGIN
 		IF (rising_edge(i_CLK)) THEN
-			s_XVECTaMath <= s_XVECT(0);
-			s_XVECTbMath <= s_XVECT(1);
-			s_XVECTcMath <= s_XVECT(2);
-			s_XVECTdMath <= s_XVECT(3);
-			s_doneMath <= s_done;
+			s_XVECTMath <= s_XVECT;
+			s_MATH_ENDmemMath <= s_MATH_EN;
 		END IF;
 	END PROCESS;
 	--signals to pipeline in read -> 4CH Phase
-		--s_done
-		--Read A->H
-
-
+	--s_done
+	--Read A->H
 	--signals to pipeline in 4CH -> 4x2 adder
-		--Will this phase even exist?
-
-
+	--Will this phase even exist?
 
 	Math_4CHa : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
-		i_RST => i_RST,
+		i_MATH_EN => s_MATH_ENDmemMath,
 		i_A => s_Amatrix,
-		i_X => s_XVECTaMath,
+		i_X => s_XVECTMath(0),
 
 		o_MY0 => s_Y(0)(0),
 		o_MY1 => s_Y(0)(1),
@@ -326,9 +320,9 @@ BEGIN
 	Math_4CHb : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
-		i_RST => i_RST,
+		i_MATH_EN => s_MATH_ENDmemMath,
 		i_A => s_Amatrix,
-		i_X => s_XVECTbMath,
+		i_X => s_XVECTMath(1),
 
 		o_MY0 => s_Y(1)(0),
 		o_MY1 => s_Y(1)(1),
@@ -338,9 +332,9 @@ BEGIN
 	Math_4CHc : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
-		i_RST => i_RST,
+		i_MATH_EN => s_MATH_ENDmemMath,
 		i_A => s_Amatrix,
-		i_X => s_XVECTcMath,
+		i_X => s_XVECTMath(2),
 
 		o_MY0 => s_Y(2)(0),
 		o_MY1 => s_Y(2)(1),
@@ -350,9 +344,9 @@ BEGIN
 	Math_4CHd : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
-		i_RST => i_RST,
+		i_MATH_EN => s_MATH_ENDmemMath,
 		i_A => s_Amatrix,
-		i_X => s_XVECTdMath,
+		i_X => s_XVECTMath(3),
 
 		o_MY0 => s_Y(3)(0),
 		o_MY1 => s_Y(3)(1),
