@@ -6,6 +6,7 @@ ENTITY Math_4CH IS
 
     PORT (
         i_CLK : IN STD_LOGIC;
+        i_RST : IN STD_LOGIC;
         i_A : uint16_4x4array;
         i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
@@ -20,6 +21,7 @@ ARCHITECTURE theArchitect OF Math_4CH IS
     COMPONENT Math_1CH
         PORT (
             i_CLK : STD_LOGIC;
+            i_RST : STD_LOGIC;
             i_A : uint16_1x4array;
             i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
             o_Y : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
@@ -42,6 +44,7 @@ BEGIN
     Math_A0 : Math_1CH
     PORT MAP(
         i_CLK => i_CLK,
+        i_RST => i_RST,
         i_A => s_A(0),
         i_X => s_X,
         o_Y => s_Y0
@@ -50,6 +53,7 @@ BEGIN
     Math_A1 : Math_1CH
     PORT MAP(
         i_CLK => i_CLK,
+        i_RST => i_RST,
         i_A => s_A(1),
         i_X => s_X,
         o_Y => s_Y1
@@ -58,6 +62,7 @@ BEGIN
     Math_A2 : Math_1CH
     PORT MAP(
         i_CLK => i_CLK,
+        i_RST => i_RST,
         i_A => s_A(2),
         i_X => s_X,
         o_Y => s_Y2
@@ -66,6 +71,7 @@ BEGIN
     Math_A3 : Math_1CH
     PORT MAP(
         i_CLK => i_CLK,
+        i_RST => i_RST,
         i_A => s_A(3),
         i_X => s_X,
         o_Y => s_Y3

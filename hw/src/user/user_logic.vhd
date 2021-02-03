@@ -80,6 +80,7 @@ ARCHITECTURE mixed OF user_logic IS
 	COMPONENT Math_4CH
 		PORT (
 			i_CLK : IN STD_LOGIC;
+			i_RST : IN STD_LOGIC;
 			i_A : uint16_4x4array;
 			i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
 
@@ -313,6 +314,7 @@ BEGIN
 	Math_4CHa : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
+		i_RST => i_RST,
 		i_A => s_Amatrix,
 		i_X => s_XVECTaMath,
 
@@ -324,6 +326,7 @@ BEGIN
 	Math_4CHb : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
+		i_RST => i_RST,
 		i_A => s_Amatrix,
 		i_X => s_XVECTbMath,
 
@@ -335,6 +338,7 @@ BEGIN
 	Math_4CHc : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
+		i_RST => i_RST,
 		i_A => s_Amatrix,
 		i_X => s_XVECTcMath,
 
@@ -346,6 +350,7 @@ BEGIN
 	Math_4CHd : Math_4CH
 	PORT MAP(
 		i_CLK => i_CLK,
+		i_RST => i_RST,
 		i_A => s_Amatrix,
 		i_X => s_XVECTdMath,
 

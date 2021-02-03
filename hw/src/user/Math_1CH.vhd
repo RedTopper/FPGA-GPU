@@ -7,6 +7,7 @@ ENTITY Math_1CH IS
 
     PORT (
         i_CLK : STD_LOGIC;
+        i_RST : STD_LOGIC;
         i_A : uint16_1x4array;
         i_X : STD_LOGIC_VECTOR(63 DOWNTO 0);
         o_Y : OUT STD_LOGIC_VECTOR(63 DOWNTO 0));
@@ -22,13 +23,20 @@ BEGIN
     s_Mult2 <= STD_LOGIC_VECTOR(unsigned(i_A(2)) * unsigned(i_X(47 DOWNTO 32)));
     s_Mult3 <= STD_LOGIC_VECTOR(unsigned(i_A(3)) * unsigned(i_X(63 DOWNTO 48)));
 
-MultAddPipe : PROCESS(i_CLK) BEGIN
-    IF(rising_edge(i_CLK)) THEN
+MultAddPipe : PROCESS(i_CLK,i_RST) BEGIN
+    IF (i_RST = '1') THEN   
+        s_Mult0Add <= (OTHERS => '0');
+        s_Mult1Add <= (OTHERS => '0');
+        s_Mult2Add <= (OTHERS => '0');
+        s_Mult3Add <= (OTHERS => '0');
+    ELSIF(rising_edge(i_CLK)) THEN
         s_Mult0Add <= s_Mult0;
         s_Mult1Add <= s_Mult1; 
         s_Mult2Add <= s_Mult2;
         s_Mult3Add <= s_Mult3;
     end if;
+
+
 
 END PROCESS;
     -- Add
