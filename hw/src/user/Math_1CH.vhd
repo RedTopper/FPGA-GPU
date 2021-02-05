@@ -40,5 +40,5 @@ MultAddPipe : PROCESS(i_CLK,i_RST) BEGIN
 
 END PROCESS;
     -- Add
-    o_Y <= (63 downto 32 => '0') & STD_LOGIC_VECTOR(unsigned(s_Mult0Add) + unsigned(s_Mult1Add) + unsigned(s_Mult2Add) + unsigned(s_Mult3Add));
+    o_Y <= STD_LOGIC_VECTOR(resize((unsigned(s_Mult0Add) + unsigned(s_Mult1Add) + unsigned(s_Mult2Add) + unsigned(s_Mult3Add)),o_Y'length));
 END myArchitecture;
