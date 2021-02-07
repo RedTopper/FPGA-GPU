@@ -19,14 +19,7 @@
 
 module dmem (i_CLKa,
              i_CLKb,
-             i_ADDRa,
-             i_ADDRb,
-             i_ADDRc,
-             i_ADDRd,
-             i_ADDRe,
-             i_ADDRf,
-             i_ADDRg,
-             i_ADDRh,
+             i_ADDR,
              o_RDATAa,
              o_RDATAb,
              o_RDATAc,
@@ -40,7 +33,7 @@ module dmem (i_CLKa,
 	parameter addr_width = 15; // 2^15 32-bit values
 	
 	input i_CLKa, i_CLKb;
-	input [(addr_width-1):0] i_ADDRa, i_ADDRb, i_ADDRc, i_ADDRd, i_ADDRe, i_ADDRf, i_ADDRg, i_ADDRh;
+	input [(addr_width-1):0] i_ADDR;
 	
 	output reg [(data_width-1):0] o_RDATAa, o_RDATAb, o_RDATAc, o_RDATAd, o_RDATAe, o_RDATAf, o_RDATAg, o_RDATAh;
 	
@@ -55,14 +48,14 @@ module dmem (i_CLKa,
 	
 	// Simple process for memory read
 	always @(posedge i_CLKa) begin
-			o_RDATAa <= ram[i_ADDRa];
-			o_RDATAb <= ram[i_ADDRb];
-			o_RDATAc <= ram[i_ADDRc];
-			o_RDATAd <= ram[i_ADDRd];
-			o_RDATAe <= ram[i_ADDRe];
-			o_RDATAf <= ram[i_ADDRf];
-			o_RDATAg <= ram[i_ADDRg];
-			o_RDATAh <= ram[i_ADDRh];
+			o_RDATAa <= ram[i_ADDR];
+			o_RDATAb <= ram[i_ADDR + 1];
+			o_RDATAc <= ram[i_ADDR + 2];
+			o_RDATAd <= ram[i_ADDR + 3];
+			o_RDATAe <= ram[i_ADDR + 4];
+			o_RDATAf <= ram[i_ADDR + 5];
+			o_RDATAg <= ram[i_ADDR + 6];
+			o_RDATAh <= ram[i_ADDR + 7];
 	end
 	
 endmodule

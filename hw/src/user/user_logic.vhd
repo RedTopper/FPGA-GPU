@@ -37,14 +37,7 @@ ARCHITECTURE mixed OF user_logic IS
 	COMPONENT dmem
 		PORT (
 			i_CLKa, i_CLKb : IN STD_LOGIC;
-			i_ADDRa : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRb : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRc : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRd : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRe : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRf : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRg : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
-			i_ADDRh : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
+			i_ADDR : IN STD_LOGIC_VECTOR(14 DOWNTO 0);
 			o_RDATAa : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAb : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAc : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -61,7 +54,7 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_CNT : unsigned(128 DOWNTO 0);
 
 	-- Signals to interface with the dmem component
-	SIGNAL s_ADDR : addr15_8array;
+	SIGNAL s_ADDR : STD_LOGIC_VECTOR(14 DOWNTO 0);
 	SIGNAL s_RDATA : addr32_8array;
 	SIGNAL s_vectorsRead : unsigned(15 DOWNTO 0);
 
@@ -103,14 +96,7 @@ BEGIN
 	PORT MAP(
 		i_CLKa => i_CLK,
 		i_CLKb => i_CLK,
-		i_ADDRa => s_ADDR(0),
-		i_ADDRb => s_ADDR(1),
-		i_ADDRc => s_ADDR(2),
-		i_ADDRd => s_ADDR(3),
-		i_ADDRe => s_ADDR(4),
-		i_ADDRf => s_ADDR(5),
-		i_ADDRg => s_ADDR(6),
-		i_ADDRh => s_ADDR(7),
+		i_ADDR => s_ADDR,
 		o_RDATAa => s_RDATA(0),
 		o_RDATAb => s_RDATA(1),
 		o_RDATAc => s_RDATA(2),
@@ -136,10 +122,7 @@ BEGIN
 			CASE cur_state IS
 				-- When we've reset, we can initialize the s_ADDR signal
 				WHEN S0 =>
-					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
-						-- Set each ADDR(I) = I in binary
-						s_ADDR(I) <= std_logic_vector(to_unsigned(I, s_ADDR(I)'length));
-					END LOOP;
+					s_ADDR <= (OTHERS => '0');
 
 					FOR I IN 0 TO (NUMVECTORS-1) LOOP
 						FOR J IN 0 TO 3 LOOP
@@ -152,36 +135,20 @@ BEGIN
 
 				WHEN S1 =>
 					-- Need to wait a cycle for RAM
-					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
-						-- The 8 needs to be fixed here since there are only 8 values needed
-						-- to fill the A Matrix
-						s_ADDR(I) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(I)) + 8);
-					END LOOP;
+					s_ADDR <= STD_LOGIC_VECTOR(unsigned(s_ADDR) + 8);
 
 					cur_state <= S2;
 
 				WHEN S2 =>
 					-- Read A Matrix
-					s_Amatrix(0)(0) <= unsigned(s_RDATA(0)(31 DOWNTO 16));
-					s_Amatrix(0)(1) <= unsigned(s_RDATA(0)(15 DOWNTO 0));
-					s_Amatrix(0)(2) <= unsigned(s_RDATA(1)(31 DOWNTO 16));
-					s_Amatrix(0)(3) <= unsigned(s_RDATA(1)(15 DOWNTO 0));
-					s_Amatrix(1)(0) <= unsigned(s_RDATA(2)(31 DOWNTO 16));
-					s_Amatrix(1)(1) <= unsigned(s_RDATA(2)(15 DOWNTO 0));
-					s_Amatrix(1)(2) <= unsigned(s_RDATA(3)(31 DOWNTO 16));
-					s_Amatrix(1)(3) <= unsigned(s_RDATA(3)(15 DOWNTO 0));
-					s_Amatrix(2)(0) <= unsigned(s_RDATA(4)(31 DOWNTO 16));
-					s_Amatrix(2)(1) <= unsigned(s_RDATA(4)(15 DOWNTO 0));
-					s_Amatrix(2)(2) <= unsigned(s_RDATA(5)(31 DOWNTO 16));
-					s_Amatrix(2)(3) <= unsigned(s_RDATA(5)(15 DOWNTO 0));
-					s_Amatrix(3)(0) <= unsigned(s_RDATA(6)(31 DOWNTO 16));
-					s_Amatrix(3)(1) <= unsigned(s_RDATA(6)(15 DOWNTO 0));
-					s_Amatrix(3)(2) <= unsigned(s_RDATA(7)(31 DOWNTO 16));
-					s_Amatrix(3)(3) <= unsigned(s_RDATA(7)(15 DOWNTO 0));
-
-					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
-						s_ADDR(I) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(I)) + 2*NUMVECTORS);
+					FOR I IN 0 TO 3 LOOP
+						s_Amatrix(I)(0) <= unsigned(s_RDATA(I*2)(31 DOWNTO 16));
+						s_Amatrix(I)(1) <= unsigned(s_RDATA(I*2)(15 DOWNTO 0));
+						s_Amatrix(I)(2) <= unsigned(s_RDATA(I*2 + 1)(31 DOWNTO 16));
+						s_Amatrix(I)(3) <= unsigned(s_RDATA(I*2 + 1)(15 DOWNTO 0));
 					END LOOP;
+
+					s_ADDR <= STD_LOGIC_VECTOR(unsigned(s_ADDR) + 2*NUMVECTORS);
 
 					cur_state <= S3;
 
@@ -193,9 +160,7 @@ BEGIN
 						s_XVECT(I)(3) <= unsigned(s_RDATA(I*2 + 1)(15 DOWNTO 0));
 					END LOOP;
 
-					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
-						s_ADDR(I) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(I)) + 2*NUMVECTORS);
-					END LOOP;
+					s_ADDR <= STD_LOGIC_VECTOR(unsigned(s_ADDR) + 2*NUMVECTORS);
 
 					FOR I IN 0 TO (NUMVECTORS-1) LOOP
 						FOR J IN 0 TO 3 LOOP
@@ -227,11 +192,9 @@ BEGIN
 
 				WHEN S6 =>
 				    s_DONE <= '0';
-					
+
 				WHEN OTHERS =>
-					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
-						s_ADDR(I) <= (OTHERS => '0');
-					END LOOP;
+					s_ADDR <= (OTHERS => '0');
 
 					cur_state <= S0;
 
