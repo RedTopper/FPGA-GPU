@@ -265,19 +265,18 @@ BEGIN
 
 					-- Wait until the next state to finalize, since the Math Pipeline delays the outputs by one cycle.
 					-- This also delays the done signal
-					IF (s_vectorsRead = x"0004" + x"008") THEN
+					IF (s_vectorsRead = x"2710" + x"008") THEN
 						cur_state <= S4;
 					ELSE
 						s_vectorsRead <= s_vectorsRead + x"004";
 					END IF;
 
 				WHEN S4 =>
-					o_Y0 <= STD_LOGIC_VECTOR(s_Y_TOTAL(0)(0) + s_Y_TOTAL(0)(1) + s_Y_TOTAL(0)(2) + s_Y_TOTAL(0)(3));
-					o_Y1 <= STD_LOGIC_VECTOR(s_Y_TOTAL(1)(0) + s_Y_TOTAL(1)(1) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(1)(3));
-					o_Y2 <= STD_LOGIC_VECTOR(s_Y_TOTAL(2)(0) + s_Y_TOTAL(2)(1) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(2)(3));
-					o_Y3 <= STD_LOGIC_VECTOR(s_Y_TOTAL(3)(0) + s_Y_TOTAL(3)(1) + s_Y_TOTAL(3)(2) + s_Y_TOTAL(3)(3));
+					o_Y0 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(0) + s_Y_TOTAL(1)(0) + s_Y_TOTAL(2)(0) + s_Y_TOTAL(3)(0)));
+					o_Y1 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(1) + s_Y_TOTAL(1)(1) + s_Y_TOTAL(2)(1) + s_Y_TOTAL(3)(1)));
+					o_Y2 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(2) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(3)(2)));
+					o_Y3 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(3) + s_Y_TOTAL(1)(3) + s_Y_TOTAL(2)(3) + s_Y_TOTAL(3)(3)));
 					s_DONE <= '1';
-
 				WHEN OTHERS =>
 					cur_state <= S0;
 					s_ADDR(0) <= (OTHERS => '0');
@@ -352,5 +351,4 @@ BEGIN
 		o_MY1 => s_Y(3)(1),
 		o_MY2 => s_Y(3)(2),
 		o_MY3 => s_Y(3)(3));
-
 END mixed;
