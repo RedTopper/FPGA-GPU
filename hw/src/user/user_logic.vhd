@@ -75,7 +75,7 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_MATH_ENDmemMath : STD_LOGIC;
 
 	-- Finite State Machine signals
-	TYPE state_type IS (S0, S1, S2, S3, S4);
+	TYPE state_type IS (S0, S1, S2, S3, S4, S5);
 	SIGNAL cur_state : state_type;
 
 	COMPONENT Math_4CH
@@ -277,6 +277,9 @@ BEGIN
 					o_Y2 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(2) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(3)(2)));
 					o_Y3 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(3) + s_Y_TOTAL(1)(3) + s_Y_TOTAL(2)(3) + s_Y_TOTAL(3)(3)));
 					s_DONE <= '1';
+					cur_state <= S5;
+				WHEN S5 =>
+					s_DONE <= '0';
 				WHEN OTHERS =>
 					cur_state <= S0;
 					s_ADDR(0) <= (OTHERS => '0');
