@@ -17,7 +17,9 @@ USE Work.Common.ALL;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 ENTITY user_logic IS
-
+	generic (
+		NUMVECTORS: integer := 4 -- counter width
+	);
 	PORT (
 		i_CLK : IN STD_LOGIC;
 		i_RST : IN STD_LOGIC;
@@ -63,6 +65,7 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_RDATA : addr32_8array;
 	SIGNAL s_vectorsRead : unsigned(15 DOWNTO 0);
 
+	-- Signals to hold Y outputs
 	SIGNAL s_Y : std64_4x4array;
 	SIGNAL s_Y_TOTAL : uint64_4x4array;
 
@@ -95,8 +98,7 @@ BEGIN
 
 	-- Set o_DONE as s_DONE
 	o_DONE <= s_DONE;
-	-- Currently, we are just instantiating a single-port, read-only version
-	-- of the dmem. You will want to improve upon this mapping.
+
 	U1 : dmem
 	PORT MAP(
 		i_CLKa => i_CLK,
@@ -118,15 +120,6 @@ BEGIN
 		o_RDATAg => s_RDATA(6),
 		o_RDATAh => s_RDATA(7));
 
-	-- Temporary logic - set the result vector to arbitrary values. 
-	-- o_Y0 <= x"1a1a1a1a2b2b2b2b";
-	-- o_Y1 <= x"3c3c3c3c4d4d4d4d";
-	-- o_Y2 <= x"5e5e5e5e6f6f6f6f";
-	-- o_Y3 <= x"7070707081818181";
-
-	-- Temporary process - this creates a simple FSM to load the 16 values of A
-	-- by reading from dmem at the appropriate addresses. You may be able to 
-	-- resuse / extend this code depending on your design strategy. 
 	P2 : PROCESS (i_CLK, i_RST)
 	BEGIN
 		IF (i_RST = '1') THEN
@@ -141,54 +134,34 @@ BEGIN
 			END IF;
 
 			CASE cur_state IS
-					-- When we've reset, we can initialize the s_ADDRa signal
+				-- When we've reset, we can initialize the s_ADDR signal
 				WHEN S0 =>
-					s_ADDR(0) <= "000000000000000";
-					s_ADDR(1) <= "000000000000001";
-					s_ADDR(2) <= "000000000000010";
-					s_ADDR(3) <= "000000000000011";
-					s_ADDR(4) <= "000000000000100";
-					s_ADDR(5) <= "000000000000101";
-					s_ADDR(6) <= "000000000000110";
-					s_ADDR(7) <= "000000000000111";
+					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
+						-- Set each ADDR(I) = I in binary
+						s_ADDR(I) <= std_logic_vector(to_unsigned(I, s_ADDR(I)'length));
+					END LOOP;
 
-					s_Y_TOTAL(0)(0) <= (OTHERS => '0');
-					s_Y_TOTAL(0)(1) <= (OTHERS => '0');
-					s_Y_TOTAL(0)(2) <= (OTHERS => '0');
-					s_Y_TOTAL(0)(3) <= (OTHERS => '0');
-					s_Y_TOTAL(1)(0) <= (OTHERS => '0');
-					s_Y_TOTAL(1)(1) <= (OTHERS => '0');
-					s_Y_TOTAL(1)(2) <= (OTHERS => '0');
-					s_Y_TOTAL(1)(3) <= (OTHERS => '0');
-					s_Y_TOTAL(2)(0) <= (OTHERS => '0');
-					s_Y_TOTAL(2)(1) <= (OTHERS => '0');
-					s_Y_TOTAL(2)(2) <= (OTHERS => '0');
-					s_Y_TOTAL(2)(3) <= (OTHERS => '0');
-					s_Y_TOTAL(3)(0) <= (OTHERS => '0');
-					s_Y_TOTAL(3)(1) <= (OTHERS => '0');
-					s_Y_TOTAL(3)(2) <= (OTHERS => '0');
-					s_Y_TOTAL(3)(3) <= (OTHERS => '0');
+					FOR I IN 0 TO (NUMVECTORS-1) LOOP
+						FOR J IN 0 TO 3 LOOP
+							s_Y_TOTAL(I)(J) <= (OTHERS => '0');
+						END LOOP;
+					END LOOP;
 
-					cur_state <= S1;
 					s_vectorsRead <= x"0000";
+					cur_state <= S1;
 
-					-- The prev s_ADDRa takes a cycle to be latched by the BRAM, so 
-					-- we wait a cycle to start our reading.
 				WHEN S1 =>
-					-- This is the recommended mechanism for doing math operations on 
-					-- std_logic_vectors. 		  
-					s_ADDR(0) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(0)) + 8);
-					s_ADDR(1) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(1)) + 8);
-					s_ADDR(2) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(2)) + 8);
-					s_ADDR(3) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(3)) + 8);
-					s_ADDR(4) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(4)) + 8);
-					s_ADDR(5) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(5)) + 8);
-					s_ADDR(6) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(6)) + 8);
-					s_ADDR(7) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(7)) + 8);
+					-- Need to wait a cycle for RAM
+					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
+						-- The 8 needs to be fixed here since there are only 8 values needed
+						-- to fill the A Matrix
+						s_ADDR(I) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(I)) + 8);
+					END LOOP;
+
 					cur_state <= S2;
 
-					-- We are grabbing two unit16's per 32-bit BRAM read
 				WHEN S2 =>
+					-- Read A Matrix
 					s_Amatrix(0)(0) <= unsigned(s_RDATA(0)(31 DOWNTO 16));
 					s_Amatrix(0)(1) <= unsigned(s_RDATA(0)(15 DOWNTO 0));
 					s_Amatrix(0)(2) <= unsigned(s_RDATA(1)(31 DOWNTO 16));
@@ -206,60 +179,29 @@ BEGIN
 					s_Amatrix(3)(2) <= unsigned(s_RDATA(7)(31 DOWNTO 16));
 					s_Amatrix(3)(3) <= unsigned(s_RDATA(7)(15 DOWNTO 0));
 
-					s_ADDR(0) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(0)) + 8);
-					s_ADDR(1) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(1)) + 8);
-					s_ADDR(2) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(2)) + 8);
-					s_ADDR(3) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(3)) + 8);
-					s_ADDR(4) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(4)) + 8);
-					s_ADDR(5) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(5)) + 8);
-					s_ADDR(6) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(6)) + 8);
-					s_ADDR(7) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(7)) + 8);
+					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
+						s_ADDR(I) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(I)) + 2*NUMVECTORS);
+					END LOOP;
 
 					cur_state <= S3;
 
 				WHEN S3 =>
-					s_XVECT(0)(0) <= unsigned(s_RDATA(0)(31 DOWNTO 16));
-					s_XVECT(0)(1) <= unsigned(s_RDATA(0)(15 DOWNTO 0));
-					s_XVECT(0)(2) <= unsigned(s_RDATA(1)(31 DOWNTO 16));
-					s_XVECT(0)(3) <= unsigned(s_RDATA(1)(15 DOWNTO 0));
-					s_XVECT(1)(0) <= unsigned(s_RDATA(2)(31 DOWNTO 16));
-					s_XVECT(1)(1) <= unsigned(s_RDATA(2)(15 DOWNTO 0));
-					s_XVECT(1)(2) <= unsigned(s_RDATA(3)(31 DOWNTO 16));
-					s_XVECT(1)(3) <= unsigned(s_RDATA(3)(15 DOWNTO 0));
-					s_XVECT(2)(0) <= unsigned(s_RDATA(4)(31 DOWNTO 16));
-					s_XVECT(2)(1) <= unsigned(s_RDATA(4)(15 DOWNTO 0));
-					s_XVECT(2)(2) <= unsigned(s_RDATA(5)(31 DOWNTO 16));
-					s_XVECT(2)(3) <= unsigned(s_RDATA(5)(15 DOWNTO 0));
-					s_XVECT(3)(0) <= unsigned(s_RDATA(6)(31 DOWNTO 16));
-					s_XVECT(3)(1) <= unsigned(s_RDATA(6)(15 DOWNTO 0));
-					s_XVECT(3)(2) <= unsigned(s_RDATA(7)(31 DOWNTO 16));
-					s_XVECT(3)(3) <= unsigned(s_RDATA(7)(15 DOWNTO 0));
+					FOR I IN 0 TO (NUMVECTORS-1) LOOP
+						s_XVECT(I)(0) <= unsigned(s_RDATA(I*2)(31 DOWNTO 16));
+						s_XVECT(I)(1) <= unsigned(s_RDATA(I*2)(15 DOWNTO 0));
+						s_XVECT(I)(2) <= unsigned(s_RDATA(I*2 + 1)(31 DOWNTO 16));
+						s_XVECT(I)(3) <= unsigned(s_RDATA(I*2 + 1)(15 DOWNTO 0));
+					END LOOP;
 
-					s_ADDR(0) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(0)) + 8);
-					s_ADDR(1) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(1)) + 8);
-					s_ADDR(2) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(2)) + 8);
-					s_ADDR(3) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(3)) + 8);
-					s_ADDR(4) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(4)) + 8);
-					s_ADDR(5) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(5)) + 8);
-					s_ADDR(6) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(6)) + 8);
-					s_ADDR(7) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(7)) + 8);
+					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
+						s_ADDR(I) <= STD_LOGIC_VECTOR(unsigned(s_ADDR(I)) + 2*NUMVECTORS);
+					END LOOP;
 
-					s_Y_TOTAL(0)(0) <= s_Y_TOTAL(0)(0) + unsigned(s_Y(0)(0));
-					s_Y_TOTAL(0)(1) <= s_Y_TOTAL(0)(1) + unsigned(s_Y(0)(1));
-					s_Y_TOTAL(0)(2) <= s_Y_TOTAL(0)(2) + unsigned(s_Y(0)(2));
-					s_Y_TOTAL(0)(3) <= s_Y_TOTAL(0)(3) + unsigned(s_Y(0)(3));
-					s_Y_TOTAL(1)(0) <= s_Y_TOTAL(1)(0) + unsigned(s_Y(1)(0));
-					s_Y_TOTAL(1)(1) <= s_Y_TOTAL(1)(1) + unsigned(s_Y(1)(1));
-					s_Y_TOTAL(1)(2) <= s_Y_TOTAL(1)(2) + unsigned(s_Y(1)(2));
-					s_Y_TOTAL(1)(3) <= s_Y_TOTAL(1)(3) + unsigned(s_Y(1)(3));
-					s_Y_TOTAL(2)(0) <= s_Y_TOTAL(2)(0) + unsigned(s_Y(2)(0));
-					s_Y_TOTAL(2)(1) <= s_Y_TOTAL(2)(1) + unsigned(s_Y(2)(1));
-					s_Y_TOTAL(2)(2) <= s_Y_TOTAL(2)(2) + unsigned(s_Y(2)(2));
-					s_Y_TOTAL(2)(3) <= s_Y_TOTAL(2)(3) + unsigned(s_Y(2)(3));
-					s_Y_TOTAL(3)(0) <= s_Y_TOTAL(3)(0) + unsigned(s_Y(3)(0));
-					s_Y_TOTAL(3)(1) <= s_Y_TOTAL(3)(1) + unsigned(s_Y(3)(1));
-					s_Y_TOTAL(3)(2) <= s_Y_TOTAL(3)(2) + unsigned(s_Y(3)(2));
-					s_Y_TOTAL(3)(3) <= s_Y_TOTAL(3)(3) + unsigned(s_Y(3)(3));
+					FOR I IN 0 TO (NUMVECTORS-1) LOOP
+						FOR J IN 0 TO 3 LOOP
+							s_Y_TOTAL(I)(J) <= s_Y_TOTAL(I)(J) + unsigned(s_Y(I)(J));
+						END LOOP;
+					END LOOP;
 
 					s_MATH_EN <= '1';
 
@@ -277,21 +219,21 @@ BEGIN
 					o_Y2 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(2) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(3)(2)));
 					o_Y3 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(3) + s_Y_TOTAL(1)(3) + s_Y_TOTAL(2)(3) + s_Y_TOTAL(3)(3)));
 					cur_state <= S5;
+
 				WHEN S5 =>
-				    cur_state <= S6;
 					s_DONE <= '1';
+
+					cur_state <= S6;
+
 				WHEN S6 =>
 				    s_DONE <= '0';
+					
 				WHEN OTHERS =>
+					FOR I IN 0 TO (2*NUMVECTORS-1) LOOP
+						s_ADDR(I) <= (OTHERS => '0');
+					END LOOP;
+
 					cur_state <= S0;
-					s_ADDR(0) <= (OTHERS => '0');
-					s_ADDR(1) <= (OTHERS => '0');
-					s_ADDR(2) <= (OTHERS => '0');
-					s_ADDR(3) <= (OTHERS => '0');
-					s_ADDR(4) <= (OTHERS => '0');
-					s_ADDR(5) <= (OTHERS => '0');
-					s_ADDR(6) <= (OTHERS => '0');
-					s_ADDR(7) <= (OTHERS => '0');
 
 			END CASE;
 		END IF;
@@ -303,57 +245,19 @@ BEGIN
 			s_MATH_ENDmemMath <= s_MATH_EN;
 		END IF;
 	END PROCESS;
-	--signals to pipeline in read -> 4CH Phase
-	--s_done
-	--Read A->H
-	--signals to pipeline in 4CH -> 4x2 adder
-	--Will this phase even exist?
 
-	Math_4CHa : Math_4CH
-	PORT MAP(
-		i_CLK => i_CLK,
-		i_MATH_EN => s_MATH_ENDmemMath,
-		i_A => s_Amatrix,
-		i_X => s_XVECTMath(0),
+	VECTORS: FOR I IN 0 TO (NUMVECTORS-1) GENERATE
+		Math_4CHM : Math_4CH
+		PORT MAP(
+			i_CLK => i_CLK,
+			i_MATH_EN => s_MATH_ENDmemMath,
+			i_A => s_Amatrix,
+			i_X => s_XVECTMath(I),
 
-		o_MY0 => s_Y(0)(0),
-		o_MY1 => s_Y(0)(1),
-		o_MY2 => s_Y(0)(2),
-		o_MY3 => s_Y(0)(3));
+			o_MY0 => s_Y(I)(0),
+			o_MY1 => s_Y(I)(1),
+			o_MY2 => s_Y(I)(2),
+			o_MY3 => s_Y(I)(3));
+	END GENERATE VECTORS;
 
-	Math_4CHb : Math_4CH
-	PORT MAP(
-		i_CLK => i_CLK,
-		i_MATH_EN => s_MATH_ENDmemMath,
-		i_A => s_Amatrix,
-		i_X => s_XVECTMath(1),
-
-		o_MY0 => s_Y(1)(0),
-		o_MY1 => s_Y(1)(1),
-		o_MY2 => s_Y(1)(2),
-		o_MY3 => s_Y(1)(3));
-
-	Math_4CHc : Math_4CH
-	PORT MAP(
-		i_CLK => i_CLK,
-		i_MATH_EN => s_MATH_ENDmemMath,
-		i_A => s_Amatrix,
-		i_X => s_XVECTMath(2),
-
-		o_MY0 => s_Y(2)(0),
-		o_MY1 => s_Y(2)(1),
-		o_MY2 => s_Y(2)(2),
-		o_MY3 => s_Y(2)(3));
-
-	Math_4CHd : Math_4CH
-	PORT MAP(
-		i_CLK => i_CLK,
-		i_MATH_EN => s_MATH_ENDmemMath,
-		i_A => s_Amatrix,
-		i_X => s_XVECTMath(3),
-
-		o_MY0 => s_Y(3)(0),
-		o_MY1 => s_Y(3)(1),
-		o_MY2 => s_Y(3)(2),
-		o_MY3 => s_Y(3)(3));
 END mixed;
