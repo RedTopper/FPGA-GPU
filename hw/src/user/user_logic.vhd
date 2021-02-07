@@ -18,7 +18,7 @@ USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 ENTITY user_logic IS
 	generic (
-		NUMVECTORS: integer := 4 -- counter width
+		NUMVECTORS: integer := 8 -- counter width
 	);
 	PORT (
 		i_CLK : IN STD_LOGIC;
@@ -45,7 +45,15 @@ ARCHITECTURE mixed OF user_logic IS
 			o_RDATAe : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAf : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
 			o_RDATAg : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-			o_RDATAh : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
+			o_RDATAh : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAi : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAj : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAk : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAl : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAm : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAn : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAo : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+			o_RDATAp : OUT STD_LOGIC_VECTOR(31 DOWNTO 0));
 	END COMPONENT;
 
 	-- Glue logic signals.
@@ -55,19 +63,19 @@ ARCHITECTURE mixed OF user_logic IS
 
 	-- Signals to interface with the dmem component
 	SIGNAL s_ADDR : STD_LOGIC_VECTOR(14 DOWNTO 0);
-	SIGNAL s_RDATA : addr32_8array;
+	SIGNAL s_RDATA : addr32_2Narray;
 	SIGNAL s_vectorsRead : unsigned(15 DOWNTO 0);
 
 	-- Signals to hold Y outputs
-	SIGNAL s_Y : std64_4x4array;
-	SIGNAL s_Y_TOTAL : uint64_4x4array;
+	SIGNAL s_Y : std64_Nx4array;
+	SIGNAL s_Y_TOTAL : uint64_Nx4array;
 
 	-- Signals to hold the array values
 	SIGNAL s_Amatrix : uint16_4x4array;
-	SIGNAL s_XVECT : uint16_4x4array;
+	SIGNAL s_XVECT : uint16_Nx4array;
 
 	--Signals for the DMEM -> Math Pipeline
-	SIGNAL s_XVECTMath : uint16_4x4array;
+	SIGNAL s_XVECTMath : uint16_Nx4array;
 	SIGNAL s_MATH_ENDmemMath : STD_LOGIC;
 
 	-- Finite State Machine signals
@@ -104,7 +112,15 @@ BEGIN
 		o_RDATAe => s_RDATA(4),
 		o_RDATAf => s_RDATA(5),
 		o_RDATAg => s_RDATA(6),
-		o_RDATAh => s_RDATA(7));
+		o_RDATAh => s_RDATA(7),
+		o_RDATAi => s_RDATA(8),
+		o_RDATAj => s_RDATA(9),
+		o_RDATAk => s_RDATA(10),
+		o_RDATAl => s_RDATA(11),
+		o_RDATAm => s_RDATA(12),
+		o_RDATAn => s_RDATA(13),
+		o_RDATAo => s_RDATA(14),
+		o_RDATAp => s_RDATA(15));
 
 	P2 : PROCESS (i_CLK, i_RST)
 	BEGIN
@@ -120,8 +136,8 @@ BEGIN
 			END IF;
 
 			CASE cur_state IS
-				-- When we've reset, we can initialize the s_ADDR signal
 				WHEN S0 =>
+					-- When we've reset, we can initialize the s_ADDR signal
 					s_ADDR <= (OTHERS => '0');
 
 					FOR I IN 0 TO (NUMVECTORS-1) LOOP
@@ -172,17 +188,17 @@ BEGIN
 
 					-- Wait until the next state to finalize, since the Math Pipeline delays the outputs by one cycle.
 					-- This also delays the done signal
-					IF (s_vectorsRead = x"2710" + x"008") THEN
+					IF (s_vectorsRead = x"2710" + NUMVECTORS*2) THEN
 						cur_state <= S4;
 					ELSE
-						s_vectorsRead <= s_vectorsRead + x"004";
+						s_vectorsRead <= s_vectorsRead + NUMVECTORS;
 					END IF;
 
 				WHEN S4 =>
-					o_Y0 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(0) + s_Y_TOTAL(1)(0) + s_Y_TOTAL(2)(0) + s_Y_TOTAL(3)(0)));
-					o_Y1 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(1) + s_Y_TOTAL(1)(1) + s_Y_TOTAL(2)(1) + s_Y_TOTAL(3)(1)));
-					o_Y2 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(2) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(3)(2)));
-					o_Y3 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(3) + s_Y_TOTAL(1)(3) + s_Y_TOTAL(2)(3) + s_Y_TOTAL(3)(3)));
+					o_Y0 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(0) + s_Y_TOTAL(1)(0) + s_Y_TOTAL(2)(0) + s_Y_TOTAL(3)(0) + s_Y_TOTAL(4)(0) + s_Y_TOTAL(5)(0) + s_Y_TOTAL(6)(0) + s_Y_TOTAL(7)(0)));
+					o_Y1 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(1) + s_Y_TOTAL(1)(1) + s_Y_TOTAL(2)(1) + s_Y_TOTAL(3)(1) + s_Y_TOTAL(4)(1) + s_Y_TOTAL(5)(1) + s_Y_TOTAL(6)(1) + s_Y_TOTAL(7)(1)));
+					o_Y2 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(2) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(3)(2) + s_Y_TOTAL(4)(2) + s_Y_TOTAL(5)(2) + s_Y_TOTAL(6)(2) + s_Y_TOTAL(7)(2)));
+					o_Y3 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(3) + s_Y_TOTAL(1)(3) + s_Y_TOTAL(2)(3) + s_Y_TOTAL(3)(3) + s_Y_TOTAL(4)(3) + s_Y_TOTAL(5)(3) + s_Y_TOTAL(6)(3) + s_Y_TOTAL(7)(3)));
 					cur_state <= S5;
 
 				WHEN S5 =>
