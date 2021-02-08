@@ -69,6 +69,7 @@ ARCHITECTURE mixed OF user_logic IS
 	-- Signals to hold Y outputs
 	SIGNAL s_Y : std64_Nx4array;
 	SIGNAL s_Y_TOTAL : uint64_Nx4array;
+	SIGNAL s_Y_TOTAL_OUT : uint64_1x4array;
 
 	-- Signals to hold the array values
 	SIGNAL s_Amatrix : uint16_4x4array;
@@ -79,7 +80,7 @@ ARCHITECTURE mixed OF user_logic IS
 	SIGNAL s_MATH_ENDmemMath : STD_LOGIC;
 
 	-- Finite State Machine signals
-	TYPE state_type IS (S0, S1, S2, S3, S4, S5, S6);
+	TYPE state_type IS (S0, S1, S2, S3, S4, S5, S6, S7);
 	SIGNAL cur_state : state_type;
 
 	COMPONENT Math_4CH
@@ -146,6 +147,10 @@ BEGIN
 						END LOOP;
 					END LOOP;
 
+					FOR I IN 0 TO 3 LOOP
+						s_Y_TOTAL_OUT(I) <= (OTHERS => '0');
+					END LOOP;
+
 					s_vectorsRead <= x"0000";
 					cur_state <= S1;
 
@@ -189,24 +194,35 @@ BEGIN
 					-- Wait until the next state to finalize, since the Math Pipeline delays the outputs by one cycle.
 					-- This also delays the done signal
 					IF (s_vectorsRead = x"2710" + NUMVECTORS*2) THEN
+						s_vectorsRead <= (OTHERS => '0');
 						cur_state <= S4;
 					ELSE
 						s_vectorsRead <= s_vectorsRead + NUMVECTORS;
 					END IF;
 
 				WHEN S4 =>
-					o_Y0 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(0) + s_Y_TOTAL(1)(0) + s_Y_TOTAL(2)(0) + s_Y_TOTAL(3)(0) + s_Y_TOTAL(4)(0) + s_Y_TOTAL(5)(0) + s_Y_TOTAL(6)(0) + s_Y_TOTAL(7)(0)));
-					o_Y1 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(1) + s_Y_TOTAL(1)(1) + s_Y_TOTAL(2)(1) + s_Y_TOTAL(3)(1) + s_Y_TOTAL(4)(1) + s_Y_TOTAL(5)(1) + s_Y_TOTAL(6)(1) + s_Y_TOTAL(7)(1)));
-					o_Y2 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(2) + s_Y_TOTAL(1)(2) + s_Y_TOTAL(2)(2) + s_Y_TOTAL(3)(2) + s_Y_TOTAL(4)(2) + s_Y_TOTAL(5)(2) + s_Y_TOTAL(6)(2) + s_Y_TOTAL(7)(2)));
-					o_Y3 <= STD_LOGIC_VECTOR(unsigned(s_Y_TOTAL(0)(3) + s_Y_TOTAL(1)(3) + s_Y_TOTAL(2)(3) + s_Y_TOTAL(3)(3) + s_Y_TOTAL(4)(3) + s_Y_TOTAL(5)(3) + s_Y_TOTAL(6)(3) + s_Y_TOTAL(7)(3)));
-					cur_state <= S5;
+					FOR I IN 0 TO 3 LOOP
+						s_Y_TOTAL_OUT(I) <= s_Y_TOTAL_OUT(I) + s_Y_TOTAL(to_integer(s_vectorsRead))(I);
+					END LOOP;
+					
+					IF (s_vectorsRead = NUMVECTORS - 1) THEN
+						cur_state <= S5;
+					ELSE
+						s_vectorsRead <= s_vectorsRead + 1;
+					END IF;
 
 				WHEN S5 =>
+                    o_Y0 <= STD_LOGIC_VECTOR(s_Y_TOTAL_OUT(0));
+					o_Y1 <= STD_LOGIC_VECTOR(s_Y_TOTAL_OUT(1));
+					o_Y2 <= STD_LOGIC_VECTOR(s_Y_TOTAL_OUT(2));
+					o_Y3 <= STD_LOGIC_VECTOR(s_Y_TOTAL_OUT(3));
+					
+				WHEN S6 =>
 					s_DONE <= '1';
 
-					cur_state <= S6;
+					cur_state <= S7;
 
-				WHEN S6 =>
+				WHEN S7 =>
 				    s_DONE <= '0';
 
 				WHEN OTHERS =>
