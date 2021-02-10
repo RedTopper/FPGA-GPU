@@ -1,0 +1,10 @@
+{
+    global:
+        _init;
+        _fini;
+        gl[A-Z]*;
+        dlopen;
+	_exit;
+    local:
+        *;
+};
