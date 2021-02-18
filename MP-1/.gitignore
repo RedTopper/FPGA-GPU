@@ -4,14 +4,6 @@
 **/hw/proj/*
 !*.tcl
 
-**/hw/src/fixed/uart/fifo/*
-!*.xci
-*.exe
-*.o
-*.dll
-*.o.32
-*.a
-
 #common folders should be symlinked, so ignore the contents of them
 /sw/src/Examples/common/*
 /sw/src/Games/common/*
