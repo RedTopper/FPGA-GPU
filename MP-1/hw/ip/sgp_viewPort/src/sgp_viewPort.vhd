@@ -216,7 +216,7 @@ begin
 
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  viewport_debug <= x"00000003";
+  viewport_debug <= x"00000005";
 
 
    
@@ -250,9 +250,27 @@ begin
                     state <= CALC_XMULT;
                 end if;
 
-            when others =>                
-        end case;
+			-- Calcualte the X multiplcation
+			when CALC_XMULT =>
+				viewport_xmult <= viewport_width_div_2 * (x_ndc_coords);
+				state <= CALC_YMULT;
 
+			when CALC_YMULT =>
+				viewport_ymult <= viewport_height_div_2 * (y_ndc_coords);
+				state <= CALC_VPCOORDS;
+				
+			when CALC_VPCOORDS =>
+				x_vp_coords <= wfixed_t_to_fixed_t(viewport_xmult) + viewport_x;
+				y_vp_coords <= wfixed_t_to_fixed_t(viewport_ymult) + viewport_y; 
+				state <= VERTEX_WRITE;
+				
+			when VERTEX_WRITE =>
+				state <= WAIT_FOR_VERTEX;
+
+            when others =>          
+				state <= WAIT_FOR_VERTEX;
+
+        end case;
       end if;
     end if;
    end process;

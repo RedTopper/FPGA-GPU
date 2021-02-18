@@ -19,7 +19,7 @@ export CDIR=`readlink -f "$SDIR"`
 # Link-time driver configuration variables. 
 # Check the CprE 480 documentation for how to change these. 
 export SGP_TRANSMIT="ETH"          # [ETH* | NONE]
-export SGP_TRACE="STDOUT"          # [FILE* | STDOUT | DEEP | VBIOS | NONE]
+export SGP_TRACE="NONE"          # [FILE* | STDOUT | DEEP | VBIOS | NONE]
 export SGP_DEST="192.168.1.128"    # [192.168.1.128*]
 export SGP_NAME="trace.sgb"        # [trace.sgb* | trace.dat]
 
