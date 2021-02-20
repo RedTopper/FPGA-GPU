@@ -389,12 +389,8 @@ BEGIN
 
           WHEN GEN_ADDRESS =>
             --fragment = potential pixel
-
-            x_pos_fixed <= input_fragment_array(0)(0);
-            y_pos_fixed <= input_fragment_array(0)(1);
-
-            x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16); -- + x_pos_fixed(15); --(rounding)
-            y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16); -- + y_pos_fixed(15); --(rounding)
+            x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16); -- + input_fragment_array(0)(0)(15); --(rounding)
+            y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16); -- + input_fragment_array(0)(1)(15); --(rounding)
 
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             a_color <= input_fragment_array(1)(0) * x"00FF0000";
