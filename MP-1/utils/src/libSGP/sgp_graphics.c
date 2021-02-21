@@ -325,10 +325,10 @@ void SGP_glViewport(GLint x, GLint y, GLsizei width, GLsizei height) {
 	SGP_graphicsstate.viewport_height = height;
 
 	// Store the updated values in the viewPort registers
-	SGP_VIEWPORT[SGP_AXI_VIEWPORT_X_REG] = x;
-	SGP_VIEWPORT[SGP_AXI_VIEWPORT_Y_REG] = y;
-	SGP_VIEWPORT[SGP_AXI_VIEWPORT_WIDTH_REG] = width;
-	SGP_VIEWPORT[SGP_AXI_VIEWPORT_HEIGHT_REG] = height;
+	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_X_REG, x);
+	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_Y_REG, y);
+	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_WIDTH_REG, width);
+	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_HEIGHT_REG, height);
 
 	return;
 }
@@ -423,7 +423,7 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 	}
 
 	//TODO 
-	SGP_RENDER_OUTPUT[SGP_AXI_RENDEROUTPUT_COLORBUFFER].backbuffer = SGP_graphicsmap[SGP_COLORBUFFER_1+cur_buffer].baseaddr;
+	SGP_write32(SGPconfig, SGP_RENDER_OUTPUT + SGP_AXI_RENDEROUTPUT_COLORBUFFER, SGP_graphicsmap[SGP_COLORBUFFER_1+cur_buffer].baseaddr);
 
 	framecount++;
 	if (framecount % 100 == 0) {
