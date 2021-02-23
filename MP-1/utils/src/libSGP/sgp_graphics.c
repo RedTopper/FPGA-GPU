@@ -325,10 +325,10 @@ void SGP_glViewport(GLint x, GLint y, GLsizei width, GLsizei height) {
 	SGP_graphicsstate.viewport_height = height;
 
 	// Store the updated values in the viewPort registers
-	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_X_REG, x);
-	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_Y_REG, y);
-	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_WIDTH_REG, width);
-	SGP_write32(SGPconfig, SGP_VIEWPORT + SGP_AXI_VIEWPORT_HEIGHT_REG, height);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VIEWPORT].baseaddr + SGP_AXI_VIEWPORT_X_REG, x);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VIEWPORT].baseaddr + SGP_AXI_VIEWPORT_Y_REG, y);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VIEWPORT].baseaddr + SGP_AXI_VIEWPORT_WIDTH_REG, width);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VIEWPORT].baseaddr + SGP_AXI_VIEWPORT_HEIGHT_REG, height);
 
 	return;
 }
@@ -402,6 +402,7 @@ void SGP_glClear(GLbitfield mask) {
 void SGP_glxSwapBuffers(uint32_t flag) {
 
 	static int framecount = 0;
+	//uint32_t tempMaskVariable =0;
 
 	// SwapBuffers is a reasonable place to synchronize all the previous draw calls. 
 	if (flag & SGP_SYSTEM_WAITIDLE) {
@@ -423,7 +424,9 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 	}
 
 	//TODO 
-	SGP_write32(SGPconfig, SGP_RENDER_OUTPUT + SGP_AXI_RENDEROUTPUT_COLORBUFFER, SGP_graphicsmap[SGP_COLORBUFFER_1+cur_buffer].baseaddr);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, SGP_graphicsmap[SGP_COLORBUFFER_1 + cur_buffer].baseaddr);
+	//tempMaskVariable |= 1UL << 3;
+	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, tempMaskVariable);
 
 	framecount++;
 	if (framecount % 100 == 0) {
