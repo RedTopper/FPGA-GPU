@@ -353,7 +353,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000002";
+  renderoutput_debug <= x"00000013";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -389,30 +389,29 @@ BEGIN
 
           WHEN GEN_ADDRESS =>
             --fragment = potential pixel
-            x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16); -- + input_fragment_array(0)(0)(15); --(rounding)
-            y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16); -- + input_fragment_array(0)(1)(15); --(rounding)
+            x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
+            y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
 
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             --multiple [0, 1.0] by 255 in Q16.16, output to a Q32.32.
             a_color <= input_fragment_array(1)(0) * x"00FF0000";
-            r_color <= input_fragment_array(1)(1) * x"00FF0000";
+            b_color <= input_fragment_array(1)(1) * x"00FF0000";
             g_color <= input_fragment_array(1)(2) * x"00FF0000";
-            b_color <= input_fragment_array(1)(3) * x"00FF0000";
+            r_color <= input_fragment_array(1)(3) * x"00FF0000";
 
             state <= WRITE_ADDRESS;
           WHEN WRITE_ADDRESS =>
-            mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed(y_pos_short_reg) * 4 * 1920 + signed(4 * x_pos_short_reg));
-            mem_data_wr <= STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
+            mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
+            mem_data_wr <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
             
             --wait for mem_accept to go high. then write to the dcache.
-            if(mem_accept = '1') then
+           if(mem_accept = '1') then
                 mem_wr <= b"1111";
                 state <= WAIT_FOR_RESPONSE;
            end if;
-           
-          WHEN WAIT_FOR_RESPONSE =>
-            if(mem_ack = '1') then
-              mem_wr <= b"0000";
+           WHEN WAIT_FOR_RESPONSE =>
+           mem_wr <= b"0000"; 
+             if(mem_ack = '1') then
               state <= WAIT_FOR_FRAGMENT;
              end if;
           WHEN OTHERS =>

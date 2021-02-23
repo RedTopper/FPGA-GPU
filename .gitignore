@@ -1,18 +1,3 @@
-# ignore everything in hw/proj/ EXCEPT .tcl files
-**/hw/proj/*
-!*.tcl
-
-**/hw/src/fixed/uart/fifo/*
-!*.xci
-
-**/sw/mvmac
-**/sw/mvmac.o
-**/sw/mvmac.exe
-**/sw/mvmac.o
-verilog-format.exe
-/sw/launch4j.log
-
-
 # Created by https://www.toptal.com/developers/gitignore/api/c,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,c++
 
@@ -25,6 +10,7 @@ verilog-format.exe
 *.ko
 *.obj
 *.elf
+*.o.32
 
 # Linker output
 *.ilk
@@ -95,3 +81,4 @@ dkms.conf
 
 # End of https://www.toptal.com/developers/gitignore/api/c,c++
 MP-1/.vscode/settings.json
+/.vscode

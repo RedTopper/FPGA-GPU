@@ -216,7 +216,7 @@ begin
 
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  viewport_debug <= x"00000005";
+  viewport_debug <= x"00000011";
 
 
    
@@ -265,7 +265,9 @@ begin
 				state <= VERTEX_WRITE;
 				
 			when VERTEX_WRITE =>
-				state <= WAIT_FOR_VERTEX;
+				if (M_AXIS_TREADY = '1') then
+					state <= WAIT_FOR_VERTEX;
+				end if;
 
             when others =>          
 				state <= WAIT_FOR_VERTEX;

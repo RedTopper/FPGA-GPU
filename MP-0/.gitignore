@@ -1,0 +1,13 @@
+# ignore everything in hw/proj/ EXCEPT .tcl files
+**/hw/proj/*
+!*.tcl
+
+**/hw/src/fixed/uart/fifo/*
+!*.xci
+
+**/sw/mvmac
+**/sw/mvmac.o
+**/sw/mvmac.exe
+**/sw/mvmac.o
+verilog-format.exe
+/sw/launch4j.log
