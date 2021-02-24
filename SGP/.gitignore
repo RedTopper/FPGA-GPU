@@ -1,0 +1,10 @@
+# ignore everything in hw/proj/ EXCEPT .tcl files
+**/hw/ip/sgp_viewPort/proj/*
+**/hw/ip/sgp_renderOutput/proj/*
+**/hw/proj/*
+!*.tcl
+
+#common folders should be symlinked, so ignore the contents of them
+/sw/src/Examples/common/*
+/sw/src/Games/common/*
+/sw/src/MP-1/common/*
