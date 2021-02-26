@@ -1,8 +1,11 @@
 # ignore everything in hw/proj/ EXCEPT .tcl files
 **/hw/ip/sgp_viewPort/proj/*
 **/hw/ip/sgp_renderOutput/proj/*
+**/hw/ip/sgp_rasterizer/proj/*
+**/hw/ip/sgp_rasterizer/src/shared_divider/*
 **/hw/proj/*
 !*.tcl
+!*.xci
 
 #common folders should be symlinked, so ignore the contents of them
 /sw/src/Examples/common/*
