@@ -1,0 +1,14 @@
+Vivado Simulator 2020.1
+Time resolution is 1 ps
+Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+Time: 0 ps  Iteration: 0  Process: /sgp_rasterizer/triangleTest_inst/\G1(0)\/line__104  File: D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd
+Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+Time: 0 ps  Iteration: 0  Process: /sgp_rasterizer/triangleTest_inst/\G1(1)\/line__104  File: D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd
+Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+Time: 0 ps  Iteration: 0  Process: /sgp_rasterizer/triangleTest_inst/\G1(2)\/line__104  File: D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd
+Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+Time: 1010 ns  Iteration: 1  Process: /sgp_rasterizer/triangleTest_inst/\G1(2)\/line__104  File: D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd
+Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+Time: 1010 ns  Iteration: 1  Process: /sgp_rasterizer/triangleTest_inst/\G1(1)\/line__104  File: D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd
+Warning: NUMERIC_STD."=": metavalue detected, returning FALSE
+Time: 1010 ns  Iteration: 1  Process: /sgp_rasterizer/triangleTest_inst/\G1(0)\/line__104  File: D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd

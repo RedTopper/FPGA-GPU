@@ -49,11 +49,12 @@ end primitiveAssembly_core;
 architecture behavioral of primitiveAssembly_core is
 
 
-    type STATE_TYPE is (WAIT_FOR_VERTEX0, WAIT_FOR_VERTEX1, WAIT_FOR_VERTEX2, PRIM_WRITE);
+    type STATE_TYPE is (WAIT_FOR_VERTEX0, WAIT_FOR_VERTEX1, WAIT_FOR_VERTEX2, PRIM_WRITE, ADDITIONAL_VERTICES);
     signal primitiveAssembly_state        : STATE_TYPE;
    
     -- Registers to store vertex data (needed for some primitive types)
     signal V0_reg, V1_reg, V2_reg : vertexVector_t;
+    signal vertexReplace : integer range 0 to 2;
 
 begin
 
@@ -88,7 +89,8 @@ begin
     if rising_edge(ACLK) then  
 
       -- Reset all design registers
-      if ARESETN = '0' then    
+      if ARESETN = '0' then
+            vertexReplace <= 2;
             V0_reg <= vertexVector_t_zero;
             V1_reg <= vertexVector_t_zero;
             V2_reg <= vertexVector_t_zero;
@@ -123,14 +125,53 @@ begin
                     primitiveAssembly_state <= PRIM_WRITE;
                 end if; 
 
-
+            when ADDITIONAL_VERTICES =>
+                case vertexReplace is
+                    when 0 =>
+                        V0_reg <= vertex_in;
+                    when 1 =>
+                        V1_reg <= vertex_in;
+                    when 2 =>
+                        V2_reg <= vertex_in;
+                    when others =>
+                end case;
+                primitiveAssembly_state <= PRIM_WRITE;
+                
             when PRIM_WRITE =>
                 if (primout_ready = '1') then
                     primitiveAssembly_state <= WAIT_FOR_VERTEX0;
                 end if;
                 
-        end case;
+                if (primtype = SGP_GL_TRIANGLE_STRIP) then
+                    if (vertexReplace = 2) then
+                        vertexReplace <= 0;
+                    else
+                        vertexReplace <= vertexReplace + 1;
+                    end if;
+                    primitiveAssembly_state <= ADDITIONAL_VERTICES;
+                    
+                else if (primtype = SGP_GL_TRIANGLE_FAN) then
+                    if (vertexReplace = 2) then
+                        vertexReplace <= 1;
+                    else
+                        vertexReplace <= vertexReplace + 1;
+                    end if;
+                    primitiveAssembly_state <= ADDITIONAL_VERTICES;
+                end if;
 
+                -- case primtype is
+                --     when SGP_GL_POINTS =>
+                --         if (primout_ready = '1') then
+                --             primitiveAssembly_state <= WAIT_FOR_VERTEX0;
+                --         end if;
+                --     when SGP_GL_TRIANGLES =>
+                --         if (primout_ready = '1') then
+                --             primitiveAssembly_state <= WAIT_FOR_VERTEX0;
+                --         end if;
+                --     when others =>
+                -- end case;
+            end if;
+        end case;
       end if;
     end if;
    end process;

@@ -1,0 +1,12 @@
+0.7
+2020.1
+May 27 2020
+20:09:33
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/primitiveAssembly_core.vhd,1614192304,vhdl,,,,primitiveassembly_core,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/sgp_rasterizer.vhd,1614184425,vhdl,,,,sgp_rasterizer,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/sgp_rasterizer_axi_lite_regs.vhd,1614184425,vhdl,,,,sgp_rasterizer_axi_lite_regs,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/shared_divider/sim/shared_divider.vhd,1614190677,vhdl,,,,shared_divider,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleSetup_core.vhd,1614184425,vhdl,,,,trianglesetup_core,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTest_core.vhd,1614184425,vhdl,,,,triangletest_core,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/triangleTraversal_core.vhd,1614184425,vhdl,,,,triangletraversal_core,,,,,,,,
+D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_types.vhd,1614184426,vhdl,D:/CprE480/FPGA-GPU/SGP/hw/ip/sgp_rasterizer/src/primitiveAssembly_core.vhd,,,sgp_types,,,,,,,,

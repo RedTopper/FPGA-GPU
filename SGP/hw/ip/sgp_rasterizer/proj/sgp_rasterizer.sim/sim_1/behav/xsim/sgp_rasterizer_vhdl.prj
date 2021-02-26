@@ -1,0 +1,13 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../../src/shared_divider/sim/shared_divider.vhd" \
+"../../../../../../sgp_types.vhd" \
+"../../../../../src/primitiveAssembly_core.vhd" \
+"../../../../../src/sgp_rasterizer_axi_lite_regs.vhd" \
+"../../../../../src/triangleSetup_core.vhd" \
+"../../../../../src/triangleTest_core.vhd" \
+"../../../../../src/triangleTraversal_core.vhd" \
+"../../../../../src/sgp_rasterizer.vhd" \
+
+# Do not sort compile order
+nosort
