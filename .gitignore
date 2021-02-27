@@ -86,3 +86,18 @@ SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.sim/
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.sim/*
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/*
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/
+
+
+# ignore everything in hw/proj/ EXCEPT .tcl files
+**/hw/ip/sgp_viewPort/proj/*
+**/hw/ip/sgp_renderOutput/proj/*
+**/hw/ip/sgp_rasterizer/proj/*
+**/hw/ip/sgp_rasterizer/src/shared_divider/*
+**/hw/proj/*
+!*.tcl
+!*.xci
+
+#common folders should be symlinked, so ignore the contents of them
+SGP/sw/src/Examples/common/*
+SGP/sw/src/Games/common/*
+SGP/sw/src/MP-1/common/*
