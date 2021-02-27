@@ -20,7 +20,6 @@ use ieee.numeric_std.all;
 library WORK;
 use WORK.sgp_types.all;
 
-
 entity primitiveAssembly_core is
 
 	port (ACLK	: in	std_logic;
@@ -28,6 +27,7 @@ entity primitiveAssembly_core is
 
 		  -- Primtive type
           primtype                    : in     primtype_t;
+          vertex_in_final             : in     std_logic:='0';
         
           -- AXIS-style vertex input
 		  vertex_in_ready		        : out	std_logic;
@@ -139,37 +139,28 @@ begin
                 
             when PRIM_WRITE =>
                 if (primout_ready = '1') then
+                    if (primtype = SGP_GL_TRIANGLE_STRIP) then
+                        if (vertexReplace = 2) then
+                            vertexReplace <= 0;
+                        else
+                            vertexReplace <= vertexReplace + 1;
+                        end if;
+                        primitiveAssembly_state <= ADDITIONAL_VERTICES;
+                        
+                    else if (primtype = SGP_GL_TRIANGLE_FAN) then
+                        if (vertexReplace = 2) then
+                            vertexReplace <= 1;
+                        else
+                            vertexReplace <= vertexReplace + 1;
+                        end if;
+                        primitiveAssembly_state <= ADDITIONAL_VERTICES;
+                    else 
                     primitiveAssembly_state <= WAIT_FOR_VERTEX0;
-                end if;
-                
-                if (primtype = SGP_GL_TRIANGLE_STRIP) then
-                    if (vertexReplace = 2) then
-                        vertexReplace <= 0;
-                    else
-                        vertexReplace <= vertexReplace + 1;
                     end if;
-                    primitiveAssembly_state <= ADDITIONAL_VERTICES;
-                    
-                else if (primtype = SGP_GL_TRIANGLE_FAN) then
-                    if (vertexReplace = 2) then
-                        vertexReplace <= 1;
-                    else
-                        vertexReplace <= vertexReplace + 1;
-                    end if;
-                    primitiveAssembly_state <= ADDITIONAL_VERTICES;
+                    if(vertex_in_final = '1')then
+                        primitiveAssembly_state <= WAIT_FOR_VERTEX0;
+                    end if; 
                 end if;
-
-                -- case primtype is
-                --     when SGP_GL_POINTS =>
-                --         if (primout_ready = '1') then
-                --             primitiveAssembly_state <= WAIT_FOR_VERTEX0;
-                --         end if;
-                --     when SGP_GL_TRIANGLES =>
-                --         if (primout_ready = '1') then
-                --             primitiveAssembly_state <= WAIT_FOR_VERTEX0;
-                --         end if;
-                --     when others =>
-                -- end case;
             end if;
         end case;
       end if;

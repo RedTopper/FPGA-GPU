@@ -126,6 +126,7 @@ architecture behavioral of sgp_rasterizer is
 	   port (ACLK	: in	std_logic;
 		    ARESETN	: in	std_logic;
             primtype                    : in     primtype_t;
+            vertex_in_final             : in     std_logic;
     		vertex_in_ready		        : out	std_logic;
 		    vertex_in					: in	vertexVector_t;
 		    vertex_valid 				: in 	std_logic; 
@@ -281,11 +282,13 @@ begin
 	);
 
 
+    --todo vertex_in_final is prolly mapped incorrectly
     primitiveAssembly_inst: primitiveAssembly_core 
 	   port map (
 	       ACLK	            => ACLK,
            ARESETN          => ARESETN,
            primtype         => primtype,
+           vertex_in_final  => S_AXIS_TLAST,
            vertex_in_ready  => primitiveAssembly_vertex_in_ready,
            vertex_in        => primitiveAssembly_vertex_in,
            vertex_valid     => primitiveAssembly_vertex_valid,
