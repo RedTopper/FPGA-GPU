@@ -367,13 +367,34 @@ begin
                 end if;           
 
                 -- Ymin. Do not overthink top vs bottom, either ymin or ymax is ok as long as we are consistent. 
+                if ((V0_record.att0.y <= V1_record.att0.y) and (V0_record.att0.y <= V2_record.att0.y)) then
+                    boundingbox_reg.ymin <= V0_record.att0.y;
+                elsif (V1_record.att0.y <= V2_record.att0.y) then
+                    boundingbox_reg.ymin <= V1_record.att0.y;
+                else
+                    boundingbox_reg.ymin <= V2_record.att0.y;                
+                end if;
 
                 -- XMax
+                if ((V0_record.att0.x >= V1_record.att0.x) and (V0_record.att0.x >= V2_record.att0.x)) then
+                    boundingbox_reg.xmax <= V0_record.att0.x;
+                elsif (V1_record.att0.x >= V2_record.att0.x) then
+                    boundingbox_reg.xmax <= V1_record.att0.x;
+                else
+                    boundingbox_reg.xmax <= V2_record.att0.x;                
+                end if;
 
                 -- YMax
---                if ((V0_record.att0.y >= V1_record.att0.y) and (V0_record.att0.y >= V2_record.att0.y)) then
---                    topVertexIndex <= 0;
---                    boundingbox_reg.ymax <= V0_record.att0.y;
+                if ((V0_record.att0.y >= V1_record.att0.y) and (V0_record.att0.y >= V2_record.att0.y)) then
+                    topVertexIndex <= 0;
+                    boundingbox_reg.ymin <= V0_record.att0.y;
+                elsif (V1_record.att0.y >= V2_record.att0.y) then
+                    topVertexIndex <= 1;
+                    boundingbox_reg.ymin <= V1_record.att0.y;
+                else
+                    topVertexIndex <= 2;
+                    boundingbox_reg.ymin <= V2_record.att0.y;                
+                end if;
 
                 triangleSetup_state <= REORDER_TRIANGLE;
 
