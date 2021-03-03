@@ -181,8 +181,8 @@ begin
    In3_wire <= V2_array(0)(1) when triangleSetup_state = CALC_C1 else 
                V2_array(0)(1) when triangleSetup_state = CALC_C2 else
                V2_array(C5C6_attribute_count)(C5C6_size_count) when triangleSetup_state = CALC_C3 else
-               C4_reg  when triangleSetup_state = CALC_C5 else
-               C4_reg  when triangleSetup_state = CALC_C6 else
+               wfixed_t_to_fixed_t(C4_reg)  when triangleSetup_state = CALC_C5 else
+               wfixed_t_to_fixed_t(C4_reg)  when triangleSetup_state = CALC_C6 else
                V1_array(0)(1) when triangleSetup_state = CALC_AREA else
                fixed_t_zero;
 
@@ -337,11 +337,25 @@ begin
                         
             when CALC_C3 =>
                 C3_reg <= wfixed_t_to_fixed_t(Val7_reg);
+
+                if (circuit1_state(CIRCUIT1_LATENCY) = '1') then
+                    triangleSetup_state <= CALC_C5;                    
+                    circuit1_state(0) <= '1';
+                end if;
+
             when CALC_C5 =>
                 -- For the C5 and C6 calculations, the result is in 17.47 format (Q1.31 x Q16.16)
                 C5_reg(C5C6_attribute_count)(C5C6_size_count) <= Val7_reg(62 downto 31);
 
+                if (circuit1_state(CIRCUIT1_LATENCY) = '1') then
+                    triangleSetup_state <= CALC_C6;                    
+                    circuit1_state(0) <= '1';
+                end if;
             when CALC_C6 =>
+                if (circuit1_state(CIRCUIT1_LATENCY) = '1') then
+                    triangleSetup_state <= CALC_AREA;                    
+                    circuit1_state(0) <= '1';
+                end if;
                 C6_reg(C5C6_attribute_count)(C5C6_size_count) <= Val7_reg(62 downto 31);
 
             -- For area calculations, we do need 24-bits of integer value (large triangles can have ~2M fragments in them). 
@@ -387,13 +401,13 @@ begin
                 -- YMax
                 if ((V0_record.att0.y >= V1_record.att0.y) and (V0_record.att0.y >= V2_record.att0.y)) then
                     topVertexIndex <= 0;
-                    boundingbox_reg.ymin <= V0_record.att0.y;
+                    boundingbox_reg.ymax <= V0_record.att0.y;
                 elsif (V1_record.att0.y >= V2_record.att0.y) then
                     topVertexIndex <= 1;
-                    boundingbox_reg.ymin <= V1_record.att0.y;
+                    boundingbox_reg.ymax <= V1_record.att0.y;
                 else
                     topVertexIndex <= 2;
-                    boundingbox_reg.ymin <= V2_record.att0.y;                
+                    boundingbox_reg.ymax <= V2_record.att0.y;                
                 end if;
 
                 triangleSetup_state <= REORDER_TRIANGLE;
