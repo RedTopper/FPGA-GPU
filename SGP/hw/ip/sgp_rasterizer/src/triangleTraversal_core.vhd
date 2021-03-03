@@ -143,6 +143,7 @@ begin
 
                         -- Otherwise, we're done with this line
                         else
+                            linestart_direction_reg <= direction_right;
                             triangleTraversal_state <= PUSH_MOVE_DOWN;
                         end if;
                     else
@@ -168,6 +169,7 @@ begin
 
                         -- Otherwise, we're done with this line
                         else
+                            linestart_direction_reg <= direction_left;
                             triangleTraversal_state <= PUSH_MOVE_DOWN;
                         end if;
                         
@@ -183,6 +185,7 @@ begin
                     current_position_reg.y <= linestart_position_reg.y;
                     -- If we're out, we're done with this line
                     if ((fragment_test_result = testresult_out) or ((linestart_position_reg.x-fixed_t_one) < boundingbox_reg.xmin)) then
+                        linestart_direction_reg <= direction_left;
                         triangleTraversal_state <= PUSH_MOVE_DOWN;
                     else
                         triangleTraversal_state <= MOVE_LEFT_IN;                
@@ -191,6 +194,18 @@ begin
 
 
             -- POP_MOVE_RIGHT_IN. This is the backhalf of the linescan, so once we're out, we move down
+            when POP_MOVE_RIGHT_IN =>
+                if (fragment_out_valid = '1') then
+                    current_position_reg.x <= linestart_position_reg.x + fixed_t_one;
+                    current_position_reg.y <= linestart_position_reg.y;
+                    -- If we're out, we're done with this line
+                    if ((fragment_test_result = testresult_out) or ((linestart_position_reg.x + fixed_t_one) < boundingbox_reg.xmin)) then
+                        linestart_direction_reg <= direction_right;
+                        triangleTraversal_state <= PUSH_MOVE_DOWN;
+                    else
+                        triangleTraversal_state <= MOVE_RIGHT_IN;                
+                    end if;
+                end if;
 
 
 
@@ -202,11 +217,19 @@ begin
                     current_position_reg.y   <= current_position_reg.y - fixed_t_one; 
                     linestart_testresult_reg <= fragment_test_result;
 
-                    -- After moving down are we out? If so, we only need to check the other direction.
-                    --if (fragment_test_result = testresult_out) then 
-
+                    if(fragment_test_result = testresult_out) then 
+                        if(linestart_direction_reg = direction_right) then
+                            triangleTraversal_state => MOVE_LEFT_OUT;
+                        else
+                            triangleTraversal_state => MOVE_RIGHT_OUT;
+                        end if;
                     -- After moving down, are we in? Keep going in the direction we are in
-                    --else
+                    else
+                        if(linestart_direction_reg = direction_right) then
+                            triangleTraversal_state => MOVE_RIGHT_IN;
+                        else
+                            triangleTraversal_state => MOVE_LEFT_IN;
+                    end if;
 
                     -- Separately, this is an appropriate time to check if we are completely done.
                     if ((current_position_reg.y - fixed_t_one) < boundingbox_reg.ymin) then
@@ -215,25 +238,63 @@ begin
 
                 end if;
 
-             -- MOVE_RIGHT_OUT. Keep moving right until we go back into the triangle or hit the bounding box
-                
-             -- MOVE_LEFT_OUT. Keep moving left until we go back into the triangle or hit the bounding box
+            -- MOVE_RIGHT_OUT. Keep moving right until we go back into the triangle or hit the bounding box
+            when MOVE_RIGHT_OUT =>
+                if (fragment_out_valid = '1') then
+                    current_position_reg.x <=  current_position_reg.x + fixed_t_one;
+                    if((fragment_test_result = testresult_in) then
+                        triangleTraversal_state <= MOVE_RIGHT_IN;
+                    elsif((current_position_reg.x + fixed_t_one) > boundingbox_reg.xmax)) then
+                        triangleTraversal_state <= POP_MOVE_LEFT_OUT;
+                    end if;
+                end if;
+        
+            -- MOVE_LEFT_OUT. Keep moving left until we go back into the triangle or hit the bounding box
+            when MOVE_LEFT_OUT =>
+                if (fragment_out_valid = '1') then
+                    current_position_reg.x <=  current_position_reg.x - fixed_t_one;
+                    if((fragment_test_result = testresult_in) then
+                        triangleTraversal_state <= MOVE_LEFT_IN;
+                    elsif((current_position_reg.x - fixed_t_one) < boundingbox_reg.xmin)) then
+                        triangleTraversal_state <= POP_MOVE_RIGHT_OUT;
+                    end if;
+                end if;
+            
+            -- POP_MOVE_RIGHT_OUT.  Pop, then move by one. If we are inside the triangle it's time to move in, otherwise move out
+            -- Note it is impossible to hit the bounding box on this side, as the only way to get here is by hitting the left bounding box
+            --Hitting the bounding box would imply that there is no triangle
+            when POP_MOVE_RIGHT_OUT =>
+                if (fragment_out_valid = '1') then
+                    current_position_reg.x <= linestart_position_reg.x + fixed_t_one;
+                    current_position_reg.y <= linestart_position_reg.y;
+                    if ((fragment_test_result = testresult_in) then
+                        triangleTraversal_state <= MOVE_RIGHT_IN;
+                    else
+                        triangleTraversal_state <= MOVE_RIGHT_OUT;
+                    end if;
+                end if;
     
+            -- POP_MOVE_LEFT_OUT. TODO
+			when POP_MOVE_LEFT_OUT =>
+                if (fragment_out_valid = '1') then
+                    current_position_reg.x <= linestart_position_reg.x - fixed_t_one;
+                    current_position_reg.y <= linestart_position_reg.y;
+                    if ((fragment_test_result = testresult_in) then
+                        triangleTraversal_state <= MOVE_LEFT_IN;
+                    else
+                        triangleTraversal_state <= MOVE_LEFT_OUT;
+                    end if;
+                end if;							
 
-            -- POP_MOVE_RIGHT_OUT. 
 
-    
-            -- POP_MOVE_LEFT_OUT.
-												
-
-             when TRAVERSAL_DONE =>
+            when TRAVERSAL_DONE =>
                 if (fragment_out_valid = '1') then
                     triangleTraversal_state <= WAIT_FOR_SETUP;
                 end if;
 
 
              -- This shouldn't happen
-             when others =>
+            when others =>
                 triangleTraversal_state <= WAIT_FOR_SETUP;
 
 
