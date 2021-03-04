@@ -126,7 +126,10 @@ void SGP_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
 // Sets the primitive type in the sgp_rasterizer component.  We could probably use the built-in declaration but then would have to manually modify the sgp_types.vhd.
 void SGP_setprimtype(GLenum mode) {
 
+	
+
 	uint32_t sgp_primtype = SGP_GL_POINTS;
+	uint32_t baseaddr = SGP_graphicsmap[SGP_RASTERIZER].baseaddr;
 	switch(mode) {
 
 		case GL_POINTS:
@@ -155,6 +158,7 @@ void SGP_setprimtype(GLenum mode) {
 			sgp_primtype = SGP_GL_POINTS;
 	}
 
+	SGP_write32(SGPconfig, baseaddr+SGP_AXI_RASTERIZER_PRIMTYPE_REG, sgp_primtype);
 	return;
 }
 
