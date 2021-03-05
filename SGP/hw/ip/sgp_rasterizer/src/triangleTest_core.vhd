@@ -85,12 +85,10 @@ BEGIN
     -- Our fragment is in if the direction of the point relative to all three lines is the same as our triangle's starting direction. 
     -- We can check the sign bits of the Area_line wire to confirm (also consider A=0 to be in)
     G1 : FOR i IN 2 DOWNTO 0 GENERATE
-        in_vals(i) <= testresult_in WHEN Area_line_nextreg(i) = 0 ELSE
-        testresult_in WHEN Area_line_nextreg(i)(Area_line_nextreg(i)'high) = start_direction_reg ELSE
-        testresult_out;
+        in_vals(i) <= testresult_in WHEN Area_line_nextreg(i) = 0 ELSE 
+        testresult_in WHEN Area_line_nextreg(i)(Area_line_nextreg(i)'high) = start_direction_reg ELSE testresult_out;
     END GENERATE;
-    fragment_test_result <= testresult_in WHEN in_vals = "111" ELSE
-        testresult_out;
+    fragment_test_result <= testresult_in WHEN in_vals = "111" ELSE testresult_out;
 
     -- We're using fragment_out_valid as backpressure on triangleTraversal
     fragment_out <= newfragment_nextreg WHEN triangleTest_state = WAIT_FOR_DONE_CMD ELSE vertexArray_t_zero;
@@ -140,22 +138,22 @@ BEGIN
                 -- When moving right, move all values 1 interpolated amount in +x dimension (+C5, +C7)
             WHEN MOVE_RIGHT_CMD =>
                 FOR i IN 0 TO 2 LOOP
-                    Area_line_nextreg(i) <= Area_line_nextreg(i) + C7_reg(i);
+                    Area_line_nextreg(i) <= Area_line_reg(i) + C7_reg(i);
                 END LOOP;
                 FOR i IN 0 TO C_SGP_NUM_VERTEX_ATTRIB - 1 LOOP
                     FOR j IN 0 TO C_SGP_VERTEX_ATTRIB_SIZE - 1 LOOP
-                        newfragment_nextreg(i)(j) <= newfragment_nextreg(i)(j) + C5_reg(i)(j);
+                        newfragment_nextreg(i)(j) <= newfragment_reg(i)(j) + C5_reg(i)(j);
                     END LOOP;
                 END LOOP;
 
                 -- When moving left, move all values 1 interpolated amount in +x dimension (-C5, -C7)
             WHEN MOVE_LEFT_CMD =>
                 FOR i IN 0 TO 2 LOOP
-                    Area_line_nextreg(i) <= Area_line_nextreg(i) - C7_reg(i);
+                    Area_line_nextreg(i) <= Area_line_reg(i) - C7_reg(i);
                 END LOOP;
                 FOR i IN 0 TO C_SGP_NUM_VERTEX_ATTRIB - 1 LOOP
                     FOR j IN 0 TO C_SGP_VERTEX_ATTRIB_SIZE - 1 LOOP
-                        newfragment_nextreg(i)(j) <= newfragment_nextreg(i)(j) - C5_reg(i)(j);
+                        newfragment_nextreg(i)(j) <= newfragment_reg(i)(j) - C5_reg(i)(j);
                     END LOOP;
                 END LOOP;
 
@@ -163,11 +161,13 @@ BEGIN
                 -- Move all values 1 interpolated amount in -y dimension (-C6, -C8)               
             WHEN PUSH_MOVE_DOWN_CMD =>
                 FOR i IN 0 TO 2 LOOP
-                    Area_line_nextreg(i) <= Area_line_nextreg(i) - C8_reg(i);
+                    Area_line_nextreg(i) <= Area_line_reg(i) - C8_reg(i);
+                    Area_line_nextstack(i) <= Area_line_reg(i) - C8_reg(i);
                 END LOOP;
                 FOR i IN 0 TO C_SGP_NUM_VERTEX_ATTRIB - 1 LOOP
                     FOR j IN 0 TO C_SGP_VERTEX_ATTRIB_SIZE - 1 LOOP
-                        newfragment_nextreg(i)(j) <= newfragment_nextreg(i)(j) - C6_reg(i)(j);
+                        newfragment_nextreg(i)(j) <= newfragment_reg(i)(j) - C6_reg(i)(j);
+                        newfragment_nextstack(i)(j) <= newfragment_reg(i)(j) - C6_reg(i)(j);
                     END LOOP;
                 END LOOP;
                 

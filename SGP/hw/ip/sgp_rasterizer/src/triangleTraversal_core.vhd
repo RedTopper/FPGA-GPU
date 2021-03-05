@@ -195,7 +195,10 @@ BEGIN
                             current_position_reg.y <= current_position_reg.y - fixed_t_one;
                             linestart_testresult_reg <= fragment_test_result;
 
-                            IF (fragment_test_result = testresult_out) THEN
+                            IF ((current_position_reg.y - fixed_t_one) < boundingbox_reg.ymin) THEN
+                                -- This is an appropriate time to check if we are completely done.
+                                triangleTraversal_state <= TRAVERSAL_DONE;
+                            ELSIF (fragment_test_result = testresult_out) THEN
                                 IF (linestart_direction_reg = direction_right) THEN
                                     triangleTraversal_state <= MOVE_LEFT_OUT;
                                 ELSE
@@ -208,12 +211,6 @@ BEGIN
                                 ELSE
                                     triangleTraversal_state <= MOVE_LEFT_IN;
                                 END IF;
-
-                                -- Separately, this is an appropriate time to check if we are completely done.
-                                IF ((current_position_reg.y - fixed_t_one) < boundingbox_reg.ymin) THEN
-                                    triangleTraversal_state <= TRAVERSAL_DONE;
-                                END IF;
-
                             END IF;
                         END IF;
 
