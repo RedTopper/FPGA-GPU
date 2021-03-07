@@ -428,7 +428,7 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 	}
 
 	//TODO 
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, SGP_graphicsmap[SGP_COLORBUFFER_1 + cur_buffer].baseaddr);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, SGP_graphicsmap[SGP_COLORBUFFER_1 + !cur_buffer].baseaddr);
 	//tempMaskVariable |= 1UL << 3;
 	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, tempMaskVariable);
 
