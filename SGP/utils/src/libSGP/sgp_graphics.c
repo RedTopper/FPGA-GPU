@@ -414,12 +414,14 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 
 		// For each component in the pipeline that has a status register, check it and wait until it is =0. Only do this if we're in a transmit mode. 
 		// Loop until all components are done at the same time. 
-		// Loop until all components are done at the same time. 
 	    if (SGPconfig->driverMode & SGP_ETH) {
 			uint32_t rastStatus;
+			uint32_t vertexStatus;
+			// /SGP_AXI_VERTEXFETCH_STATUS
 			do {
 				rastStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RASTERIZER].baseaddr + SGP_AXI_RASTERIZER_STATUS);
-			} while(rastStatus != 0);
+				vertexStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_VERTEX_FETCH].baseaddr + SGP_AXI_VERTEXFETCH_STATUS);
+			} while(rastStatus != 0 || vertexStatus!=0);
 		}	
 	}
 
