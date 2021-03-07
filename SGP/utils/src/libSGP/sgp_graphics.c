@@ -422,13 +422,14 @@ void SGP_glxSwapBuffers(uint32_t flag) {
     SGP_setactivebuffer(SGPconfig, backbuffer);
 
 	// Let the renderOutput module know where the backbuffer currently is
-	uint8_t cur_buffer = 0;
+	uint32_t buffer_addr = SGP_graphicsmap[SGP_COLORBUFFER_1].baseaddr;
+	// uint8_t cur_buffer = 0;
 	if (backbuffer == 0) {
-		cur_buffer = 1;
+		buffer_addr = SGP_graphicsmap[SGP_COLORBUFFER_2].baseaddr;
 	}
 
 	//TODO 
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, SGP_graphicsmap[SGP_COLORBUFFER_1 + !cur_buffer].baseaddr);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, buffer_addr);
 	//tempMaskVariable |= 1UL << 3;
 	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, tempMaskVariable);
 
