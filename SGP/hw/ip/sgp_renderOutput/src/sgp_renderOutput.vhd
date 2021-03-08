@@ -194,8 +194,9 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE, WAIT_FOR_FLUSH, WAIT_FOR_FIFO, FLUSH, WAIT_FOR_LOW);
   SIGNAL state : STATE_TYPE;
+  SIGNAL flush_state : STATE_TYPE;
   -- User register values
   SIGNAL renderoutput_colorbuffer : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_depthbuffer : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
@@ -344,7 +345,7 @@ BEGIN
   mem_req_tag <= (OTHERS => '0'); -- Request tag - useful for tracking requests
   mem_invalidate <= renderoutput_cachectrl(1); -- Invalidate address
   mem_writeback <= renderoutput_cachectrl(2); -- Writeback request to memory through cache
-  mem_flush <= renderoutput_cachectrl(3); -- Flush entire cache
+  mem_flush <= '1' when flush_state = FLUSH else '0';  -- Flush entire cache
   S_AXIS_TREADY <= '1' WHEN state = WAIT_FOR_FRAGMENT ELSE '0';
 
   -- The vertexArray_t data types will make this code look much cleaner
@@ -353,7 +354,36 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000020";
+  renderoutput_debug <= x"00000032";
+
+  PROCESS (ACLK) IS
+  BEGIN
+    IF rising_edge(ACLK) THEN
+      IF ARESETN = '0' THEN
+        flush_state <= WAIT_FOR_FLUSH;
+      ELSE
+        CASE flush_state IS
+        when WAIT_FOR_FLUSH =>
+          if(renderoutput_cachectrl(3) = '1') then
+            flush_state <= WAIT_FOR_FIFO;
+          end if;
+        when WAIT_FOR_FIFO =>
+          if(S_AXIS_TVALID = '0') then
+            flush_state <= FLUSH;
+          end if;
+        when FLUSH =>
+          -- mem_flush <= '1' when flush_state = FLUSH else '0'; happens outside this state machine
+          flush_state <= WAIT_FOR_LOW;
+        when WAIT_FOR_LOW =>
+          if(renderoutput_cachectrl(3) = '0') then
+            flush_state <= WAIT_FOR_FLUSH;
+          end if;
+        when OTHERS =>
+          flush_state <= WAIT_FOR_FLUSH;
+        end case;
+      end if;
+    end if;
+  END PROCESS;
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -375,7 +405,6 @@ BEGIN
         r_color_reg <= (OTHERS => '0');
         b_color_reg <= (OTHERS => '0');
         g_color_reg <= (OTHERS => '0');
-
       ELSE
         CASE state IS
             --(WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
