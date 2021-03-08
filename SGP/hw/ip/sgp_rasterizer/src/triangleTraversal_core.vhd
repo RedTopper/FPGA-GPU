@@ -52,6 +52,7 @@ ARCHITECTURE behavioral OF triangleTraversal_core IS
     SIGNAL linestart_position_reg : attributeRecord_t;
     SIGNAL linestart_testresult_reg : STD_LOGIC;
     SIGNAL linestart_direction_reg : STD_LOGIC;
+    signal SeenTheLight : STD_LOGIC;
 
 BEGIN
 
@@ -116,6 +117,7 @@ BEGIN
                         -- either pop back and head back left or head down
                     WHEN MOVE_RIGHT_IN =>
                         IF (fragment_out_valid = '1') THEN
+                            SeenTheLight <= '1';
                             current_position_reg.x <= current_position_reg.x + fixed_t_one;
                             IF ((fragment_test_result = testresult_out) OR ((current_position_reg.x + fixed_t_one) > boundingbox_reg.xmax)) THEN
 
@@ -140,6 +142,7 @@ BEGIN
                         -- either pop back and head back left or head down
                     WHEN MOVE_LEFT_IN =>
                         IF (fragment_out_valid = '1') THEN
+                            SeenTheLight <= '1';
                             current_position_reg.x <= current_position_reg.x - fixed_t_one;
                             IF ((fragment_test_result = testresult_out) OR ((current_position_reg.x - fixed_t_one) < boundingbox_reg.xmin)) THEN
 
@@ -190,6 +193,7 @@ BEGIN
                         -- PUSH_MOVE_DOWN. Move down one pixel and store this as the beginning of the line
                     WHEN PUSH_MOVE_DOWN =>
                         IF (fragment_out_valid = '1') THEN
+                            SeenTheLight <= '0';
                             linestart_position_reg.x <= current_position_reg.x;
                             linestart_position_reg.y <= current_position_reg.y - fixed_t_one;
                             current_position_reg.y <= current_position_reg.y - fixed_t_one;
@@ -221,7 +225,12 @@ BEGIN
                             IF (fragment_test_result = testresult_in) THEN
                                 triangleTraversal_state <= MOVE_RIGHT_IN;
                             ELSIF ((current_position_reg.x + fixed_t_one) > boundingbox_reg.xmax) THEN
-                                triangleTraversal_state <= POP_MOVE_LEFT_OUT;
+                                IF (linestart_direction_reg = direction_left and SeenTheLight = '1') THEN
+                                    triangleTraversal_state <= PUSH_MOVE_DOWN;
+                                    linestart_direction_reg <= direction_right;
+                                 ELSE
+                                    triangleTraversal_state <= POP_MOVE_LEFT_OUT;
+                                 END IF;
                             END IF;
                         END IF;
 
@@ -232,7 +241,12 @@ BEGIN
                             IF (fragment_test_result = testresult_in) THEN
                                 triangleTraversal_state <= MOVE_LEFT_IN;
                             ELSIF ((current_position_reg.x - fixed_t_one) < boundingbox_reg.xmin) THEN
-                                triangleTraversal_state <= POP_MOVE_RIGHT_OUT;
+                                IF (linestart_direction_reg = direction_right  and SeenTheLight = '1') THEN
+                                    triangleTraversal_state <= PUSH_MOVE_DOWN;
+                                    linestart_direction_reg <= direction_left;
+                                ELSE
+                                    triangleTraversal_state <= POP_MOVE_RIGHT_OUT;
+                                END IF;
                             END IF;
                         END IF;
 
