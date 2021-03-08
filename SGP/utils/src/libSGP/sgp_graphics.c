@@ -406,7 +406,6 @@ void SGP_glClear(GLbitfield mask) {
 void SGP_glxSwapBuffers(uint32_t flag) {
 
 	static int framecount = 0;
-	uint32_t tempMaskVariable =0;
 
 	// SwapBuffers is a reasonable place to synchronize all the previous draw calls. 
 	if (flag & SGP_SYSTEM_WAITIDLE) {
@@ -437,9 +436,8 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 
 	//TODO 
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, buffer_addr);
-	tempMaskVariable |= 1UL << 3;
 
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, tempMaskVariable);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, DCACHE_CTRL_FLUSH_FLAG);
 
 	framecount++;
 	if (framecount % 100 == 0) {
