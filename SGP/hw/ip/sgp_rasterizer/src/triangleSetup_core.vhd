@@ -160,8 +160,8 @@ BEGIN
     In3_wire <= V2_array(0)(1) WHEN triangleSetup_state = CALC_C1 ELSE
         V2_array(0)(1) WHEN triangleSetup_state = CALC_C2 ELSE
         V2_array(C5C6_attribute_count)(C5C6_size_count) WHEN triangleSetup_state = CALC_C3 ELSE
-        C4_reg(32 downto 1) WHEN triangleSetup_state = CALC_C5 ELSE
-        C4_reg(32 downto 1) WHEN triangleSetup_state = CALC_C6 ELSE
+        C4_reg(32 DOWNTO 1) WHEN triangleSetup_state = CALC_C5 ELSE
+        C4_reg(32 DOWNTO 1) WHEN triangleSetup_state = CALC_C6 ELSE
         V1_array(0)(1) WHEN triangleSetup_state = CALC_AREA ELSE
         fixed_t_zero;
 
@@ -304,7 +304,7 @@ BEGIN
 
                         -- We want to calculate C2-C6 16 times (per-attribute, per-dim)
                     WHEN CALC_C2 =>
-                    C2_reg <= wfixed_t_to_fixed_t(Val7_reg);
+                        C2_reg <= wfixed_t_to_fixed_t(Val7_reg);
                         IF (circuit1_state(CIRCUIT1_LATENCY) = '1') THEN
                             triangleSetup_state <= CALC_C5;
                             circuit1_state(0) <= '1';
@@ -330,14 +330,15 @@ BEGIN
                                 ELSE
                                     C5C6_attribute_count <= C5C6_attribute_count + 1;
                                     triangleSetup_state <= CALC_C2;
+                                    C5C6_size_count <= 0;
                                 END IF;
-                                C5C6_size_count <= 0;
                             ELSE
                                 C5C6_size_count <= C5C6_size_count + 1;
                                 triangleSetup_state <= CALC_C2;
                             END IF;
                             circuit1_state(0) <= '1';
                         END IF;
+
                     WHEN CALC_C6 =>
                         C6_reg(C5C6_attribute_count)(C5C6_size_count) <= Val7_reg(62 DOWNTO 31);
 
@@ -348,8 +349,8 @@ BEGIN
                                 ELSE
                                     C5C6_attribute_count <= C5C6_attribute_count + 1;
                                     triangleSetup_state <= CALC_C3;
+                                    C5C6_size_count <= 0;
                                 END IF;
-                                C5C6_size_count <= 0;
                             ELSE
                                 C5C6_size_count <= C5C6_size_count + 1;
                                 triangleSetup_state <= CALC_C3;
@@ -425,7 +426,7 @@ BEGIN
                             triangle_out(1) <= triangle_reg(0);
                             triangle_out(2) <= triangle_reg(1);
                         END IF;
-                        
+
                         triangleSetup_state <= WRITE_SETUP;
 
                     WHEN WRITE_SETUP =>
