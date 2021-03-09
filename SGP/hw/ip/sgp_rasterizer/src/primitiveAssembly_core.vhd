@@ -20,6 +20,7 @@ use ieee.numeric_std.all;
 library WORK;
 use WORK.sgp_types.all;
 
+
 entity primitiveAssembly_core is
 
 	port (ACLK	: in	std_logic;
@@ -27,6 +28,8 @@ entity primitiveAssembly_core is
 
 		  -- Primtive type
           primtype                    : in     primtype_t;
+
+          --Dictate if this is the final vertex or not.
           vertex_in_final             : in     std_logic:='0';
         
           -- AXIS-style vertex input
@@ -49,12 +52,14 @@ end primitiveAssembly_core;
 architecture behavioral of primitiveAssembly_core is
 
 
-    type STATE_TYPE is (WAIT_FOR_VERTEX0, WAIT_FOR_VERTEX1, WAIT_FOR_VERTEX2, PRIM_WRITE, ADDITIONAL_VERTICES);
+    type STATE_TYPE is (WAIT_FOR_VERTEX0, WAIT_FOR_VERTEX1, WAIT_FOR_VERTEX2, PRIM_WRITE, READ_FANA, READ_FANB, READ_STRIP);
     signal primitiveAssembly_state        : STATE_TYPE;
+    
    
     -- Registers to store vertex data (needed for some primitive types)
     signal V0_reg, V1_reg, V2_reg : vertexVector_t;
     signal vertexReplace : integer range 0 to 2;
+    signal finishedFlag : std_logic;
 
 begin
 
@@ -63,6 +68,9 @@ begin
    vertex_in_ready <= primout_ready when primitiveAssembly_state = WAIT_FOR_VERTEX0 else
                       primout_ready when primitiveAssembly_state = WAIT_FOR_VERTEX1 else
                       primout_ready when primitiveAssembly_state = WAIT_FOR_VERTEX2 else
+                      primout_ready when primitiveAssembly_state = READ_FANA else
+                      primout_ready when primitiveAssembly_state = READ_FANB else
+                      primout_ready when primitiveAssembly_state = READ_STRIP else
                       '0';
                       
    -- We have valid output when we are at the end of a primitive
@@ -89,11 +97,12 @@ begin
     if rising_edge(ACLK) then  
 
       -- Reset all design registers
-      if ARESETN = '0' then
-            vertexReplace <= 2;
+      if ARESETN = '0' then    
             V0_reg <= vertexVector_t_zero;
             V1_reg <= vertexVector_t_zero;
             V2_reg <= vertexVector_t_zero;
+            vertexReplace <= 2;
+            finishedFlag <= '0';
             primitiveAssembly_state <= WAIT_FOR_VERTEX0;
       else
 
@@ -120,49 +129,70 @@ begin
 
             when WAIT_FOR_VERTEX2 =>
                 if ((vertex_valid = '1') and (primout_ready = '1')) then
+                    if(vertex_in_final  = '1')then
+                        finishedFlag <= '1';
+                    end if;
                     V2_reg <= vertex_in;
                     -- Modifying this to support other primitive types would be very straightforward.
                     primitiveAssembly_state <= PRIM_WRITE;
                 end if; 
+            
+            when READ_STRIP =>
+                if ((vertex_valid = '1') and (primout_ready = '1')) then
+                    if(vertex_in_final  = '1')then
+                        finishedFlag <= '1';
+                    end if;
 
-            when ADDITIONAL_VERTICES =>
-                case vertexReplace is
-                    when 0 =>
+                    if(vertexReplace = 0)then
                         V0_reg <= vertex_in;
-                    when 1 =>
+                    elsif(vertexReplace = 1)then
                         V1_reg <= vertex_in;
-                    when 2 =>
+                    elsif(vertexReplace = 2)then
                         V2_reg <= vertex_in;
-                    when others =>
-                end case;
-                primitiveAssembly_state <= PRIM_WRITE;
-                
-            when PRIM_WRITE =>
+                    else
+                        --uh oh
+                    end if;
+                    primitiveAssembly_state <= PRIM_WRITE;
+                end if;
+
+            when READ_FANA =>
+                if ((vertex_valid = '1') and (primout_ready = '1')) then
+                    V1_reg <= vertex_in;
+                    primitiveAssembly_state <= READ_FANB;
+                end if;
+
+            when READ_FANB =>
+                if ((vertex_valid = '1') and (primout_ready = '1')) then
+                    if(vertex_in_final  = '1')then
+                        finishedFlag <= '1';
+                    end if;
+
+                    V2_reg <= vertex_in;
+                    primitiveAssembly_state <= PRIM_WRITE;
+                end if;
+
+            when PRIM_WRITE => 
                 if (primout_ready = '1') then
-                    if (primtype = SGP_GL_TRIANGLE_STRIP) then
-                        if (vertexReplace = 2) then
+                    if(finishedFlag = '1')then
+                        finishedFlag <='0';
+                        vertexReplace <= 0;
+                        primitiveAssembly_state <= WAIT_FOR_VERTEX0;
+                    elsif(primtype = SGP_GL_TRIANGLE_STRIP) then
+                        primitiveAssembly_state <= READ_STRIP;
+                        if((vertexReplace + 1) = 3)then
                             vertexReplace <= 0;
                         else
-                            vertexReplace <= vertexReplace + 1;
+                         vertexReplace <= vertexReplace + 1;
                         end if;
-                        primitiveAssembly_state <= ADDITIONAL_VERTICES;
-                        
-                    else if (primtype = SGP_GL_TRIANGLE_FAN) then
-                        if (vertexReplace = 2) then
-                            vertexReplace <= 1;
-                        else
-                            vertexReplace <= vertexReplace + 1;
-                        end if;
-                        primitiveAssembly_state <= ADDITIONAL_VERTICES;
-                    else 
-                    primitiveAssembly_state <= WAIT_FOR_VERTEX0;
-                    end if;
-                    if(vertex_in_final = '1')then
+                    elsif(primtype = SGP_GL_TRIANGLE_FAN)then
+                        primitiveAssembly_state <= READ_FANA;
+                    else
                         primitiveAssembly_state <= WAIT_FOR_VERTEX0;
-                    end if; 
+                    end if;
                 end if;
-            end if;
+                
         end case;
+
       end if;
     end if;
    end process;
