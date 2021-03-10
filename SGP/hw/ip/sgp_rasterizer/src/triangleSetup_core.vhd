@@ -28,6 +28,9 @@ ENTITY triangleSetup_core IS
         triangle_in_valid : IN STD_LOGIC;
         triangle_in : IN triangleArray_t;
 
+        tLast_in  : in    std_logic;
+        tLast_out : out   std_logic;
+
         -- AXIS-style triangle setup outputs
         boundingbox : OUT boundingboxRecord_t;
         Area : OUT signed(23 DOWNTO 0);
@@ -72,6 +75,7 @@ ARCHITECTURE behavioral OF triangleSetup_core IS
     SIGNAL boundingbox_reg : boundingboxRecord_t;
     SIGNAL topVertexIndex : INTEGER RANGE 0 TO 3;
     SIGNAL direction_reg : STD_LOGIC;
+    SIGNAL tLast : STD_LOGIC;
 
     -- Circuit1 signals
     SIGNAL In1_wire, In2_wire, In3_wire, In4_wire, In5_wire, In6_wire, In7_wire, In8_wire : fixed_t;
@@ -275,6 +279,7 @@ BEGIN
                         -- Wait here until we receive a new triangle
                     WHEN WAIT_FOR_TRIANGLE =>
                         IF (triangle_in_valid = '1') THEN
+                            tLast <= tLast_in;
                             triangle_reg <= triangle_in;
                             triangleSetup_state <= CALC_C1;
                             circuit1_state(0) <= '1';
@@ -438,6 +443,7 @@ BEGIN
                     WHEN WAIT_FOR_TRIANGLE_DONE =>
                         IF (command_in = DONE_CMD) THEN
                             triangleSetup_state <= WAIT_FOR_TRIANGLE;
+                            tLast_out <= tLast;
                         END IF;
                 END CASE;
 

@@ -127,6 +127,7 @@ architecture behavioral of sgp_rasterizer is
 		    ARESETN	: in	std_logic;
             primtype                    : in     primtype_t;
             vertex_in_final             : in     std_logic;
+            vertex_out_final            : out   std_logic;
     		vertex_in_ready		        : out	std_logic;
 		    vertex_in					: in	vertexVector_t;
 		    vertex_valid 				: in 	std_logic; 
@@ -145,6 +146,8 @@ architecture behavioral of sgp_rasterizer is
 		  triangle_in_ready		        : out	std_logic;
 		  triangle_in_valid 			: in 	std_logic; 
           triangle_in                   : in    triangleArray_t;
+          tLast_in                      : in    std_logic;
+          tLast_out                     : out   std_logic;
           boundingbox                   : out   boundingboxRecord_t;          
           AREA                          : out   signed(23 downto 0); 
           direction                     : out   std_logic;
@@ -179,6 +182,8 @@ architecture behavioral of sgp_rasterizer is
           C5                            : in   vertexArray_t;
           C6                            : in   vertexArray_t;
           triangle_in                   : in   triangleArray_t;
+          tLast_in                      : in    std_logic;
+          tLast_out                     : out   std_logic;
           setup_in_ready 				: out 	std_logic;
           setup_in_valid 				: in 	std_logic;
 		  command_in		            : in	traversal_cmds_t;
@@ -238,6 +243,10 @@ architecture behavioral of sgp_rasterizer is
     signal triangleTest_fragment_out           : vertexArray_t;
     signal fragment_valid                      : std_logic;
 
+    -- tLast propogation signals
+    signal tLast_prim_setup                    : std_logic;
+    signal tLast_setup_test                    : std_logic;
+
 begin
 
 
@@ -289,6 +298,7 @@ begin
            ARESETN          => ARESETN,
            primtype         => primtype,
            vertex_in_final  => S_AXIS_TLAST,
+           vertex_out_final => tLast_prim_setup,
            vertex_in_ready  => primitiveAssembly_vertex_in_ready,
            vertex_in        => primitiveAssembly_vertex_in,
            vertex_valid     => primitiveAssembly_vertex_valid,
@@ -315,7 +325,9 @@ begin
            triangle_out         => trianglesetup_triangle_out,
            setup_out_ready      => triangleSetup_setup_out_ready,
            setup_out_valid      => triangleSetup_setup_out_valid,
-           command_in           => triangleTraversal_command_out
+           command_in           => triangleTraversal_command_out,
+           tLast_in             => tLast_prim_setup,
+           tLast_out            => tLast_setup_test
            );
 
     triangleTraversal_inst: triangleTraversal_core
@@ -347,7 +359,9 @@ begin
            fragment_test_result => triangleTest_fragment_test_result,
            fragment_out_ready   => triangleTest_fragment_out_ready,
            fragment_out_valid   => triangleTest_fragment_out_valid,
-           fragment_out         => triangleTest_fragment_out
+           fragment_out         => triangleTest_fragment_out,
+           tLast_in             => tLast_setup_test,
+           tLast_out            => M_AXIS_TLAST
           );
 
 

@@ -31,6 +31,7 @@ entity primitiveAssembly_core is
 
           --Dictate if this is the final vertex or not.
           vertex_in_final             : in     std_logic:='0';
+          vertex_out_final            : out    std_logic;
         
           -- AXIS-style vertex input
 		  vertex_in_ready		        : out	std_logic;
@@ -112,6 +113,7 @@ begin
             when WAIT_FOR_VERTEX0 =>
                 if ((vertex_valid = '1') and (primout_ready = '1')) then
                     V0_reg <= vertex_in;
+                    vertex_out_final <= '0';
                     -- If this was GL_POINTS, we are done, otherwise we have to keep grabbing vertices
                     if (primtype = SGP_GL_POINTS) then
                     --    primitiveAssembly_state <= PRIM_WRITE;
@@ -174,6 +176,7 @@ begin
             when PRIM_WRITE => 
                 if (primout_ready = '1') then
                     if(finishedFlag = '1')then
+                        vertex_out_final <= '1';
                         finishedFlag <='0';
                         vertexReplace <= 0;
                         primitiveAssembly_state <= WAIT_FOR_VERTEX0;

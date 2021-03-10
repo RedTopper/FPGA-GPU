@@ -41,8 +41,10 @@ ENTITY triangleTest_core IS
         -- AXIS-style fragment output
         fragment_out_ready : IN STD_LOGIC;
         fragment_out_valid : OUT STD_LOGIC;
-        fragment_out : OUT vertexArray_t
+        fragment_out : OUT vertexArray_t;
 
+        tLast_in                      : in    std_logic;
+        tLast_out                     : out   std_logic
     );
 END triangleTest_core;
 ARCHITECTURE behavioral OF triangleTest_core IS
@@ -56,6 +58,7 @@ ARCHITECTURE behavioral OF triangleTest_core IS
     SIGNAL start_Area_reg : signed(23 DOWNTO 0);
     SIGNAL start_direction_reg : STD_LOGIC;
     SIGNAL in_vals : STD_LOGIC_VECTOR(2 DOWNTO 0);
+    SIGNAL tLast : std_logic;
 
     -- C7, C8 for updating the areas of the three lines. These values are fixed per-triangle. 
     -- Note, we have to be consistent with what each index means for these 3-length arrays:
@@ -251,7 +254,7 @@ BEGIN
                             IF (command_in = START_CMD) THEN
                                 triangleTest_state <= WAIT_FOR_DONE_CMD;
                             END IF;
-
+                            tLast <= tLast_in;
                         END IF;
 
                     WHEN WAIT_FOR_DONE_CMD =>
@@ -259,6 +262,7 @@ BEGIN
                         IF (fragment_out_ready = '1') THEN
                             IF (command_in = DONE_CMD) THEN
                                 triangleTest_state <= WAIT_FOR_SETUP;
+                                tLast_out <= tLast;
                             END IF;
                         END IF;
 
