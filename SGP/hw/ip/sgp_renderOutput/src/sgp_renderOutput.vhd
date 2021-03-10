@@ -143,6 +143,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       SGP_AXI_RENDEROUTPUT_STRIDE : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_HEIGHT : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_DEBUG : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
+      SGP_AXI_RENDEROUTPUT_STATUS : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
 
     );
   END COMPONENT sgp_renderOutput_axi_lite_regs;
@@ -204,6 +205,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL renderoutput_stride : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_height : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_debug : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+  SIGNAL renderoutput_status : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
 
   SIGNAL input_fragment : vertexVector_t;
   SIGNAL input_fragment_array : vertexArray_t;
@@ -276,7 +278,8 @@ BEGIN
     SGP_AXI_RENDEROUTPUT_CACHECTRL => renderoutput_cachectrl,
     SGP_AXI_RENDEROUTPUT_STRIDE => renderoutput_stride,
     SGP_AXI_RENDEROUTPUT_HEIGHT => renderoutput_height,
-    SGP_AXI_RENDEROUTPUT_DEBUG => renderoutput_debug
+    SGP_AXI_RENDEROUTPUT_DEBUG => renderoutput_debug,
+    SGP_AXI_RENDEROUTPUT_STATUS => renderoutput_status
   );
   -- Cache component's reset is active high
   ARESET <= NOT ARESETn;
@@ -345,8 +348,10 @@ BEGIN
   mem_req_tag <= (OTHERS => '0'); -- Request tag - useful for tracking requests
   mem_invalidate <= renderoutput_cachectrl(1); -- Invalidate address
   mem_writeback <= renderoutput_cachectrl(2); -- Writeback request to memory through cache
-  mem_flush <= '1' when flush_state = FLUSH else '0';  -- Flush entire cache
-  S_AXIS_TREADY <= '1' WHEN state = WAIT_FOR_FRAGMENT ELSE '0';
+  mem_flush <= '1' WHEN flush_state = FLUSH ELSE
+    '0'; -- Flush entire cache
+  S_AXIS_TREADY <= '1' WHEN state = WAIT_FOR_FRAGMENT ELSE
+    '0';
 
   -- The vertexArray_t data types will make this code look much cleaner
   input_fragment_array <= to_vertexArray_t(input_fragment);
@@ -356,34 +361,41 @@ BEGIN
   -- It would also be useful to connect internal signals to this register for software debug purposes
   renderoutput_debug <= x"00000043";
 
-  PROCESS (ACLK) IS
-  BEGIN
-    IF rising_edge(ACLK) THEN
-      IF ARESETN = '0' THEN
-        flush_state <= WAIT_FOR_FLUSH;
-      ELSE
-        CASE flush_state IS
-        when WAIT_FOR_FLUSH =>
-          if(renderoutput_cachectrl(3) = '1') then
-            flush_state <= WAIT_FOR_FIFO;
-          end if;
-        when WAIT_FOR_FIFO =>
-          if(S_AXIS_TVALID = '0') then
-            flush_state <= FLUSH;
-          end if;
-        when FLUSH =>
-          -- mem_flush <= '1' when flush_state = FLUSH else '0'; happens outside this state machine
-          flush_state <= WAIT_FOR_LOW;
-        when WAIT_FOR_LOW =>
-          if(renderoutput_cachectrl(3) = '0') then
-            flush_state <= WAIT_FOR_FLUSH;
-          end if;
-        when OTHERS =>
-          flush_state <= WAIT_FOR_FLUSH;
-        end case;
-      end if;
-    end if;
-  END PROCESS;
+
+  renderoutput_Tlast_Latched <= '0' WHEN S_AXIS_TLAST = '1' ELSE renderoutput_Tlast_Latched;
+
+  renderoutput_status <= (OTHERS => '0') WHEN (renderoutput_Tlast_Latched AND state = WAIT_FOR_FRAGMENT) ELSE (OTHERS => '1');
+  mem_flush <= '1' when (renderoutput_Tlast_Latched AND state = WAIT_FOR_FRAGMENT) ELSE 0;
+
+
+  -- PROCESS (ACLK) IS
+  -- BEGIN
+  --   IF rising_edge(ACLK) THEN
+  --     IF ARESETN = '0' THEN
+  --       flush_state <= WAIT_FOR_FLUSH;
+  --     ELSE
+  --       CASE flush_state IS
+  --         WHEN WAIT_FOR_FLUSH =>
+  --           IF (renderoutput_cachectrl(3) = '1') THEN
+  --             flush_state <= WAIT_FOR_FIFO;
+  --           END IF;
+  --         WHEN WAIT_FOR_FIFO =>
+  --           IF (S_AXIS_TVALID = '0') THEN
+  --             flush_state <= FLUSH;
+  --           END IF;
+  --         WHEN FLUSH =>
+  --           -- mem_flush <= '1' when flush_state = FLUSH else '0'; happens outside this state machine
+  --           flush_state <= WAIT_FOR_LOW;
+  --         WHEN WAIT_FOR_LOW =>
+  --           IF (renderoutput_cachectrl(3) = '0') THEN
+  --             flush_state <= WAIT_FOR_FLUSH;
+  --           END IF;
+  --         WHEN OTHERS =>
+  --           flush_state <= WAIT_FOR_FLUSH;
+  --       END CASE;
+  --     END IF;
+  --   END IF;
+  -- END PROCESS;
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -432,18 +444,24 @@ BEGIN
           WHEN WRITE_ADDRESS =>
             mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
             mem_data_wr <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
+
             
             --wait for mem_accept to go high. then write to the dcache.
-           if(mem_accept = '1') then
-                mem_wr <= b"1111";
-                state <= WAIT_FOR_RESPONSE;
-           end if;
-           WHEN WAIT_FOR_RESPONSE =>
-           mem_wr <= b"0000"; 
-             if(mem_ack = '1') then
+            IF (mem_accept = '1') THEN
+              mem_wr <= b"1111";
+              state <= WAIT_FOR_RESPONSE;
+            END IF;
+          WHEN WAIT_FOR_RESPONSE =>
+            mem_wr <= b"0000";
+            IF (mem_ack = '1') THEN
+              IF (renderoutput_Tlast_Latched = '1') THEN
+                renderoutput_status <= '1';
+                mem_flush => '1';
+              END IF;
               state <= WAIT_FOR_FRAGMENT;
-             end if;
+            END IF;
           WHEN OTHERS =>
+
         END CASE;
       END IF;
     END IF;
