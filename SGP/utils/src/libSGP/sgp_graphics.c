@@ -414,13 +414,25 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 		// For each component in the pipeline that has a status register, check it and wait until it is =0. Only do this if we're in a transmit mode. 
 		// Loop until all components are done at the same time. 
 	    if (SGPconfig->driverMode & SGP_ETH) {
+			uint32_t numTimes = 0;
+			uint32_t idle;
 			uint32_t rastStatus;
 			uint32_t vertexStatus;
+			uint32_t renderStatus = 0;
 			// /SGP_AXI_VERTEXFETCH_STATUS
 			do {
 				rastStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RASTERIZER].baseaddr + SGP_AXI_RASTERIZER_STATUS);
 				vertexStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_VERTEX_FETCH].baseaddr + SGP_AXI_VERTEXFETCH_STATUS);
-			} while(rastStatus != 0 || vertexStatus!=0);
+				//renderStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_STATUS);
+				idle = rastStatus == 0 && vertexStatus == 0 && renderStatus == 0;
+				if (idle) {
+					numTimes++;
+				} else {
+					numTimes = 0;
+				}
+				
+				//printf("%d %d %d %d\n", rastStatus, vertexStatus, renderStatus, numTimes);
+			} while(numTimes != 2);
 		}	
 	}
 
@@ -435,9 +447,9 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 	}
 
 	//TODO 
-    SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, DCACHE_CTRL_FLUSH_FLAG);
-    SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, 0);
-    SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, buffer_addr);
+	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, DCACHE_CTRL_FLUSH_FLAG);
+	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, 0);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, buffer_addr);
 
 	framecount++;
 	if (framecount % 100 == 0) {

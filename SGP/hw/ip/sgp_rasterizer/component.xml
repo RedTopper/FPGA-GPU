@@ -3,7 +3,7 @@
   <spirit:vendor>xilinx.com</spirit:vendor>
   <spirit:library>user</spirit:library>
   <spirit:name>sgp_rasterizer</spirit:name>
-  <spirit:version>1.45</spirit:version>
+  <spirit:version>1.47</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>M_AXIS</spirit:name>
@@ -325,7 +325,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ddbe96f4</spirit:value>
+            <spirit:value>baca6376</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -344,7 +344,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ddbe96f4</spirit:value>
+            <spirit:value>baca6376</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -888,7 +888,7 @@
       <spirit:file>
         <spirit:name>src/triangleTest_core.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_fc5a06fd</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_4cc79a26</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -950,7 +950,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/sgp_rasterizer_v1_45.tcl</spirit:name>
+        <spirit:name>xgui/sgp_rasterizer_v1_47.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_0224029d</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
@@ -1009,10 +1009,10 @@
       <xilinx:taxonomies>
         <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
       </xilinx:taxonomies>
-      <xilinx:displayName>sgp_rasterizer_v1_45</xilinx:displayName>
+      <xilinx:displayName>sgp_rasterizer_v1_47</xilinx:displayName>
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
-      <xilinx:coreRevision>46</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-03-09T05:14:41Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>48</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-03-10T05:51:15Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@4f2b5770_ARCHIVE_LOCATION">c:/Users/zambr/Desktop/MP-1/hw/ip/sgp_rasterizer</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@5162e5e8_ARCHIVE_LOCATION">c:/Users/zambr/Desktop/MP-1/hw/ip/sgp_rasterizer</xilinx:tag>
@@ -1536,13 +1536,35 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@7e35ae8a_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@51b9bb3_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@1a544d46_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@61728f92_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3db92134_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2526d02_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3cf1e699_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5c689b3b_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@739b6cee_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1466f950_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@36f68234_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@52009a2b_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4fe96b8d_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6ab67421_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1b7ca570_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@491768d6_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76d1b0c_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1150bd16_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4500d8af_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@15d0a595_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3047eed4_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@68f8b28d_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@34e8da29_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4501cd8f_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d72e2e9_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_rasterizer</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="e52d02b1"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="a869f448"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="b7b3813f"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="15f12207"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="6ff7fe6e"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="54d82e33"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="151474b6"/>

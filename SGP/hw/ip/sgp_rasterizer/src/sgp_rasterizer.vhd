@@ -369,7 +369,7 @@ begin
 
    -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
    -- It would also be useful to connect internal signals to this register for software debug purposes
-   rasterizer_debug  <= x"00000045";
+   rasterizer_debug  <= x"00000047";
    rasterizer_status <= (0 => triangleTraversal_status_out, others => '0'); 
 
    -- Convert the register to the primtype_t.
@@ -400,9 +400,6 @@ begin
                     fragment_valid when primtype=SGP_GL_TRIANGLE_STRIP else
                     fragment_valid when primtype=SGP_GL_TRIANGLE_FAN else
                     '0';
-
-   -- Todo: propagate TLAST properly. We can't rely on TLAST downstream. 
-   M_AXIS_TLAST <= S_AXIS_TLAST;
 
    primitiveAssembly_primout_ready <= M_AXIS_TREADY when primtype=SGP_GL_POINTS else
                                       triangleSetup_triangle_in_ready when primtype=SGP_GL_TRIANGLES else

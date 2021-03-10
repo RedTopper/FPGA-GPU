@@ -142,9 +142,8 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       SGP_AXI_RENDEROUTPUT_CACHECTRL : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_STRIDE : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_HEIGHT : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_DEBUG : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
-      SGP_AXI_RENDEROUTPUT_STATUS : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-
+      SGP_AXI_RENDEROUTPUT_DEBUG : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_STATUS : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
     );
   END COMPONENT sgp_renderOutput_axi_lite_regs;
 
@@ -195,7 +194,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE, WAIT_FOR_FLUSH, WAIT_FOR_FIFO, FLUSH, WAIT_FOR_LOW);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE); -- WAIT_FOR_FLUSH, WAIT_FOR_FIFO, FLUSH, WAIT_FOR_LOW);
   SIGNAL state : STATE_TYPE;
   SIGNAL flush_state : STATE_TYPE;
   -- User register values
@@ -243,6 +242,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL r_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL g_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL b_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL renderoutput_Tlast_Latched : STD_LOGIC;
 BEGIN
   -- Instantiation of Axi Bus Interface S_AXI_LITE
   sgp_renderOutput_axi_lite_regs_inst : sgp_renderOutput_axi_lite_regs
@@ -348,8 +348,7 @@ BEGIN
   mem_req_tag <= (OTHERS => '0'); -- Request tag - useful for tracking requests
   mem_invalidate <= renderoutput_cachectrl(1); -- Invalidate address
   mem_writeback <= renderoutput_cachectrl(2); -- Writeback request to memory through cache
-  mem_flush <= '1' WHEN flush_state = FLUSH ELSE
-    '0'; -- Flush entire cache
+
   S_AXIS_TREADY <= '1' WHEN state = WAIT_FOR_FRAGMENT ELSE
     '0';
 
@@ -359,13 +358,12 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000043";
+  renderoutput_debug <= x"00000044";
 
 
   renderoutput_Tlast_Latched <= '0' WHEN S_AXIS_TLAST = '1' ELSE renderoutput_Tlast_Latched;
 
-  renderoutput_status <= (OTHERS => '0') WHEN (renderoutput_Tlast_Latched AND state = WAIT_FOR_FRAGMENT) ELSE (OTHERS => '1');
-  mem_flush <= '1' when (renderoutput_Tlast_Latched AND state = WAIT_FOR_FRAGMENT) ELSE 0;
+  renderoutput_status <= (OTHERS => '0') WHEN (renderoutput_Tlast_Latched = '1' AND state = WAIT_FOR_FRAGMENT) ELSE (OTHERS => '1');
 
 
   -- PROCESS (ACLK) IS
@@ -417,6 +415,7 @@ BEGIN
         r_color_reg <= (OTHERS => '0');
         b_color_reg <= (OTHERS => '0');
         g_color_reg <= (OTHERS => '0');
+        mem_flush <= '0';
       ELSE
         CASE state IS
             --(WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
@@ -424,6 +423,7 @@ BEGIN
             -- Consider looking at TLAST to determine cache flushability
           WHEN WAIT_FOR_FRAGMENT =>
             IF (S_AXIS_TVALID = '1') THEN
+              mem_flush <= '0';
               input_fragment <= signed(S_AXIS_TDATA);
               state <= GEN_ADDRESS;
             END IF;
@@ -455,13 +455,12 @@ BEGIN
             mem_wr <= b"0000";
             IF (mem_ack = '1') THEN
               IF (renderoutput_Tlast_Latched = '1') THEN
-                renderoutput_status <= '1';
-                mem_flush => '1';
+                renderoutput_status <= (OTHERS => '1');
+                mem_flush <= '1';
               END IF;
               state <= WAIT_FOR_FRAGMENT;
             END IF;
           WHEN OTHERS =>
-
         END CASE;
       END IF;
     END IF;
