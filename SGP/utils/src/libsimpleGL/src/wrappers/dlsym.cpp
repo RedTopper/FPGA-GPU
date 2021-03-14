@@ -38,6 +38,7 @@ extern "C" {
 #include "sgp.h"
 #include "sgp_system.h"
 #include "sgp_graphics.h"
+#include "sgp_shaders.h"
 }
 
 
@@ -170,13 +171,17 @@ void * dlopen(const char *filename, int flag)
             printf("%s: Error setting up SGP driver infrastructure.\n", __FILE__);
         }
 
-
         // Initialize the SGP graphics components
         returnValue = SGP_graphicsInit(SGPconfig);
         if (returnValue != 0) {
             printf("%s: Error setting up SGP driver infrastructure.\n", __FILE__);
         }
 
+        // Initialize the SGP shader components
+        returnValue = SGP_shadersInit(SGPconfig);
+        if (returnValue != 0) {
+            printf("%s: Error setting up SGP driver infrastructure.\n", __FILE__);
+        }
 
         // Initialize the rest of the SGP system components
         returnValue = SGP_systemInit(SGPconfig);

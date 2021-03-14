@@ -12,7 +12,7 @@
 CXX=g++
 CFLAGS+=
 INCLUDE_PATH+=../../include/
-LDFLAGS = -L../../lib64 -lSGP
+LDFLAGS = -L../../lib64 -lshaderc_shared -llua -lSGP 
 all: makedirectories libGL.so.1.2
 
 

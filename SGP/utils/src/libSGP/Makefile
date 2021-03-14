@@ -31,7 +31,7 @@ LINK	:= gcc
 CLIB	:= ar rcs
 
 # Arguments
-COMMONFLAGS	+= -O2 
+COMMONFLAGS	+= -O2
 ifdef OS	
 COMMONFLAGS += -mno-ms-bitfields
 endif
@@ -44,9 +44,9 @@ else
 	VERBOSE := 
 endif
 
-OBJFILES := $(ROOTOBJDIR)/sgp_axi.o $(ROOTOBJDIR)/sgp_system.o $(ROOTOBJDIR)/sgp_graphics.o $(ROOTOBJDIR)/sgp_transmit.o $(ROOTOBJDIR)/sgp.o
-OBJFILES32 := $(ROOTOBJDIR)/sgp_axi.o.32 $(ROOTOBJDIR)/sgp_system.o.32 $(ROOTOBJDIR)/sgp_graphics.o.32 $(ROOTOBJDIR)/sgp_transmit.o.32 $(ROOTOBJDIR)/sgp.o.32
-SRCFILES := $(SOURCE)/sgp_axi.c $(SOURCE)/sgp_system.c $(SOURCE)/sgp_graphics.c $(SOURCE)/sgp_transmit.c $(SOURCE)/sgp.c
+OBJFILES := $(ROOTOBJDIR)/sgp_axi.o $(ROOTOBJDIR)/sgp_system.o $(ROOTOBJDIR)/sgp_graphics.o $(ROOTOBJDIR)/sgp_shaders.o $(ROOTOBJDIR)/sgp_transmit.o $(ROOTOBJDIR)/sgp.o
+OBJFILES32 := $(ROOTOBJDIR)/sgp_axi.o.32 $(ROOTOBJDIR)/sgp_system.o.32 $(ROOTOBJDIR)/sgp_graphics.o.32 $(ROOTOBJDIR)/sgp_shaders.o.32 $(ROOTOBJDIR)/sgp_transmit.o.32 $(ROOTOBJDIR)/sgp.o.32
+SRCFILES := $(SOURCE)/sgp_axi.c $(SOURCE)/sgp_system.c $(SOURCE)/sgp_graphics.c $(SOURCE)/sgp_shaders.c $(SOURCE)/sgp_transmit.c $(SOURCE)/sgp.c
 
 all: makedirectories $(SRCFILES) $(OBJFILES) $(OBJFILES32)
 	$(VERBOSE)$(CLIB) $(TARGET) $(OBJFILES)
