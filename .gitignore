@@ -92,6 +92,7 @@ SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/
 **/hw/ip/sgp_viewPort/proj/*
 **/hw/ip/sgp_renderOutput/proj/*
 **/hw/ip/sgp_rasterizer/proj/*
+**/hw/ip/sgp_vertexShader/proj/*
 **/hw/ip/sgp_rasterizer/src/shared_divider/*
 **/hw/proj/*
 !*.tcl
@@ -101,3 +102,5 @@ SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/
 SGP/sw/src/Examples/common/*
 SGP/sw/src/Games/common/*
 SGP/sw/src/MP-1/common/*
+SGP/sw/src/MP-2/common/*
+SGP/sw/src/MP-3/common/*

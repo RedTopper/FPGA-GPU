@@ -3,7 +3,7 @@
   <spirit:vendor>xilinx.com</spirit:vendor>
   <spirit:library>user</spirit:library>
   <spirit:name>sgp_vertexShader</spirit:name>
-  <spirit:version>1.0</spirit:version>
+  <spirit:version>1.30</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>M_AXIS</spirit:name>
@@ -946,7 +946,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ae4f980c</spirit:value>
+            <spirit:value>1f72151d</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -962,7 +962,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ae4f980c</spirit:value>
+            <spirit:value>1f72151d</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2755,23 +2755,23 @@
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/sgp_types.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>src/sgp_vertexShader_axi_lite_regs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/vertexShader_core.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/sgp_vertexShader.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_c323cb36</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_a0d59614</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>../sgp_types.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>CHECKSUM_4206a5f1</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -2825,36 +2825,35 @@
         <spirit:fileType>verilogSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>src/sgp_types.vhd</spirit:name>
-        <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>src/sgp_vertexShader_axi_lite_regs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/vertexShader_core.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
       <spirit:file>
         <spirit:name>src/sgp_vertexShader.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
       </spirit:file>
+      <spirit:file>
+        <spirit:name>../sgp_types.vhd</spirit:name>
+        <spirit:fileType>vhdlSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
+        <spirit:logicalName>xil_defaultlib</spirit:logicalName>
+      </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/sgp_vertexShader_v1_0.tcl</spirit:name>
+        <spirit:name>xgui/sgp_vertexShader_v1_30.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
         <spirit:userFileType>CHECKSUM_bffacea9</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
   </spirit:fileSets>
-  <spirit:description>sgp_vertexShader_v1_0</spirit:description>
+  <spirit:description>sgp_vertexShader_v1</spirit:description>
   <spirit:parameters>
     <spirit:parameter>
       <spirit:name>C_S_AXI_DATA_WIDTH</spirit:name>
@@ -2926,10 +2925,10 @@
       <xilinx:taxonomies>
         <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
       </xilinx:taxonomies>
-      <xilinx:displayName>sgp_vertexShader_v1_0</xilinx:displayName>
+      <xilinx:displayName>sgp_vertexShader_v1_30</xilinx:displayName>
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
-      <xilinx:coreRevision>5</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-01-21T13:48:01Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>11</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-03-17T17:18:35Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@1053536e_ARCHIVE_LOCATION">c:/Users/zambreno/Documents/MobaXterm/home/dev/cpre480-dev/Demo/hw/ip/sgp_vertexShader</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@42fef584_ARCHIVE_LOCATION">c:/Users/zambreno/Documents/MobaXterm/home/dev/cpre480-dev/Demo/hw/ip/sgp_vertexShader</xilinx:tag>
@@ -2959,6 +2958,64 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@701ca494_ARCHIVE_LOCATION">c:/Users/zambreno/Documents/MobaXterm/home/dev/cpre480-dev/Demo/hw/ip/sgp_vertexShader</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@5e400d08_ARCHIVE_LOCATION">c:/Users/zambreno/Documents/MobaXterm/home/dev/cpre480-dev/Demo/hw/ip/sgp_vertexShader</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@484b7ef0_ARCHIVE_LOCATION">c:/Users/zambreno/Documents/MobaXterm/home/dev/cpre480-dev/Demo/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1c2a5548_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@b70ea60_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d794c9_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@76b56cba_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@50636f3d_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@215e1bcb_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@646b1726_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@69ecf608_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@219871e8_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@22d4d90a_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6a801d62_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3d002789_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5440a624_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40125b0c_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2622932e_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f8e584f_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3a47eed0_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@398bf6fd_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54f7863c_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@39409572_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@721f01ba_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1a4f0aad_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f03af59_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@66c0a97b_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2d477c03_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3c896141_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@461b504b_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1549c7e9_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@4ad581ff_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@14490be5_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@27962756_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@725591c4_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d732710_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@25d39106_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@79ccfad2_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f4b61e4_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7f002d67_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3ff353d2_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@72f43c20_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1ac87661_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2042d9e5_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@45eb1d3d_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@40dd9c8d_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@54677098_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@124c3083_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@342e4a85_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@37d28244_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5890becd_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@49510bf1_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e5ae2bc_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@6d63dc12_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@1113fd62_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7981128f_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2295489b_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@188459c6_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@3bce0750_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@e489951_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@71dc751d_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_vertexShader</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
@@ -2966,7 +3023,7 @@
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="26ca55dc"/>
       <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="67f816ca"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="a869f448"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="15c1c23c"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="d9f34f50"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="b5cdf6dd"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="7c4a9b26"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="0249d16b"/>
