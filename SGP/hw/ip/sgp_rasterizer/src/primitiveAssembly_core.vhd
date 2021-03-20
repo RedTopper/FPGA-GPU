@@ -69,7 +69,6 @@ begin
    vertex_in_ready <= primout_ready when primitiveAssembly_state = WAIT_FOR_VERTEX0 else
                       primout_ready when primitiveAssembly_state = WAIT_FOR_VERTEX1 else
                       primout_ready when primitiveAssembly_state = WAIT_FOR_VERTEX2 else
-                      primout_ready when primitiveAssembly_state = READ_FANA else
                       primout_ready when primitiveAssembly_state = READ_FANB else
                       primout_ready when primitiveAssembly_state = READ_STRIP else
                       '0';
@@ -159,7 +158,7 @@ begin
 
             when READ_FANA =>
                 if ((vertex_valid = '1') and (primout_ready = '1')) then
-                    V1_reg <= vertex_in;
+                    V1_reg <= V2_reg;
                     primitiveAssembly_state <= READ_FANB;
                 end if;
 
