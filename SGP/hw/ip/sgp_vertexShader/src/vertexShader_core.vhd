@@ -74,10 +74,10 @@ architecture behavioral of vertexShader_core is
     --used to make two's complement a one cycle occurence
     signal negateTemp0, negateTemp1, negateTemp2, negateTemp3 : unsigned(31 downto 0);
     --dictates which SIMD vector we are on
-    signal processed : std_logic_vector(2 downto 0);
+    signal processed : std_logic_vector(1 downto 0);
     --Indicates that we should block while doing serialized instructions
     signal blocking : std_logic := '0';
-
+    signal testSig : integer;
 
     -- don't subscript aliases unless you know what you are doing!  I don't.
     alias a3 is a(127 downto 96); alias a2 is a( 95 downto 64); alias a1 is a( 63 downto 32); alias a0 is a( 31 downto  0);
@@ -151,11 +151,6 @@ begin
     negateTemp2 <= NOT a2;
     negateTemp3 <= NOT a3;
 
-
-    -- Set output to input for passthrough mode. Remove this. 
-    outputVertex <= inputVertex;
-
-
     process(ACLK)
     begin
         if rising_edge(ACLK) then
@@ -189,6 +184,10 @@ begin
                             state <= FETCH2;
                         end if;
 
+                        if (op /= ST and op /= DONE and op /= NOP and op /= OUTFIFO) then
+                            v(to_integer(rd)) <= c;
+                        end if;
+
                     --wait until icache is done,
                             --set read req low,
                             --store fetched instruction in ir
@@ -196,7 +195,7 @@ begin
                         if(imem_req_done = '1') then
                             imem_rd_req <= '0';
                             ir <= unsigned(imem_rdata);
-                            state <= EXECUTE;
+                            state <= DECODE;
                             pc <= pc + 4;
                         end if;
 
@@ -214,26 +213,33 @@ begin
                                 blocking <='1';
                             when FMUL =>
                                 blocking <='1';
-                                -- Why are you doing it this way // with the for loop it would all happen in one cycle, defeating the point a lil// would it? //  I'ma come upstairs 
                                 if(processed = "00")then
                                     c0 <= a0 * b0;
+                                    processed <= "01";
                                 elsif(processed = "01")then
                                     c1 <= a1 * b1;
+                                    processed <= "10";
                                 elsif(processed = "10")then
                                     c2 <= a2 * b2;
+                                    processed <= "11";
                                 elsif(processed = "11")then
                                     c3 <= a3 * b3;
-                                    processed = "00";
-                                    blocking = '0';
+                                    processed <= "00";
+                                    blocking <= '0';
                                 end if;
                             when FPOW =>
                                 blocking <='1';
                             when NOP =>
                             when SWIZZLE =>
-                                c0 <= a(to_integer(xx * 32 + 31) downto to_integer(xx * 32));
-                                c1 <= a(to_integer(yy * 32 + 31) downto to_integer(yy * 32));
-                                c2 <= a(to_integer(zz * 32 + 31) downto to_integer(zz * 32));
-                                c3 <= a(to_integer(ww * 32 + 31) downto to_integer(ww * 32));
+                                c0 <= a(TO_INTEGER((xx & b"00000") + 31) downto to_integer(xx & b"00000"));
+                                c1 <= a(TO_INTEGER((yy & b"00000") + 31) downto to_integer(yy & b"00000"));
+                                c2 <= a(TO_INTEGER((zz & b"00000") + 31) downto to_integer(zz & b"00000"));
+                                c3 <= a(TO_INTEGER((ww & b"00000") + 31) downto to_integer(ww & b"00000"));
+                                testSig <= TO_INTEGER((xx & b"00000") + 31);
+                                --c0 <= a(to_integer(xx * 32 + 31) downto to_integer(xx * 32));
+                                --c1 <= a(to_integer(yy * 32 + 31) downto to_integer(yy * 32));
+                                --c2 <= a(to_integer(zz * 32 + 31) downto to_integer(zz * 32));
+                                --c3 <= a(to_integer(ww * 32 + 31) downto to_integer(ww * 32));
                             when LDILO =>
                                 c0 <= resize(unsigned(ir(15 downto 0)),32);
                                 c1 <= resize(unsigned(ir(15 downto 0)),32);
@@ -244,10 +250,10 @@ begin
                                 -- c2 <= "00" && ir(15 downto 0);
                                 -- c3 <= "00" && ir(15 downto 0);
                             when LDIHI =>
-                                c0 <= ir(15 downto 0) & x"00";
-                                c1 <= ir(15 downto 0) & x"00";
-                                c2 <= ir(15 downto 0) & x"00";
-                                c3 <= ir(15 downto 0) & x"00";
+                                c0 <= ir(15 downto 0) & x"0000";
+                                c1 <= ir(15 downto 0) & x"0000";
+                                c2 <= ir(15 downto 0) & x"0000";
+                                c3 <= ir(15 downto 0) & x"0000";
                             when LD =>
                                 c0 <= a0 + rb;
                                 if (dmem_rdy = '1') then
@@ -261,10 +267,10 @@ begin
                                     state <= ST2;
                                 end if;
                             when INFIFO =>
-                                c0 <= inputVertex(to_integer(rb * 32 + 31) downto to_integer(rb * 32)); -- Need to do something like this but not sure about the syntax for it
+                                c0 <= unsigned(inputvertex(to_integer(rb(7 downto 2)))(to_integer(rb(1 downto 0))));
                                 c(127 downto 32) <= (others => '0');
                             when OUTFIFO =>
-                                outputVertex(to_integer(rd * 32 + 31) downto to_integer(rd * 32)) <= b0; -- Same comment as above
+                                outputvertex(to_integer(rd(7 downto 2)))(to_integer(rd(1 downto 0))) <= signed(b0);
                             when INSERT0 =>
                                 c0 <= b0;
                                 c1 <= a1;
@@ -272,19 +278,19 @@ begin
                                 c3 <= a3;
                             when INSERT1 =>
                                 c0 <= a0;
-                                c1 <= b1;
+                                c1 <= b0;
                                 c2 <= a2;
                                 c3 <= a3;
                             when INSERT2 =>
                                 c0 <= a0;
                                 c1 <= a1;
-                                c2 <= b2;
+                                c2 <= b0;
                                 c3 <= a3;
                             when INSERT3 =>
                                 c0 <= a0;
                                 c1 <= a1;
                                 c2 <= a2;
-                                c3 <= b3;
+                                c3 <= b0;
                             when ADD =>
                                 c0 <= a0 + b0;
                                 c1 <= a1 + b1;
@@ -373,24 +379,21 @@ begin
                                 if(a2>=b2) then
                                     c2<=a2;
                                 else
+                                    c2<=b2;
+                                end if;
+                                if(a3>=b3) then
+                                    c3 <= a3;
+                                else
                                     c3<=b3;
                                 end if;
-                                if(a4>=b4) then
-                                    c4 <= a4;
-                                else
-                                    c4<=b4;
-                                end if;
                             when DONE =>
-                                state <= WAIT_FOR_START;
+                                state <= WAIT_TO_START;
                                 vertexDone <= '1';
                             when others =>
                         end case;
                         
                         if (op /= ST and op /= LD and op /= DONE and blocking /= '1') then
                             state <= FETCH;
-                            if (op /= NOP and op /= OUTFIFO) then
-                                v(to_integer(rd)) <= c;
-                            end if;
                         end if;
 
                     when ST2 =>
@@ -400,9 +403,8 @@ begin
                     when LD2 =>
                         if (dmem_req_done = '1') then
                             dmem_rd_req <= '0';
-                            c0 <= unsigned(dmem_rdata); -- Also unsure why we don't just write dmem_rdata to the register file, made sense earlier but doesnt at 4am
-                            v(to_integer(rd)) <= (others => '0') & unsigned(dmem_rdata);
-                            state <= FETCH -- Not sure if we are supposed to fill the rest with zeros or not
+                            c <= ((127 downto 32 => '0') & unsigned(dmem_rdata));
+                            state <= FETCH;
                         end if;
                     when others =>
                         state <= WAIT_TO_START;
