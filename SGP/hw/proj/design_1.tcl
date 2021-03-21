@@ -135,7 +135,7 @@ xilinx.com:user:axis_tx_tagger:1.0\
 xilinx.com:ip:axis_udp_ethernet:1.0\
 xilinx.com:user:sgp_rasterizer:1.47\
 xilinx.com:user:sgp_renderOutput:1.44\
-xilinx.com:user:sgp_vertexShader:1.30\
+xilinx.com:user:sgp_vertexShader:1.31\
 xilinx.com:user:sgp_viewPort:1.20\
 xilinx.com:ip:system_ila:1.1\
 xilinx.com:ip:mig_7series:4.2\
@@ -994,7 +994,7 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   create_hier_cell_sgp_vertexFetch $hier_obj sgp_vertexFetch
 
   # Create instance: sgp_vertexShader_0, and set properties
-  set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.30 sgp_vertexShader_0 ]
+  set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.31 sgp_vertexShader_0 ]
 
   # Create instance: sgp_viewPort, and set properties
   set sgp_viewPort [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_viewPort:1.20 sgp_viewPort ]
