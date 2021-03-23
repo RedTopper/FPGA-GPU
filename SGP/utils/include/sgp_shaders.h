@@ -120,6 +120,8 @@ int SGP_glUseProgram(GLuint gl_programID);
 int SGP_glShaderSource(GLuint gl_shaderID, GLsizei count, const GLchar * const * string, const GLint * length);
 int SGP_glGetUniformLocation(GLuint gl_programID, GLint gl_uniformID, const GLchar * name);
 void SGP_glUniform1f(GLint location, GLfloat v0);
+void SGP_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+void SGP_glUniformMatrix4f(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value);
 
 
 // Utility functions for program/shader/uniform ID match
