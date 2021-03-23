@@ -73,10 +73,11 @@ ARCHITECTURE behavioral OF vertexShader_core IS
     --used to make two's complement a one cycle occurence
     SIGNAL negateTemp0, negateTemp1, negateTemp2, negateTemp3 : unsigned(31 DOWNTO 0);
     --dictates which SIMD vector we are on
-    SIGNAL processed : STD_LOGIC_VECTOR(1 DOWNTO 0);
+    SIGNAL processed : STD_LOGIC_VECTOR(2 DOWNTO 0);
     --Indicates that we should block while doing serialized instructions
     SIGNAL blocking : STD_LOGIC := '0';
     SIGNAL testSig : INTEGER;
+    SIGNAL multResa,multResb,multResc,multResd : std_logic_vector(63 downto 0); 
 
     -- don't subscript aliases unless you know what you are doing!  I don't.
     ALIAS a3 IS a(127 DOWNTO 96);
@@ -166,7 +167,7 @@ BEGIN
                 dmem_rd_req <= '0';
                 dmem_wr_req <= '0';
                 vertexDone <= '0';
-                processed <= "00";
+                processed <= "000";
             ELSE
                 CASE state IS
                     WHEN WAIT_TO_START =>
@@ -205,6 +206,9 @@ BEGIN
                         --don't set rd,rb,ra etc as they are done above
                         a <= v(to_integer(ra));
                         b <= v(to_integer(rb));
+                        if (op = FMUL) then
+                            blocking <= '1';
+                        end if;
                         state <= EXECUTE;
                     WHEN EXECUTE =>
                         CASE op IS
@@ -214,20 +218,25 @@ BEGIN
                             WHEN FDIV =>
                                 --blocking <='1';
                             WHEN FMUL =>
-                                blocking <='0';
-                                if(processed = "00")then
-                                   c0 <= unsigned(wfixed_t_to_fixed_t(wfixed_t(a0 * b0)));
-                                   processed <= "01";
-                                elsif(processed = "01")then
-                                   c1 <= unsigned(wfixed_t_to_fixed_t(wfixed_t(a1 * b1)));
-                                   processed <= "10";
-                                elsif(processed = "10")then
-                                   c2 <= unsigned(wfixed_t_to_fixed_t(wfixed_t(a2 * b2)));
-                                   processed <= "11";
-                                elsif(processed = "11")then
-                                   c3 <= unsigned(wfixed_t_to_fixed_t(wfixed_t(a3 * b3)));
-                                   processed <= "00";
+                                if(processed = "000")then
+                                   multResa <= std_logic_vector(a0 * b0);
+                                   processed <= "001";
+                                elsif(processed = "001")then
+                                   c0 <= unsigned(multResa(47 downto 16));
+                                   multResa <= std_logic_vector(a1 * b1);
+                                   processed <= "010";
+                                elsif(processed = "010")then
+                                   c1 <= unsigned(multResa(47 downto 16));
+                                   multResa <= std_logic_vector(a2 * b2);
+                                   processed <= "011";
+                                elsif(processed = "011")then
+                                   c2 <= unsigned(multResa(47 downto 16));
+                                   multResa <= std_logic_vector(a3 * b3);
+                                   processed <= "100";
                                    blocking <= '0';
+                                elsif(processed = "100")then
+                                    c3 <= unsigned(multResa(47 downto 16));
+                                    processed <="000";
                                 end if;
                             WHEN FPOW =>
                                 --blocking <='1';
@@ -242,6 +251,7 @@ BEGIN
                                         c0 <= a(95 DOWNTO 64);
                                     WHEN "11" =>
                                         c0 <= a(127 DOWNTO 96);
+                                    WHEN others =>
                                 END CASE;
                                 CASE yy IS
                                     WHEN "00" =>
@@ -252,6 +262,7 @@ BEGIN
                                         c1 <= a(95 DOWNTO 64);
                                     WHEN "11" =>
                                         c1 <= a(127 DOWNTO 96);
+                                    WHEN others =>
                                 END CASE;
                                 CASE zz IS
                                     WHEN "00" =>
@@ -262,6 +273,7 @@ BEGIN
                                         c2 <= a(95 DOWNTO 64);
                                     WHEN "11" =>
                                         c2 <= a(127 DOWNTO 96);
+                                    WHEN others =>
                                 END CASE;
                                 CASE ww IS
                                     WHEN "00" =>
@@ -272,6 +284,7 @@ BEGIN
                                         c3 <= a(95 DOWNTO 64);
                                     WHEN "11" =>
                                         c3 <= a(127 DOWNTO 96);
+                                    WHEN others =>
                                 END CASE;
                             WHEN LDILO =>
                                 c0 <= resize(unsigned(ir(15 DOWNTO 0)), 32);
