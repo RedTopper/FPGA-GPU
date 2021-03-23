@@ -574,7 +574,7 @@ void SGP_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat
 }
 
 // Update the uniform at location (in the shader). Note that this function does not take uniform cache into consideration
-void SGP_glUniformMatrix4f(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value) {
+void SGP_glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat * value) {
 
 	int32_t sgp_uniform_loc = SGP_lookupUniform(location);
 	if (sgp_uniform_loc == -1) {
@@ -585,7 +585,7 @@ void SGP_glUniformMatrix4f(GLint location, GLsizei count, GLboolean transpose, c
 	}
 
     uint32_t baseaddr = SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr;
-	if (SGPconfig->driverMode & SGP_DEEP) {
+	//if (SGPconfig->driverMode & SGP_DEEP) {
 		printf("SGP_glUniform1f: updating uniform %s at address 0x%08x with value:\n",
 				SGP_shadersstate.uniforms[sgp_uniform_loc].name,
 				SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr);
@@ -611,7 +611,7 @@ void SGP_glUniformMatrix4f(GLint location, GLsizei count, GLboolean transpose, c
 			}
 			printf("]\n");
 		}
-	}
+	//}
 	
 	return;
 }
