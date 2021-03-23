@@ -586,12 +586,11 @@ void SGP_glUniformMatrix4f(GLint location, GLsizei count, GLboolean transpose, c
 
     uint32_t baseaddr = SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr;
 	if (SGPconfig->driverMode & SGP_DEEP) {
-		printf("SGP_glUniform1f: updating uniform %s at address 0x%08x with value:\n"
+		printf("SGP_glUniform1f: updating uniform %s at address 0x%08x with value:\n",
 				SGP_shadersstate.uniforms[sgp_uniform_loc].name,
 				SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr);
 
-		GLfloat* addr = NULL;
-		printf(delimOuter);
+		int addr = NULL;
 		for (int pos = 0; pos < count; pos++) {
 			printf("[");
 			const char* delimOuter = "";
