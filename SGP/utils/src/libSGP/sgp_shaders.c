@@ -535,12 +535,12 @@ void SGP_glUniform1f(GLint location, GLfloat v0) {
 
 
 // Update the uniform at location (in the shader). Note that this function does not take uniform cache into consideration
-void SGP_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) {
+void SGP_glUniform4fv(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3) {
 
 	int32_t sgp_uniform_loc = SGP_lookupUniform(location);
 	if (sgp_uniform_loc == -1) {
 		if (SGPconfig->driverMode & SGP_STDOUT) {
-			printf("SGP_glUniform1f: called with location=%d which is not a valid uniform location\n", (int)location);
+			printf("SGP_glUniform4fv: called with location=%d which is not a valid uniform location\n", (int)location);
 		}
 		return;
 	}
@@ -553,7 +553,7 @@ void SGP_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat
 	sglu_fixed_t v3_fixed = sglu_float_to_fixed(v3, 16);
 
 	if (SGPconfig->driverMode & SGP_DEEP) {
-		printf("SGP_glUniform1f: updating uniform %s at address 0x%08x with value [%f = 0x%08x, %f = 0x%08x, %f = 0x%08x, %f = 0x%08x]\n", 
+		printf("SGP_glUniform4fv: updating uniform %s at address 0x%08x with value [%f = 0x%08x, %f = 0x%08x, %f = 0x%08x, %f = 0x%08x]\n", 
 				SGP_shadersstate.uniforms[sgp_uniform_loc].name,
 				SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr,
 				v0,
@@ -579,14 +579,14 @@ void SGP_glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, 
 	int32_t sgp_uniform_loc = SGP_lookupUniform(location);
 	if (sgp_uniform_loc == -1) {
 		if (SGPconfig->driverMode & SGP_STDOUT) {
-			printf("SGP_glUniform1f: called with location=%d which is not a valid uniform location\n", (int)location);
+			printf("SGP_glUniformMatrix4fv: called with location=%d which is not a valid uniform location\n", (int)location);
 		}
 		return;
 	}
 
     uint32_t baseaddr = SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr;
 	//if (SGPconfig->driverMode & SGP_DEEP) {
-		printf("SGP_glUniform1f: updating uniform %s at address 0x%08x with value:\n",
+		printf("SGP_glUniformMatrix4fv: updating uniform %s at address 0x%08x with value:\n",
 				SGP_shadersstate.uniforms[sgp_uniform_loc].name,
 				SGP_shadersstate.uniforms[sgp_uniform_loc].baseaddr);
 
