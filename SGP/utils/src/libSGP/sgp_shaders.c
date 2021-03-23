@@ -601,7 +601,7 @@ void SGP_glUniformMatrix4f(GLint location, GLsizei count, GLboolean transpose, c
 				for (int j = 0; j < 4; j++) {
 					sglu_fixed_t fixed = sglu_float_to_fixed(*(value + addr), 16);
 					printf(delimInner);
-					printf("%f = 0x%08x", value + addr, fixed);
+					printf("%f = 0x%08x", *(value + addr), fixed);
 					SGP_write32(SGPconfig, baseaddr + addr, (uint32_t)fixed);
 					addr += sizeof(GLfloat);
 					delimInner = ", ";
