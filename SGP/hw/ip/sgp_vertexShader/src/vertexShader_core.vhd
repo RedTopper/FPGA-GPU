@@ -443,12 +443,13 @@ BEGIN
                         END IF;
 
                     WHEN ST2 =>
+                        dmem_wr_req <= '0';
                         IF (dmem_req_done = '1') THEN -- Waits for DCache to finish writing and that's all
                             state <= FETCH;
                         END IF;
                     WHEN LD2 =>
+                        dmem_rd_req <= '0';
                         IF (dmem_req_done = '1') THEN
-                            dmem_rd_req <= '0';
                             c <= ((127 DOWNTO 32 => '0') & unsigned(dmem_rdata));
                             state <= FETCH;
                         END IF;
