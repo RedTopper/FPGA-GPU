@@ -423,7 +423,7 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 			do {
 				rastStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RASTERIZER].baseaddr + SGP_AXI_RASTERIZER_STATUS);
 				vertexStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_VERTEX_FETCH].baseaddr + SGP_AXI_VERTEXFETCH_STATUS);
-				//renderStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_STATUS);
+				renderStatus = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_STATUS);
 				idle = rastStatus == 0 && vertexStatus == 0 && renderStatus == 0;
 				if (idle) {
 					numTimes++;
@@ -447,8 +447,8 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 	}
 
 	//TODO 
-	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, DCACHE_CTRL_FLUSH_FLAG);
-	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, 0);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, DCACHE_CTRL_FLUSH_FLAG);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, 0);
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, buffer_addr);
 
 	framecount++;
