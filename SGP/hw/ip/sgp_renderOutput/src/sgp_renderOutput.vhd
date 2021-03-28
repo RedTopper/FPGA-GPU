@@ -242,7 +242,6 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL r_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL g_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL b_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL renderoutput_Tlast_Latched : STD_LOGIC;
 BEGIN
   -- Instantiation of Axi Bus Interface S_AXI_LITE
   sgp_renderOutput_axi_lite_regs_inst : sgp_renderOutput_axi_lite_regs
@@ -348,9 +347,9 @@ BEGIN
   mem_req_tag <= (OTHERS => '0'); -- Request tag - useful for tracking requests
   mem_invalidate <= renderoutput_cachectrl(1); -- Invalidate address
   mem_writeback <= renderoutput_cachectrl(2); -- Writeback request to memory through cache
+  mem_flush <= renderoutput_cachectrl(3);
 
-  S_AXIS_TREADY <= '1' WHEN state = WAIT_FOR_FRAGMENT ELSE
-    '0';
+  S_AXIS_TREADY <= '1' WHEN state = WAIT_FOR_FRAGMENT ELSE '0';
 
   -- The vertexArray_t data types will make this code look much cleaner
   input_fragment_array <= to_vertexArray_t(input_fragment);
@@ -358,42 +357,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000044";
-
-
-  renderoutput_Tlast_Latched <= '0' WHEN S_AXIS_TLAST = '1' ELSE renderoutput_Tlast_Latched;
-
-  renderoutput_status <= (OTHERS => '0') WHEN (renderoutput_Tlast_Latched = '1' AND state = WAIT_FOR_FRAGMENT) ELSE (OTHERS => '1');
-
-
-  -- PROCESS (ACLK) IS
-  -- BEGIN
-  --   IF rising_edge(ACLK) THEN
-  --     IF ARESETN = '0' THEN
-  --       flush_state <= WAIT_FOR_FLUSH;
-  --     ELSE
-  --       CASE flush_state IS
-  --         WHEN WAIT_FOR_FLUSH =>
-  --           IF (renderoutput_cachectrl(3) = '1') THEN
-  --             flush_state <= WAIT_FOR_FIFO;
-  --           END IF;
-  --         WHEN WAIT_FOR_FIFO =>
-  --           IF (S_AXIS_TVALID = '0') THEN
-  --             flush_state <= FLUSH;
-  --           END IF;
-  --         WHEN FLUSH =>
-  --           -- mem_flush <= '1' when flush_state = FLUSH else '0'; happens outside this state machine
-  --           flush_state <= WAIT_FOR_LOW;
-  --         WHEN WAIT_FOR_LOW =>
-  --           IF (renderoutput_cachectrl(3) = '0') THEN
-  --             flush_state <= WAIT_FOR_FLUSH;
-  --           END IF;
-  --         WHEN OTHERS =>
-  --           flush_state <= WAIT_FOR_FLUSH;
-  --       END CASE;
-  --     END IF;
-  --   END IF;
-  -- END PROCESS;
+  renderoutput_debug <= x"00000045";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -416,19 +380,22 @@ BEGIN
         b_color_reg <= (OTHERS => '0');
         g_color_reg <= (OTHERS => '0');
         mem_flush <= '0';
+        renderoutput_status <= (OTHERS => '0');
       ELSE
         CASE state IS
             --(WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
             -- Wait here until we receive a fragment
-            -- Consider looking at TLAST to determine cache flushability
           WHEN WAIT_FOR_FRAGMENT =>
             IF (S_AXIS_TVALID = '1') THEN
-              mem_flush <= '0';
+              renderoutput_status <= (OTHERS => '0');
               input_fragment <= signed(S_AXIS_TDATA);
               state <= GEN_ADDRESS;
             END IF;
 
           WHEN GEN_ADDRESS =>
+            --busy
+            renderoutput_status <= (OTHERS => '1');
+
             --fragment = potential pixel
             x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
@@ -440,26 +407,28 @@ BEGIN
             g_color <= input_fragment_array(1)(2) * x"00FF0000";
             r_color <= input_fragment_array(1)(3) * x"00FF0000";
 
-            state <= WRITE_ADDRESS;
+            IF (x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) THEN
+              state <= WRITE_ADDRESS; --in bounds
+            ELSE
+              state <= WAIT_FOR_FRAGMENT; --dump fragment 
+            END IF;
+
           WHEN WRITE_ADDRESS =>
             mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
             mem_data_wr <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
 
-            
             --wait for mem_accept to go high. then write to the dcache.
             IF (mem_accept = '1') THEN
               mem_wr <= b"1111";
               state <= WAIT_FOR_RESPONSE;
             END IF;
+
           WHEN WAIT_FOR_RESPONSE =>
             mem_wr <= b"0000";
             IF (mem_ack = '1') THEN
-              IF (renderoutput_Tlast_Latched = '1') THEN
-                renderoutput_status <= (OTHERS => '1');
-                mem_flush <= '1';
-              END IF;
               state <= WAIT_FOR_FRAGMENT;
             END IF;
+
           WHEN OTHERS =>
         END CASE;
       END IF;
