@@ -108,6 +108,7 @@ extern SGP_graphicsmap_t SGP_graphicsmap[SGP_GRAPHICS_NUMCOMPONENTS];
 
 //Oh golly we're making our own now
 #define SGP_AXI_VERTEXSHADER_FLUSH       0x0010
+#define SGP_AXI_VERTEXSHADER_IFLUSH      0x0014
 
 
 

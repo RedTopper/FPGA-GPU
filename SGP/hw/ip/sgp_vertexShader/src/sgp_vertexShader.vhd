@@ -199,7 +199,8 @@ architecture behavioral of sgp_vertexShader is
 	    SGP_AXI_VERTEXSHADER_NUMVERTEX      : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 	    SGP_AXI_VERTEXSHADER_VAL2           : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
         SGP_AXI_VERTEXSHADER_VAL3           : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-        SGP_AXI_VERTEXSHADER_FLUSH          : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
+        SGP_AXI_VERTEXSHADER_FLUSH          : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+        sgp_axi_vertexshader_iflush         : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
         SGP_AXI_VERTEXSHADER_STATUS	        : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
         SGP_AXI_VERTEXSHADER_DEBUG          : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0)	    
 		
@@ -328,14 +329,18 @@ architecture behavioral of sgp_vertexShader is
   signal vertexshader_val2 	        : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_val3          : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_flush         : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+  signal vertexshader_iflush         : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_status        : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_debug 	    : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 
   signal vertexshader_flush_latch   : std_logic;
+  signal vertexshader_iflush_latch   : std_logic;
 
 
   -- DCache interface signals
   signal ARESET                 : std_logic;
+  signal reset_scuffed          : std_logic;
+  signal ireset_scuffed         : std_logic;
   signal mem_addr               : std_logic_vector(31 downto 0);
   signal mem_data_wr            : std_logic_vector(31 downto 0);
   signal mem_rd                 : std_logic;
@@ -345,6 +350,8 @@ architecture behavioral of sgp_vertexShader is
   signal mem_invalidate         : std_logic;
   signal mem_writeback          : std_logic;
   signal mem_flush              : std_logic;
+  signal mem_flush_scuffed      : std_logic:= '0';
+  signal mem_iflush_scuffed      : std_logic:= '0';
   signal mem_data_rd            : std_logic_vector(31 downto 0);
   signal mem_accept             : std_logic;
   signal mem_ack                : std_logic;
@@ -410,7 +417,8 @@ begin
 	    SGP_AXI_VERTEXSHADER_NUMVERTEX  => vertexshader_numvertex,
         SGP_AXI_VERTEXSHADER_VAL2 => vertexshader_val2,
         SGP_AXI_VERTEXSHADER_VAL3    => vertexshader_val3,
-        SGP_AXI_VERTEXSHADER_FLUSH  => vertexshader_flush,	    		
+        SGP_AXI_VERTEXSHADER_FLUSH  => vertexshader_flush,
+        SGP_AXI_VERTEXSHADER_IFLUSH  => vertexshader_iflush,	    		
         SGP_AXI_VERTEXSHADER_STATUS    => vertexshader_status,	    		
         SGP_AXI_VERTEXSHADER_DEBUG => vertexshader_debug
 	);
@@ -423,7 +431,7 @@ begin
   sgp_vertexShader_dcache : dcache
 		port map (
         clk_i               => ACLK,
-        rst_i               => ARESET,
+        rst_i               => reset_scuffed,
         mem_addr_i          => mem_addr,
         mem_data_wr_i       => mem_data_wr,
         mem_rd_i            => mem_rd,
@@ -472,7 +480,7 @@ begin
   sgp_vertexShader_icache : icache
 		port map (
         clk_i               => ACLK,
-        rst_i               => ARESET,
+        rst_i               => ireset_scuffed,
         req_pc_i            => req_pc,
         req_rd_i            => req_rd,
         req_invalidate_i    => req_invalidate,
@@ -565,6 +573,7 @@ begin
     -- We can assign some of the cache inputs to constants or control registers as well
     mem_cacheable   <= '1';   -- Process request through cache
     mem_req_tag     <= (others => '0');             -- Request tag - useful for tracking requests
+    mem_flush       <= '0';
     mem_invalidate  <= '0';   -- Invalidate address
     mem_writeback   <= '0';   -- Writeback request to memory through cache
       -- Flush entire cache
@@ -582,9 +591,15 @@ begin
   vertexshader_debug <= x"00000040";
   vertexshader_status <= x"00000000";
 
-  vertexshader_flush_latch <= '1' when vertexshader_flush /= x"00000000" else 
-                              '0' when vertexShader_state = WAIT_FOR_PROGRAM else vertexshader_flush_latch ;
+ -- vertexshader_flush_latch <= '1' when vertexshader_flush /= x"00000000" else 
+ --                              '0' when vertexShader_state = WAIT_FOR_PROGRAM else vertexshader_flush_latch ;
 
+  vertexshader_iflush_latch <= '1' when vertexshader_iflush /= x"00000000" else 
+                              '0' when vertexShader_state = WAIT_FOR_PROGRAM else vertexshader_iflush_latch ;
+
+
+  reset_scuffed <= ARESET or mem_flush_scuffed;
+  ireset_scuffed <= ARESET or mem_iflush_scuffed;
 
    process (ACLK) is
    begin 
@@ -597,24 +612,32 @@ begin
         vertexShader_vertexCount <= (others => '0');
         vertexShader_state <= WAIT_FOR_PROGRAM;
         M_AXIS_TDATA <= (others => '0');  
-        mem_flush       <= '0';      
+        mem_flush_scuffed       <= '0';
+        mem_iflush_scuffed       <= '0';      
       else
 
         case vertexShader_state is
 
             -- Wait here until we get an updated PC from the driver
             when WAIT_FOR_PROGRAM =>
-                mem_flush <= '0';
+            mem_flush_scuffed <= '0';
+            mem_iflush_scuffed <= '0';
                 if (unsigned(vertexshader_pc) >= x"80000000") then
                     vertexShader_core_startPC <= unsigned(vertexshader_pc);
                     vertexShader_state <= WAIT_FOR_VERTEX;
                 end if; 
             
             when WAIT_FOR_VERTEX =>
+                mem_flush_scuffed <= '0';
+                mem_iflush_scuffed <= '0';
                 if (S_AXIS_TVALID = '1') then
                     vertexShader_core_inputVertex <= to_vertexArray_t(signed(S_AXIS_TDATA));
                     vertexShader_core_Start <= '1';
                     vertexShader_state <= WAIT_FOR_DONE;
+                end if;
+                if(vertexshader_iflush_latch = '1')then
+                    mem_iflush_scuffed <= '1';
+                    vertexShader_state <= WAIT_FOR_PROGRAM;
                 end if;
 
             when WAIT_FOR_DONE =>
@@ -624,6 +647,7 @@ begin
                     vertexShader_vertexCount <= vertexShader_vertexCount + 1;
                     if (vertexShader_vertexCount = unsigned(vertexshader_numvertex)) then
                         vertexShader_vertexCount <= (others => '0');
+                        vertexshader_flush_latch <= '1';
                         M_AXIS_TLAST <= '1';
                     else
                         M_AXIS_TLAST <= '0';
@@ -634,9 +658,16 @@ begin
             when WRITE_OUTPUT =>
                 if (M_AXIS_TREADY = '1') then
                     if(vertexshader_flush_latch = '1')then
-                        mem_flush <= '1';
+                        mem_flush_scuffed <='1';
+                        vertexshader_flush_latch <= '0';
                     end if;
-                    vertexShader_state <= WAIT_FOR_VERTEX;             
+                    if(vertexshader_iflush_latch = '1')then
+                        mem_iflush_scuffed <= '1';
+                        vertexShader_state <= WAIT_FOR_PROGRAM;
+                    else
+                        vertexShader_state <= WAIT_FOR_VERTEX;   
+                    end if;
+                              
                 end if;
           end case;
        end if;
