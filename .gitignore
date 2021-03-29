@@ -89,6 +89,7 @@ SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/
 
 
 # ignore everything in hw/proj/ EXCEPT .tcl files
+**/hw/ip/vertexFetch_core/proj/*
 **/hw/ip/sgp_viewPort/proj/*
 **/hw/ip/sgp_renderOutput/proj/*
 **/hw/ip/sgp_rasterizer/proj/*
@@ -104,3 +105,4 @@ SGP/sw/src/Games/common/*
 SGP/sw/src/MP-1/common/*
 SGP/sw/src/MP-2/common/*
 SGP/sw/src/MP-3/common/*
+

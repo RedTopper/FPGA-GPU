@@ -106,6 +106,9 @@ extern SGP_graphicsmap_t SGP_graphicsmap[SGP_GRAPHICS_NUMCOMPONENTS];
 #define DCACHE_CTRL_WRITEBACK_FLAG       0x0004
 #define DCACHE_CTRL_FLUSH_FLAG           0x0008
 
+//Oh golly we're making our own now
+#define SGP_AXI_VERTEXSHADER_FLUSH       0x0010
+
 
 
 
