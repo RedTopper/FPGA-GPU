@@ -77,7 +77,7 @@ ARCHITECTURE behavioral OF vertexShader_core IS
     --Indicates that we should block while doing serialized instructions
     SIGNAL blocking : STD_LOGIC := '0';
     SIGNAL testSig : INTEGER;
-    SIGNAL multResa,multResb,multResc,multResd : std_logic_vector(63 downto 0); 
+    SIGNAL multResa,multResb,multResc,multResd : signed(63 downto 0); 
 
     -- don't subscript aliases unless you know what you are doing!  I don't.
     ALIAS a3 IS a(127 DOWNTO 96);
@@ -219,19 +219,19 @@ BEGIN
                                 --blocking <='1';
                             WHEN FMUL =>
                                 if(processed = "000")then
-                                   multResa <= std_logic_vector(a0 * b0);
+                                   multResa <= signed(a0) * signed(b0);
                                    processed <= "001";
                                 elsif(processed = "001")then
                                    c0 <= unsigned(multResa(47 downto 16));
-                                   multResb <= std_logic_vector(a1 * b1);
+                                   multResb <= signed(a1) * signed(b1);
                                    processed <= "010";
                                 elsif(processed = "010")then
                                    c1 <= unsigned(multResb(47 downto 16));
-                                   multResc <= std_logic_vector(a2 * b2);
+                                   multResc <= signed(a2) * signed(b2);
                                    processed <= "011";
                                 elsif(processed = "011")then
                                    c2 <= unsigned(multResc(47 downto 16));
-                                   multResd <= std_logic_vector(a3 * b3);
+                                   multResd <= signed(a3) * signed(b3);
                                    processed <= "100";
                                    blocking <= '0';
                                 elsif(processed = "100")then
