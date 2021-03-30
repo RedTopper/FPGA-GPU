@@ -223,19 +223,19 @@ BEGIN
                                    processed <= "001";
                                 elsif(processed = "001")then
                                    c0 <= unsigned(multResa(47 downto 16));
-                                   multResa <= std_logic_vector(a1 * b1);
+                                   multResb <= std_logic_vector(a1 * b1);
                                    processed <= "010";
                                 elsif(processed = "010")then
-                                   c1 <= unsigned(multResa(47 downto 16));
-                                   multResa <= std_logic_vector(a2 * b2);
+                                   c1 <= unsigned(multResb(47 downto 16));
+                                   multResc <= std_logic_vector(a2 * b2);
                                    processed <= "011";
                                 elsif(processed = "011")then
-                                   c2 <= unsigned(multResa(47 downto 16));
-                                   multResa <= std_logic_vector(a3 * b3);
+                                   c2 <= unsigned(multResc(47 downto 16));
+                                   multResd <= std_logic_vector(a3 * b3);
                                    processed <= "100";
                                    blocking <= '0';
                                 elsif(processed = "100")then
-                                    c3 <= unsigned(multResa(47 downto 16));
+                                    c3 <= unsigned(multResd(47 downto 16));
                                     processed <="000";
                                 end if;
                             WHEN FPOW =>

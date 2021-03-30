@@ -400,6 +400,9 @@ int SGP_glLinkProgram(GLuint gl_programID) {
 // Let the vertex and fragment shader cores know to get started
 int SGP_glUseProgram(GLuint gl_programID) {
 
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_VERTEXSHADER_IFLUSH, 69);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_VERTEXSHADER_IFLUSH, 0);
+
 	int32_t cur_program_index;
 
 	cur_program_index = SGP_lookupProgram(gl_programID);

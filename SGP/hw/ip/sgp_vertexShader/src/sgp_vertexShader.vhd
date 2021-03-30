@@ -588,7 +588,7 @@ begin
 
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  vertexshader_debug <= x"00000040";
+  vertexshader_debug <= x"00000042";
   vertexshader_status <= x"00000000";
 
  -- vertexshader_flush_latch <= '1' when vertexshader_flush /= x"00000000" else 
