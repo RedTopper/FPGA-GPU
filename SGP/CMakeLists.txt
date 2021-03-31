@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(sgp)
+project(SGP DESCRIPTION "cpre480 Simple Graphics Processor")
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -15,10 +15,11 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/sw/src/shared/ogldir2)
 
 # Libraries
 add_subdirectory(utils/src/libSGP)
+#add_subdirectory(utils/src/libsimpleGL)
 add_subdirectory(utils/src/libsimpleGLU)
 add_subdirectory(sw/src/shared/ogldir1)
 
-# Runtime Projects
+# Projects
 set(LINK_LIBS ogldir1 opengl32 glew32 glfw3)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/sw/bin)
 add_subdirectory(sw/src/MP-1/00_CustomTest)

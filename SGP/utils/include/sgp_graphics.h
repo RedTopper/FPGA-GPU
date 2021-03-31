@@ -118,7 +118,7 @@ typedef struct {
 	GLuint buffer;
 	GLenum target;
 	GLsizeiptr size;
-	void *cpu_ptr;
+	const void *cpu_ptr;
 	uint32_t gpu_ptr;
 	GLenum usage;
 	uint8_t status;
@@ -132,7 +132,7 @@ typedef struct {
     GLenum type;
     GLboolean normalized;
     GLsizei stride;
-    GLvoid *pointer;
+    const GLvoid *pointer;
     uint8_t status;
 } SGP_vertex_attrib_t;
 
