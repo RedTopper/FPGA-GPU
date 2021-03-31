@@ -142,8 +142,10 @@ architecture behavioral of sgp_viewPort is
     -- Input and output of viewport transformation. Keep in Q16.16 format and if input is normalized, there should be no overflow. 
     signal x_ndc_coords : fixed_t;
     signal y_ndc_coords : fixed_t;
+	signal z_ndc_coords : fixed_t;
     signal x_vp_coords  : fixed_t;
     signal y_vp_coords  : fixed_t;
+	signal z_vp_coords  : fixed_t;
 
 
     type STATE_TYPE is (WAIT_FOR_VERTEX, CALC_XMULT, CALC_YMULT, CALC_VPCOORDS, VERTEX_WRITE);
@@ -160,25 +162,25 @@ begin
 		C_S_AXI_ADDR_WIDTH	=> C_S_AXI_ADDR_WIDTH
 	)
 	port map (
-		S_AXI_ACLK	=> ACLK,
+		S_AXI_ACLK		=> ACLK,
 		S_AXI_ARESETN	=> ARESETN,
 		S_AXI_AWADDR	=> s_axi_lite_awaddr,
 		S_AXI_AWPROT	=> s_axi_lite_awprot,
 		S_AXI_AWVALID	=> s_axi_lite_awvalid,
 		S_AXI_AWREADY	=> s_axi_lite_awready,
-		S_AXI_WDATA	=> s_axi_lite_wdata,
-		S_AXI_WSTRB	=> s_axi_lite_wstrb,
+		S_AXI_WDATA		=> s_axi_lite_wdata,
+		S_AXI_WSTRB		=> s_axi_lite_wstrb,
 		S_AXI_WVALID	=> s_axi_lite_wvalid,
 		S_AXI_WREADY	=> s_axi_lite_wready,
-		S_AXI_BRESP	=> s_axi_lite_bresp,
+		S_AXI_BRESP		=> s_axi_lite_bresp,
 		S_AXI_BVALID	=> s_axi_lite_bvalid,
 		S_AXI_BREADY	=> s_axi_lite_bready,
 		S_AXI_ARADDR	=> s_axi_lite_araddr,
 		S_AXI_ARPROT	=> s_axi_lite_arprot,
 		S_AXI_ARVALID	=> s_axi_lite_arvalid,
 		S_AXI_ARREADY	=> s_axi_lite_arready,
-		S_AXI_RDATA	=> s_axi_lite_rdata,
-		S_AXI_RRESP	=> s_axi_lite_rresp,
+		S_AXI_RDATA		=> s_axi_lite_rdata,
+		S_AXI_RRESP		=> s_axi_lite_rresp,
 		S_AXI_RVALID	=> s_axi_lite_rvalid,
 		S_AXI_RREADY	=> s_axi_lite_rready,
 		
@@ -189,12 +191,12 @@ begin
 	    SGP_AXI_VIEWPORT_NEARVAL_REG      => viewport_nearval_reg,
 	    SGP_AXI_VIEWPORT_FARVAL_REG       => viewport_farval_reg,
         SGP_AXI_VIEWPORT_DEBUG            => viewport_debug	
-		
 	);
 
-   M_AXIS_TDATA(C_NUM_VERTEX_ATTRIB*128-1 downto 64) <= tdata_reg(C_NUM_VERTEX_ATTRIB*128-1 downto 64);
+   M_AXIS_TDATA(C_NUM_VERTEX_ATTRIB*128-1 downto 96) <= tdata_reg(C_NUM_VERTEX_ATTRIB*128-1 downto 96);
    M_AXIS_TDATA(31 downto 0)  <= std_logic_vector(x_vp_coords);
    M_AXIS_TDATA(63 downto 32) <= std_logic_vector(y_vp_coords);
+   M_AXIS_TDATA(95 downto 64) <= std_logic_vector(z_vp_coords);
    
    M_AXIS_TLAST  <= S_AXIS_TLAST;
 
@@ -230,10 +232,12 @@ begin
         tdata_reg       <= (others => '0');
         x_ndc_coords    <= fixed_t_zero;
         y_ndc_coords    <= fixed_t_zero;
+		z_ndc_coords	<= fixed_t_zero;
         viewport_xmult  <= wfixed_t_zero;
         viewport_ymult  <= wfixed_t_zero;
         x_vp_coords     <= fixed_t_zero;
         y_vp_coords     <= fixed_t_zero;
+		z_vp_coords     <= fixed_t_zero;
 
       else
 
@@ -247,6 +251,7 @@ begin
                      -- Our incoming vertices are in Q16.16 format, and will be in the range [-1, 1] 
                     x_ndc_coords <= signed(S_AXIS_TDATA(31 downto 0)) + fixed_t_one;
                     y_ndc_coords <= signed(S_AXIS_TDATA(63 downto 32)) + fixed_t_one;
+					z_ndc_coords <= shift_right(signed(S_AXIS_TDATA(95 downto 64)) + fixed_t_one,1);
                     state <= CALC_XMULT;
                 end if;
 
@@ -262,6 +267,27 @@ begin
 			when CALC_VPCOORDS =>
 				x_vp_coords <= wfixed_t_to_fixed_t(viewport_xmult) + viewport_x;
 				y_vp_coords <= wfixed_t_to_fixed_t(viewport_ymult) + viewport_y; 
+
+				if (viewport_farval_reg <= viewport_nearval_reg) then
+					if (std_logic_vector(z_ndc_coords) <= viewport_farval_reg) then
+						z_vp_coords <= fixed_t(viewport_farval_reg);
+					elsif (std_logic_vector(z_ndc_coords) > viewport_nearval_reg) then
+						z_vp_coords <= fixed_t(viewport_nearval_reg);
+					else
+						z_vp_coords <= fixed_t(z_ndc_coords);
+					end if;	
+				elsif (viewport_farval_reg > viewport_nearval_reg) then
+					if (std_logic_vector(z_ndc_coords) <= viewport_nearval_reg) then
+						z_vp_coords <= fixed_t(viewport_nearval_reg);
+					elsif (std_logic_vector(z_ndc_coords) > viewport_farval_reg) then
+						z_vp_coords <= fixed_t(viewport_farval_reg);
+					else
+						z_vp_coords <= fixed_t(z_ndc_coords);
+					end if;	
+				else
+					z_vp_coords <= fixed_t(z_ndc_coords);
+				end if;
+
 				state <= VERTEX_WRITE;
 				
 			when VERTEX_WRITE =>
