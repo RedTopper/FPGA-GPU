@@ -15,6 +15,8 @@ set(LIB_SIMPLE_GLU
 
 set(LINK_LIBS opengl32 glew32 glfw3)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/sw/bin)
+
 # Note: Set each project's working directory to sw/bin
 #       (sub programs access assets in ../common)
 add_subdirectory(sw/src/MP-1/00_CustomTest)
