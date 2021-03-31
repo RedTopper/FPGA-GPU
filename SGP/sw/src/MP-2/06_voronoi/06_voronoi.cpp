@@ -50,7 +50,7 @@ int image_mode = 0;
 
 VoronoiDiagramGenerator vdg;
 
-typedef struct poly {
+struct poly {
 	int nv;
 	int nvv;
 	float x[MAX_VERTS], y[MAX_VERTS];

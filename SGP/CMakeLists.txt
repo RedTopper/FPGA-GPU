@@ -7,18 +7,20 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/utils/include)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/sw/src/shared/ogldir1)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/sw/src/shared/ogldir2)
 
-set(BASE
-        ${CMAKE_CURRENT_LIST_DIR}/sw/src/shared/ogldir1/shader.cpp)
+# Dependencies
+# pacman -S mingw-w64-x86_64-shaderc
+# pacman -S mingw-w64-x86_64-glew
+# pacman -S mingw-w64-x86_64-glfw
+# I'm sure there's more
 
-set(LIB_SIMPLE_GLU
-        ${CMAKE_CURRENT_LIST_DIR}/utils/src/libsimpleGLU/simpleGLU.c)
+# Libraries
+add_subdirectory(utils/src/libSGP)
+add_subdirectory(utils/src/libsimpleGLU)
+add_subdirectory(sw/src/shared/ogldir1)
 
-set(LINK_LIBS opengl32 glew32 glfw3)
-
+# Runtime Projects
+set(LINK_LIBS ogldir1 opengl32 glew32 glfw3)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/sw/bin)
-
-# Note: Set each project's working directory to sw/bin
-#       (sub programs access assets in ../common)
 add_subdirectory(sw/src/MP-1/00_CustomTest)
 add_subdirectory(sw/src/MP-1/01_ClearTest)
 add_subdirectory(sw/src/MP-1/02_TheRedPixel)
@@ -36,3 +38,9 @@ add_subdirectory(sw/src/MP-3/01_shapeshifter)
 add_subdirectory(sw/src/MP-3/02_cubeflyby)
 add_subdirectory(sw/src/MP-3/03_flexseal)
 add_subdirectory(sw/src/MP-4/01_intersect)
+
+# Utilities
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/utils/bin)
+add_subdirectory(utils/src/glslc_test)
+add_subdirectory(utils/src/sgp_fbtransmit)
+add_subdirectory(utils/src/sgp_test)

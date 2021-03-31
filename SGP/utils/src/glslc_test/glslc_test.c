@@ -25,7 +25,8 @@
 #include "sgp_axi.h"
 #include "sgp.h"
 
-sgp_config *SGPconfig;
+// Don't know if this is needed?
+// sgp_config *SGPconfig;
 
 int SGP_inittest() {
 
@@ -134,7 +135,7 @@ int SGP_shadertest(char *vert_shader_fname, char *frag_shader_fname, int debugVa
         return returnVal;
     }
 
-    returnVal = SGP_glShaderSource(0, 1, &vert_shader_src, 0);
+    returnVal = SGP_glShaderSource(0, 1, (const GLchar* const*) &vert_shader_src, 0);
     if (returnVal) {
         if (debugValue == 1) {
             printf("Error in SGP_glShaderSource(%d)\n", 0);
@@ -142,7 +143,7 @@ int SGP_shadertest(char *vert_shader_fname, char *frag_shader_fname, int debugVa
         return returnVal;
     }
 
-    returnVal = SGP_glShaderSource(1, 1, &frag_shader_src, 0);
+    returnVal = SGP_glShaderSource(1, 1, (const GLchar* const*) &frag_shader_src, 0);
     if (returnVal) {
         if (debugValue == 1) {
             printf("Error in SGP_glShaderSource(%d)\n", 1);

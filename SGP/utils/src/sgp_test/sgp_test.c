@@ -24,7 +24,8 @@
 #include "sgp_axi.h"
 #include "sgp.h"
 
-sgp_config *SGPconfig;
+// Is this needed?
+// sgp_config *SGPconfig;
 
 void SGP_udptest() {
 
