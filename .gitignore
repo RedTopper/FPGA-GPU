@@ -56,37 +56,14 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-### C++ ###
-# Prerequisites
-
-# Compiled Object files
-*.slo
-
-# Precompiled Headers
-
-# Linker files
-
-# Debugger Files
-
-# Compiled Dynamic libraries
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-
-# Executables
-
 # End of https://www.toptal.com/developers/gitignore/api/c,c++
-MP-1/.vscode/settings.json
-/.vscode
+
+### Project Specific Ignores ###
+# ignore generated outputs
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.sim/
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.sim/*
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/*
 SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/
-
 
 # ignore everything in hw/proj/ EXCEPT .tcl files
 **/hw/ip/vertexFetch_core/proj/*
@@ -99,11 +76,33 @@ SGP/hw/ip/sgp_rasterizer/proj/sgp_rasterizer.cache/
 !*.tcl
 !*.xci
 
-#common folders should be symlinked, so ignore the contents of them
+# common folders should be symlinked, so ignore the contents of them
 SGP/sw/src/Examples/common/*
 SGP/sw/src/Games/common/*
 SGP/sw/src/MP-1/common/*
 SGP/sw/src/MP-2/common/*
 SGP/sw/src/MP-3/common/*
+SGP/sw/src/MP-4/common/*
 
+# IDE stuff
+/.vscode
 /SGP/.vscode
+/SGP/.idea
+
+# Build directory
+/SGP/cmake-build-debug
+
+# don't need the binaries
+/SGP/sw/src/MP-2/06_voronoi/06_voronoi
+/SGP/sw/src/MP-2/05_tripaint/05_tripaint
+/SGP/sw/src/MP-2/04_colorwheel/04_colorwheel
+/SGP/sw/src/MP-2/03_rand_triangles/03_rand_triangles
+/SGP/sw/src/MP-2/02_snowflake/02_snowflake
+/SGP/sw/src/MP-2/01_TheRedTriangle/01_TheRedTriangle
+/SGP/sw/src/MP-1/06_ViewPorting/06_ViewPorting
+/SGP/sw/src/MP-1/05_Fern/05_Fern
+/SGP/sw/src/MP-1/04_Fractals/04_Fractals
+/SGP/sw/src/MP-1/03_Sierpinski/03_Sierpinski
+/SGP/sw/src/MP-1/02_TheRedPixel/02_TheRedPixel
+/SGP/sw/src/MP-1/01_ClearTest/01_ClearTest
+/SGP/sw/src/MP-1/00_CustomTest/00_CustomTest
