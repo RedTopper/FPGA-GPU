@@ -133,9 +133,9 @@ xilinx.com:ip:axis_data_fifo:2.0\
 xilinx.com:user:axis_rx_tagger:1.0\
 xilinx.com:user:axis_tx_tagger:1.0\
 xilinx.com:ip:axis_udp_ethernet:1.0\
+xilinx.com:user:sgp_vertexShader:1.44\
 xilinx.com:user:sgp_rasterizer:1.47\
-xilinx.com:user:sgp_renderOutput:1.44\
-xilinx.com:user:sgp_vertexShader:1.40\
+xilinx.com:user:sgp_renderOutput:1.46\
 xilinx.com:user:sgp_viewPort:1.20\
 xilinx.com:ip:system_ila:1.1\
 xilinx.com:ip:mig_7series:4.2\
@@ -739,6 +739,8 @@ proc create_hier_cell_system_intercon { parentCell nameHier } {
 
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M13_AXI
 
+  create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 M14_AXI
+
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S00_AXI
 
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S01_AXI
@@ -752,7 +754,7 @@ proc create_hier_cell_system_intercon { parentCell nameHier } {
   set periph_intercon [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 periph_intercon ]
   set_property -dict [ list \
    CONFIG.ENABLE_ADVANCED_OPTIONS {1} \
-   CONFIG.NUM_MI {14} \
+   CONFIG.NUM_MI {15} \
    CONFIG.NUM_SI {3} \
  ] $periph_intercon
 
@@ -780,6 +782,7 @@ proc create_hier_cell_system_intercon { parentCell nameHier } {
   connect_bd_intf_net -intf_net periph_intercon_M11_AXI [get_bd_intf_pins M11_AXI] [get_bd_intf_pins periph_intercon/M11_AXI]
   connect_bd_intf_net -intf_net periph_intercon_M12_AXI [get_bd_intf_pins M12_AXI] [get_bd_intf_pins periph_intercon/M12_AXI]
   connect_bd_intf_net -intf_net periph_intercon_M13_AXI [get_bd_intf_pins M13_AXI] [get_bd_intf_pins periph_intercon/M13_AXI]
+  connect_bd_intf_net -intf_net periph_intercon_M14_AXI [get_bd_intf_pins M14_AXI] [get_bd_intf_pins periph_intercon/M14_AXI]
   connect_bd_intf_net -intf_net s00_axi_1 [get_bd_intf_pins M03_AXI] [get_bd_intf_pins periph_intercon/M03_AXI]
   connect_bd_intf_net -intf_net system_dma_M_AXI [get_bd_intf_pins periph_intercon/S02_AXI] [get_bd_intf_pins system_dma/M_AXI]
 
@@ -840,7 +843,11 @@ proc create_hier_cell_memory_subsystem { parentCell nameHier } {
 
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI_VERTEX_DCACHE
 
+  create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI_VERTEX_DCACHE1
+
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI_VERTEX_ICACHE
+
+  create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI_VERTEX_ICACHE1
 
 
   # Create pins
@@ -885,7 +892,7 @@ proc create_hier_cell_memory_subsystem { parentCell nameHier } {
   set_property -dict [ list \
    CONFIG.ADVANCED_PROPERTIES {  __view__ { clocking { S03_Entry { ASSOCIATED_CLK aclk } } } } \
    CONFIG.NUM_CLKS {2} \
-   CONFIG.NUM_SI {7} \
+   CONFIG.NUM_SI {9} \
  ] $memory_intercon
 
   # Create interface connections
@@ -894,6 +901,8 @@ proc create_hier_cell_memory_subsystem { parentCell nameHier } {
   connect_bd_intf_net -intf_net S05_AXI_1 [get_bd_intf_pins S_AXI_VERTEX_DCACHE] [get_bd_intf_pins memory_intercon/S05_AXI]
   connect_bd_intf_net -intf_net S06_AXI_1 [get_bd_intf_pins S_AXI_VERTEX_ICACHE] [get_bd_intf_pins memory_intercon/S06_AXI]
   connect_bd_intf_net -intf_net S_AXI_LITE_2 [get_bd_intf_pins S_AXI_MEMORY_DMA] [get_bd_intf_pins memory_dma/S_AXI_LITE]
+  connect_bd_intf_net -intf_net S_AXI_VERTEX_DCACHE1_1 [get_bd_intf_pins S_AXI_VERTEX_DCACHE1] [get_bd_intf_pins memory_intercon/S07_AXI]
+  connect_bd_intf_net -intf_net S_AXI_VERTEX_ICACHE1_1 [get_bd_intf_pins S_AXI_VERTEX_ICACHE1] [get_bd_intf_pins memory_intercon/S08_AXI]
   connect_bd_intf_net -intf_net mem_interface_DDR3 [get_bd_intf_pins DDR3] [get_bd_intf_pins mem_interface/DDR3]
   connect_bd_intf_net -intf_net memory_intercon_M00_AXI [get_bd_intf_pins mem_interface/S_AXI] [get_bd_intf_pins memory_intercon/M00_AXI]
   connect_bd_intf_net -intf_net memory_subsystem_M_AXI [get_bd_intf_pins memory_dma/M_AXI] [get_bd_intf_pins memory_intercon/S02_AXI]
@@ -954,6 +963,10 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
 
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI_FULL
 
+  create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 fragmentShader_dcache_M1_AXI
+
+  create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 fragmentShader_icache_M2_AXI
+
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 renderOutput_dcache_0_M0_AXI
 
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 s_axi_lite
@@ -966,6 +979,8 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
 
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 s_axi_lite4
 
+  create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 s_axi_lite5
+
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 vertexShader_dcache_M1_AXI
 
   create_bd_intf_pin -mode Master -vlnv xilinx.com:interface:aximm_rtl:1.0 vertexShader_icache_M2_AXI
@@ -975,17 +990,26 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   create_bd_pin -dir I -type clk s_axis_aclk
   create_bd_pin -dir I -type rst s_axis_aresetn
 
+  # Create instance: fragmentShader_fifo, and set properties
+  set fragmentShader_fifo [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_data_fifo:2.0 fragmentShader_fifo ]
+  set_property -dict [ list \
+   CONFIG.HAS_TLAST {0} \
+ ] $fragmentShader_fifo
+
   # Create instance: raserizer_fifo, and set properties
   set raserizer_fifo [ create_bd_cell -type ip -vlnv xilinx.com:ip:axis_data_fifo:2.0 raserizer_fifo ]
   set_property -dict [ list \
    CONFIG.HAS_TLAST {0} \
  ] $raserizer_fifo
 
+  # Create instance: sgp_fragmentShader, and set properties
+  set sgp_fragmentShader [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.44 sgp_fragmentShader ]
+
   # Create instance: sgp_rasterizer_0, and set properties
   set sgp_rasterizer_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_rasterizer:1.47 sgp_rasterizer_0 ]
 
   # Create instance: sgp_renderOutput, and set properties
-  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.44 sgp_renderOutput ]
+  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.46 sgp_renderOutput ]
   set_property -dict [ list \
    CONFIG.C_M_AXI_ID_WIDTH {4} \
  ] $sgp_renderOutput
@@ -994,7 +1018,7 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   create_hier_cell_sgp_vertexFetch $hier_obj sgp_vertexFetch
 
   # Create instance: sgp_vertexShader_0, and set properties
-  set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.40 sgp_vertexShader_0 ]
+  set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.44 sgp_vertexShader_0 ]
 
   # Create instance: sgp_viewPort, and set properties
   set sgp_viewPort [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_viewPort:1.20 sgp_viewPort ]
@@ -1002,9 +1026,9 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   # Create instance: system_ila_0, and set properties
   set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
   set_property -dict [ list \
-   CONFIG.C_BRAM_CNT {6} \
-   CONFIG.C_NUM_MONITOR_SLOTS {3} \
-   CONFIG.C_SLOT {2} \
+   CONFIG.C_BRAM_CNT {21} \
+   CONFIG.C_NUM_MONITOR_SLOTS {1} \
+   CONFIG.C_SLOT {0} \
    CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
    CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
  ] $system_ila_0
@@ -1023,13 +1047,16 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
 
   # Create interface connections
   connect_bd_intf_net -intf_net axis_data_fifo_0_M_AXIS [get_bd_intf_pins sgp_viewPort/S_AXIS] [get_bd_intf_pins vertexshader_fifo/M_AXIS]
-  connect_bd_intf_net -intf_net raserizer_fifo_M_AXIS [get_bd_intf_pins raserizer_fifo/M_AXIS] [get_bd_intf_pins sgp_renderOutput/S_AXIS]
-  connect_bd_intf_net -intf_net [get_bd_intf_nets raserizer_fifo_M_AXIS] [get_bd_intf_pins raserizer_fifo/M_AXIS] [get_bd_intf_pins system_ila_0/SLOT_1_AXIS]
-  connect_bd_intf_net -intf_net renderOutput_dcache_0_M0_AXI [get_bd_intf_pins renderOutput_dcache_0_M0_AXI] [get_bd_intf_pins sgp_renderOutput/m_axi]
-  connect_bd_intf_net -intf_net [get_bd_intf_nets renderOutput_dcache_0_M0_AXI] [get_bd_intf_pins renderOutput_dcache_0_M0_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
+  connect_bd_intf_net -intf_net fragmentShader_fifo_M_AXIS [get_bd_intf_pins fragmentShader_fifo/M_AXIS] [get_bd_intf_pins sgp_renderOutput/S_AXIS]
+  connect_bd_intf_net -intf_net raserizer_fifo_M_AXIS [get_bd_intf_pins raserizer_fifo/M_AXIS] [get_bd_intf_pins sgp_fragmentShader/S_AXIS]
   connect_bd_intf_net -intf_net s_axi_lite3_1 [get_bd_intf_pins s_axi_lite3] [get_bd_intf_pins sgp_rasterizer_0/s_axi_lite]
   connect_bd_intf_net -intf_net s_axi_lite4_1 [get_bd_intf_pins s_axi_lite4] [get_bd_intf_pins sgp_vertexShader_0/s_axi_lite]
+  connect_bd_intf_net -intf_net s_axi_lite5_1 [get_bd_intf_pins s_axi_lite5] [get_bd_intf_pins sgp_fragmentShader/s_axi_lite]
+  connect_bd_intf_net -intf_net sgp_fragmentShader_M_AXIS [get_bd_intf_pins fragmentShader_fifo/S_AXIS] [get_bd_intf_pins sgp_fragmentShader/M_AXIS]
+  connect_bd_intf_net -intf_net sgp_fragmentShader_m1_axi [get_bd_intf_pins fragmentShader_dcache_M1_AXI] [get_bd_intf_pins sgp_fragmentShader/m1_axi]
+  connect_bd_intf_net -intf_net sgp_fragmentShader_m2_axi [get_bd_intf_pins fragmentShader_icache_M2_AXI] [get_bd_intf_pins sgp_fragmentShader/m2_axi]
   connect_bd_intf_net -intf_net sgp_rasterizer_0_M_AXIS [get_bd_intf_pins raserizer_fifo/S_AXIS] [get_bd_intf_pins sgp_rasterizer_0/M_AXIS]
+  connect_bd_intf_net -intf_net sgp_renderOutput_m_axi [get_bd_intf_pins renderOutput_dcache_0_M0_AXI] [get_bd_intf_pins sgp_renderOutput/m_axi]
   connect_bd_intf_net -intf_net sgp_vertexShader_0_M_AXIS [get_bd_intf_pins sgp_vertexShader_0/M_AXIS] [get_bd_intf_pins vertexshader_fifo/S_AXIS]
   connect_bd_intf_net -intf_net sgp_vertexShader_0_m1_axi [get_bd_intf_pins vertexShader_dcache_M1_AXI] [get_bd_intf_pins sgp_vertexShader_0/m1_axi]
   connect_bd_intf_net -intf_net sgp_vertexShader_0_m2_axi [get_bd_intf_pins vertexShader_icache_M2_AXI] [get_bd_intf_pins sgp_vertexShader_0/m2_axi]
@@ -1044,8 +1071,8 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   connect_bd_intf_net -intf_net viewport_fifo_M_AXIS [get_bd_intf_pins sgp_rasterizer_0/S_AXIS] [get_bd_intf_pins viewport_fifo/M_AXIS]
 
   # Create port connections
-  connect_bd_net -net ARESETN_1 [get_bd_pins s_axis_aresetn] [get_bd_pins raserizer_fifo/s_axis_aresetn] [get_bd_pins sgp_rasterizer_0/ARESETN] [get_bd_pins sgp_renderOutput/ARESETN] [get_bd_pins sgp_vertexFetch/m_axi_aresetn] [get_bd_pins sgp_vertexShader_0/ARESETN] [get_bd_pins sgp_viewPort/ARESETN] [get_bd_pins system_ila_0/resetn] [get_bd_pins vertexfetch_fifo/s_axis_aresetn] [get_bd_pins vertexshader_fifo/s_axis_aresetn] [get_bd_pins viewport_fifo/s_axis_aresetn]
-  connect_bd_net -net mem_interface_ui_clk [get_bd_pins s_axis_aclk] [get_bd_pins raserizer_fifo/s_axis_aclk] [get_bd_pins sgp_rasterizer_0/ACLK] [get_bd_pins sgp_renderOutput/ACLK] [get_bd_pins sgp_vertexFetch/m_axis_aclk] [get_bd_pins sgp_vertexShader_0/ACLK] [get_bd_pins sgp_viewPort/ACLK] [get_bd_pins system_ila_0/clk] [get_bd_pins vertexfetch_fifo/s_axis_aclk] [get_bd_pins vertexshader_fifo/s_axis_aclk] [get_bd_pins viewport_fifo/s_axis_aclk]
+  connect_bd_net -net ARESETN_1 [get_bd_pins s_axis_aresetn] [get_bd_pins raserizer_fifo/s_axis_aresetn] [get_bd_pins sgp_fragmentShader/ARESETN] [get_bd_pins sgp_rasterizer_0/ARESETN] [get_bd_pins sgp_renderOutput/ARESETN] [get_bd_pins sgp_vertexFetch/m_axi_aresetn] [get_bd_pins sgp_vertexShader_0/ARESETN] [get_bd_pins sgp_viewPort/ARESETN] [get_bd_pins system_ila_0/resetn] [get_bd_pins vertexfetch_fifo/s_axis_aresetn] [get_bd_pins vertexshader_fifo/s_axis_aresetn] [get_bd_pins viewport_fifo/s_axis_aresetn]
+  connect_bd_net -net mem_interface_ui_clk [get_bd_pins s_axis_aclk] [get_bd_pins raserizer_fifo/s_axis_aclk] [get_bd_pins sgp_fragmentShader/ACLK] [get_bd_pins sgp_rasterizer_0/ACLK] [get_bd_pins sgp_renderOutput/ACLK] [get_bd_pins sgp_vertexFetch/m_axis_aclk] [get_bd_pins sgp_vertexShader_0/ACLK] [get_bd_pins sgp_viewPort/ACLK] [get_bd_pins system_ila_0/clk] [get_bd_pins vertexfetch_fifo/s_axis_aclk] [get_bd_pins vertexshader_fifo/s_axis_aclk] [get_bd_pins viewport_fifo/s_axis_aclk]
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -1326,11 +1353,13 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net S03_AXI_1 [get_bd_intf_pins memory_subsystem/S03_AXI] [get_bd_intf_pins system_intercon/M05_AXI]
   connect_bd_intf_net -intf_net S_AXI_LITE_1 [get_bd_intf_pins system_intercon/M01_AXI] [get_bd_intf_pins video_subsystem/S_AXI_VDMA]
   connect_bd_intf_net -intf_net S_AXI_LITE_2 [get_bd_intf_pins memory_subsystem/S_AXI_MEMORY_DMA] [get_bd_intf_pins system_intercon/M04_AXI]
+  connect_bd_intf_net -intf_net S_AXI_VERTEX_DCACHE1_1 [get_bd_intf_pins graphics_subsystem/fragmentShader_dcache_M1_AXI] [get_bd_intf_pins memory_subsystem/S_AXI_VERTEX_DCACHE1]
   connect_bd_intf_net -intf_net axi_interconnect_0_M00_AXI [get_bd_intf_pins debug_subsystem/S_AXI_SYSTEM_DMA] [get_bd_intf_pins system_intercon/M00_AXI]
   connect_bd_intf_net -intf_net axi_uartlite_0_UART [get_bd_intf_ports usb_uart] [get_bd_intf_pins debug_subsystem/usb_uart]
   connect_bd_intf_net -intf_net axis_udp_ethernet_0_RGMII_eth [get_bd_intf_ports RGMII_eth] [get_bd_intf_pins ethernet_subsystem/RGMII_eth]
   connect_bd_intf_net -intf_net ctrl_1 [get_bd_intf_pins system_intercon/M02_AXI] [get_bd_intf_pins video_subsystem/S_AXI_V_TC]
   connect_bd_intf_net -intf_net ethernet_subsystem_M00_AXI [get_bd_intf_pins ethernet_subsystem/M_AXI_ETH] [get_bd_intf_pins system_intercon/S01_AXI]
+  connect_bd_intf_net -intf_net graphics_subsystem_fragmentShader_icache_M2_AXI [get_bd_intf_pins graphics_subsystem/fragmentShader_icache_M2_AXI] [get_bd_intf_pins memory_subsystem/S_AXI_VERTEX_ICACHE1]
   connect_bd_intf_net -intf_net graphics_subsystem_vertexShader_dcache_M1_AXI [get_bd_intf_pins graphics_subsystem/vertexShader_dcache_M1_AXI] [get_bd_intf_pins memory_subsystem/S_AXI_VERTEX_DCACHE]
   connect_bd_intf_net -intf_net graphics_subsystem_vertexShader_icache_M2_AXI [get_bd_intf_pins graphics_subsystem/vertexShader_icache_M2_AXI] [get_bd_intf_pins memory_subsystem/S_AXI_VERTEX_ICACHE]
   connect_bd_intf_net -intf_net mem_interface_DDR3 [get_bd_intf_ports DDR3] [get_bd_intf_pins memory_subsystem/DDR3]
@@ -1346,6 +1375,7 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net system_intercon_M11_AXI [get_bd_intf_pins graphics_subsystem/s_axi_lite] [get_bd_intf_pins system_intercon/M11_AXI]
   connect_bd_intf_net -intf_net system_intercon_M12_AXI [get_bd_intf_pins graphics_subsystem/s_axi_lite3] [get_bd_intf_pins system_intercon/M12_AXI]
   connect_bd_intf_net -intf_net system_intercon_M12_AXI1 [get_bd_intf_pins graphics_subsystem/s_axi_lite4] [get_bd_intf_pins system_intercon/M13_AXI]
+  connect_bd_intf_net -intf_net system_intercon_M14_AXI [get_bd_intf_pins graphics_subsystem/s_axi_lite5] [get_bd_intf_pins system_intercon/M14_AXI]
   connect_bd_intf_net -intf_net video_subsystem_M_AXI_MM2S [get_bd_intf_pins memory_subsystem/S01_AXI] [get_bd_intf_pins video_subsystem/M_AXI_VDMA_MM2S]
 
   # Create port connections
@@ -1366,6 +1396,7 @@ proc create_root_design { parentCell } {
   assign_bd_address -offset 0x00000000 -range 0x00008000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Instruction] [get_bd_addr_segs debug_subsystem/microblaze_0_local_memory/ilmb_bram_if_cntrl_0/SLMB/Mem] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Data] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
   assign_bd_address -offset 0x44A30000 -range 0x00010000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Data] [get_bd_addr_segs memory_subsystem/memory_dma/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x44AC0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Data] [get_bd_addr_segs graphics_subsystem/sgp_fragmentShader/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44AA0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Data] [get_bd_addr_segs graphics_subsystem/sgp_rasterizer_0/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44A90000 -range 0x00010000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Data] [get_bd_addr_segs graphics_subsystem/sgp_renderOutput/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44AB0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces debug_subsystem/microblaze_0/Data] [get_bd_addr_segs graphics_subsystem/sgp_vertexShader_0/s_axi_lite/reg0] -force
@@ -1380,6 +1411,7 @@ proc create_root_design { parentCell } {
   assign_bd_address -offset 0x44A00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs video_subsystem/axi_vdma_0/S_AXI_LITE/Reg] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
   assign_bd_address -offset 0x44A30000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs memory_subsystem/memory_dma/S_AXI_LITE/Reg] -force
+  assign_bd_address -offset 0x44AC0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_fragmentShader/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44AA0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_rasterizer_0/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44A90000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_renderOutput/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44AB0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_vertexShader_0/s_axi_lite/reg0] -force
@@ -1389,6 +1421,8 @@ proc create_root_design { parentCell } {
   assign_bd_address -offset 0x44A70000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_vertexFetch/vertexFetch_core_0/s_axi_lite/reg0] -force
   assign_bd_address -offset 0x44A50000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_vertexFetch/vertex_buffer_FIFO/S_AXI/Mem0] -force
   assign_bd_address -offset 0x44A60000 -range 0x00010000 -target_address_space [get_bd_addr_spaces ethernet_subsystem/axi_mm2s_mapper_0/Bridge] [get_bd_addr_segs graphics_subsystem/sgp_vertexFetch/vertex_buffer_FIFO/S_AXI_FULL/Mem1] -force
+  assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces graphics_subsystem/sgp_fragmentShader/m1_axi] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
+  assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces graphics_subsystem/sgp_fragmentShader/m2_axi] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces graphics_subsystem/sgp_renderOutput/m_axi] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces graphics_subsystem/sgp_vertexShader_0/m1_axi] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces graphics_subsystem/sgp_vertexShader_0/m2_axi] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
@@ -1408,11 +1442,13 @@ proc create_root_design { parentCell } {
   assign_bd_address -offset 0x44A60000 -range 0x00010000 -target_address_space [get_bd_addr_spaces system_intercon/system_dma/Data] [get_bd_addr_segs graphics_subsystem/sgp_vertexFetch/vertex_buffer_FIFO/S_AXI_FULL/Mem1] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces video_subsystem/axi_vdma_0/Data_MM2S] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
 
+  # Exclude Address Segments
+  exclude_bd_addr_seg -offset 0x44AC0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces system_intercon/system_dma/Data] [get_bd_addr_segs graphics_subsystem/sgp_fragmentShader/s_axi_lite/reg0]
+
 
   # Restore current instance
   current_bd_instance $oldCurInst
 
-  validate_bd_design
   save_bd_design
 }
 # End of create_root_design()
@@ -1424,4 +1460,6 @@ proc create_root_design { parentCell } {
 
 create_root_design ""
 
+
+common::send_gid_msg -ssname BD::TCL -id 2053 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
 
