@@ -10,9 +10,7 @@ GLFWwindow* window;
 
 int main() {
 	if (!glfwInit()) {
-		const char* error;
-		glfwGetError(&error);
-		fprintf(stderr, "ERROR: could not start GLFW3: %s\n", error);
+		fprintf(stderr, "ERROR: could not start GLFW3\n");
 		return 1;
 	}
 

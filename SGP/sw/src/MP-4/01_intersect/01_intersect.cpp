@@ -1,9 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 #include <string>
-#include <cstring>
-#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -14,9 +11,7 @@ GLFWwindow* window;
 
 int main() {
 	if (!glfwInit()) {
-		const char* error;
-		glfwGetError(&error);
-		fprintf(stderr, "ERROR: could not start GLFW3: %s\n", error);
+		fprintf(stderr, "ERROR: could not start GLFW3\n");
 		return 1;
 	} 
 
@@ -91,10 +86,10 @@ int main() {
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0 ) {
 
 		// Set value for uniforms
-		float xoffset = 0.75*sin(frame_count*M_PI/60);
-		float yoffset = 0.75*sin(frame_count*M_PI/30);
-		float xscale = cos(frame_count*M_PI/200);
-		float yscale = cos(frame_count*M_PI/400);
+		float xoffset = 0.75f * (float)sin(frame_count*M_PI/60);
+		float yoffset = 0.75f * (float)sin(frame_count*M_PI/30);
+		auto xscale = (float)cos(frame_count*M_PI/200);
+		auto yscale = (float)cos(frame_count*M_PI/400);
 
 		if (xscale < 0.05)
 			xscale = 0.05;
