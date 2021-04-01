@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------
--- Joseph Zambreno
+-- Joseph Zambreno and Ben Pierre but definitely note Dawson Munday
 -- Department of Electrical and Computer Engineering
 -- Iowa State University
 -------------------------------------------------------------------------
@@ -142,10 +142,16 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       SGP_AXI_RENDEROUTPUT_CACHECTRL : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_STRIDE : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_HEIGHT : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_DEPTHENA : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_DEPTHCTRL : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_BLENDENA : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_BLENDCTRL : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_DEBUG : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_STATUS : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
     );
   END COMPONENT sgp_renderOutput_axi_lite_regs;
+
+
 
   COMPONENT dcache IS
     PORT (
@@ -194,7 +200,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE); -- WAIT_FOR_FLUSH, WAIT_FOR_FIFO, FLUSH, WAIT_FOR_LOW);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_ADDRESS, WAIT_FOR_RESPONSE); -- WAIT_FOR_FLUSH, WAIT_FOR_FIFO, FLUSH, WAIT_FOR_LOW);
   SIGNAL state : STATE_TYPE;
   SIGNAL flush_state : STATE_TYPE;
   -- User register values
@@ -202,6 +208,10 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL renderoutput_depthbuffer : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_cachectrl : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_stride : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+  SIGNAL renderoutput_depthEna : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH -1 DOWNTO 0);
+  SIGNAL renderoutput_depthcrtl :   STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH -1 DOWNTO 0);
+  SIGNAL renderoutput_blendEna : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH -1 DOWNTO 0);
+  SIGNAL renderoutput_blendcrtl :   STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH -1 DOWNTO 0);
   SIGNAL renderoutput_height : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_debug : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_status : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
@@ -242,6 +252,17 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL r_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL g_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL b_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  
+  
+  
+  CONSTANT GL_LESS      : UNSIGNED(2 downto 0) := "000";
+  CONSTANT GL_ALWAYS    : UNSIGNED(2 downto 0) := "001";
+  CONSTANT GL_NEVER     : UNSIGNED(2 downto 0) := "010";
+  CONSTANT GL_EQUAL     : UNSIGNED(2 downto 0) := "011";
+  CONSTANT GL_LEQUAL    : UNSIGNED(2 downto 0) := "100";
+  CONSTANT GL_GREATER   : UNSIGNED(2 downto 0) := "101";
+  CONSTANT GL_NOTEQUAL  : UNSIGNED(2 downto 0) := "110";
+  CONSTANT GL_GEQUAL	: UNSIGNED(2 downto 0) := "111";
 BEGIN
   -- Instantiation of Axi Bus Interface S_AXI_LITE
   sgp_renderOutput_axi_lite_regs_inst : sgp_renderOutput_axi_lite_regs
@@ -277,6 +298,10 @@ BEGIN
     SGP_AXI_RENDEROUTPUT_CACHECTRL => renderoutput_cachectrl,
     SGP_AXI_RENDEROUTPUT_STRIDE => renderoutput_stride,
     SGP_AXI_RENDEROUTPUT_HEIGHT => renderoutput_height,
+    SGP_AXI_RENDEROUTPUT_DEPTHENA => renderoutput_depthEna,
+    SGP_AXI_RENDEROUTPUT_DEPTHCTRL => renderoutput_depthcrtl,
+    SGP_AXI_RENDEROUTPUT_BLENDENA => renderoutput_blendEna,
+    SGP_AXI_RENDEROUTPUT_BLENDCTRL => renderoutput_blendcrtl,
     SGP_AXI_RENDEROUTPUT_DEBUG => renderoutput_debug,
     SGP_AXI_RENDEROUTPUT_STATUS => renderoutput_status
   );
@@ -329,6 +354,11 @@ BEGIN
     axi_arlen_o => m_axi_arlen,
     axi_arburst_o => m_axi_arburst,
     axi_rready_o => m_axi_rready);
+
+
+  --slighlty out of order but it makes the defaults thing easier.
+
+      
   -- Many of the AXI signals can be hard-coded for our purposes. 
   m_axi_awsize <= "010"; -- AXI Write Burst Size. Set to 2 for 2^2=4 bytes for the write
   m_axi_awlock <= '0'; -- AXI Write Lock. Not supported in AXI-4

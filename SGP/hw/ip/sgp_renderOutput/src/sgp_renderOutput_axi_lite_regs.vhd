@@ -20,9 +20,13 @@ entity sgp_renderOutput_axi_lite_regs is
 	    SGP_AXI_RENDEROUTPUT_DEPTHBUFFER  : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
         SGP_AXI_RENDEROUTPUT_CACHECTRL    : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
         SGP_AXI_RENDEROUTPUT_STRIDE	      : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
-        SGP_AXI_RENDEROUTPUT_HEIGHT	      : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
+        SGP_AXI_RENDEROUTPUT_HEIGHT	      : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+		SGP_AXI_RENDEROUTPUT_DEPTHENA 	  : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+		SGP_AXI_RENDEROUTPUT_DEPTHCTRL 	  : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+		SGP_AXI_RENDEROUTPUT_BLENDENA 	  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+		SGP_AXI_RENDEROUTPUT_BLENDCTRL 	  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);       
         SGP_AXI_RENDEROUTPUT_DEBUG        : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-		SGP_AXI_RENDEROUTPUT_STATUS         : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+		SGP_AXI_RENDEROUTPUT_STATUS       : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 
 		-- User ports ends
 		-- Do not modify the ports beyond this line
@@ -146,6 +150,11 @@ begin
     SGP_AXI_RENDEROUTPUT_CACHECTRL   <= slv_reg2;
     SGP_AXI_RENDEROUTPUT_STRIDE      <= slv_reg3;
     SGP_AXI_RENDEROUTPUT_HEIGHT      <= slv_reg4;
+	SGP_AXI_RENDEROUTPUT_DEPTHENA 	 <= slv_reg5;
+	SGP_AXI_RENDEROUTPUT_DEPTHCTRL	 <= slv_reg6;
+	SGP_AXI_RENDEROUTPUT_BLENDENA 	 <= slv_reg7;
+	SGP_AXI_RENDEROUTPUT_BLENDCTRL	 <= slv_reg8;
+	
 
 	slv_reg14 <= SGP_AXI_RENDEROUTPUT_STATUS;
     slv_reg15 <= SGP_AXI_RENDEROUTPUT_DEBUG;
