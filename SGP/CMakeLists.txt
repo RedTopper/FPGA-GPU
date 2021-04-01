@@ -38,6 +38,7 @@ add_subdirectory(sw/src/MP-2/06_voronoi)
 add_subdirectory(sw/src/MP-3/01_shapeshifter)
 add_subdirectory(sw/src/MP-3/02_cubeflyby)
 add_subdirectory(sw/src/MP-3/03_flexseal)
+add_subdirectory(sw/src/MP-4/00_primitive)
 add_subdirectory(sw/src/MP-4/01_intersect)
 
 # Utilities
