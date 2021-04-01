@@ -10,7 +10,7 @@
 
 
 # Executable name
-EXECUTABLE := 01_intersect
+EXECUTABLE := 00_primitive
 
 # Extra path for shared source
 SHAREDIR := ../../shared/ogldir1/
