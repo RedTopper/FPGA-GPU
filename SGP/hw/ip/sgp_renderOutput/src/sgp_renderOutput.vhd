@@ -231,6 +231,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL mem_writeback : STD_LOGIC;
   SIGNAL mem_flush : STD_LOGIC;
   SIGNAL mem_data_rd : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL mem_rd_data_stored : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL mem_accept : STD_LOGIC;
   SIGNAL mem_ack : STD_LOGIC;
   SIGNAL mem_error : STD_LOGIC;
@@ -242,6 +243,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL y_pos_fixed : fixed_t;
   SIGNAL y_pos_short : signed(15 DOWNTO 0);
   SIGNAL y_pos_short_reg : signed(15 DOWNTO 0);
+  SIGNAL z_pos : std_logic_vector(31 downto 0);
   SIGNAL frag_address : signed(31 DOWNTO 0);
   SIGNAL frag_color : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL a_color : wfixed_t;
@@ -255,14 +257,27 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   
   
   
-  CONSTANT GL_LESS      : UNSIGNED(2 downto 0) := "000";
-  CONSTANT GL_ALWAYS    : UNSIGNED(2 downto 0) := "001";
-  CONSTANT GL_NEVER     : UNSIGNED(2 downto 0) := "010";
-  CONSTANT GL_EQUAL     : UNSIGNED(2 downto 0) := "011";
-  CONSTANT GL_LEQUAL    : UNSIGNED(2 downto 0) := "100";
-  CONSTANT GL_GREATER   : UNSIGNED(2 downto 0) := "101";
-  CONSTANT GL_NOTEQUAL  : UNSIGNED(2 downto 0) := "110";
-  CONSTANT GL_GEQUAL	: UNSIGNED(2 downto 0) := "111";
+  CONSTANT GL_LESS      :  std_logic_vector(2 downto 0) := "000";
+  CONSTANT GL_ALWAYS    :  std_logic_vector(2 downto 0) := "001";
+  CONSTANT GL_NEVER     :  std_logic_vector(2 downto 0) := "010";
+  CONSTANT GL_EQUAL     :  std_logic_vector(2 downto 0) := "011";
+  CONSTANT GL_LEQUAL    :  std_logic_vector(2 downto 0) := "100";
+  CONSTANT GL_GREATER   :  std_logic_vector(2 downto 0) := "101";
+  CONSTANT GL_NOTEQUAL  :  std_logic_vector(2 downto 0) := "110";
+  CONSTANT GL_GEQUAL	:  std_logic_vector(2 downto 0) := "111";
+
+  ALIAS XPosShort   : signed(15 DOWNTO 0) is input_fragment_array(0)(0)(31 DOWNTO 16);
+  ALIAS YPosShort   : signed(15 DOWNTO 0) is input_fragment_array(0)(1)(31 DOWNTO 16);
+  ALIAS XPosShortRnd: signed(1 DOWNTO 0) is input_fragment_array(0)(0)(16 DOWNTO 15);
+  ALIAS YPosShortRnd: signed(1 DOWNTO 0) is input_fragment_array(0)(1)(16 DOWNTO 15);
+  ALIAS zPosShort   : signed(31 DOWNTO 0) is input_fragment_array(0)(2)(31 DOWNTO 0);
+
+  ALIAS DepthENA    : std_logic is renderoutput_depthEna(0);
+  ALIAS DepthCtrl   : std_logic_vector(2 downto 0) is renderoutput_depthcrtl(2 downto 0);
+  ALIAS BlendENA    : std_logic is renderoutput_blendEna(0);
+  ALIAS BlendCtrl   : std_logic_vector(2 downto 0) is renderoutput_depthcrtl(2 downto 0);
+  
+  
 BEGIN
   -- Instantiation of Axi Bus Interface S_AXI_LITE
   sgp_renderOutput_axi_lite_regs_inst : sgp_renderOutput_axi_lite_regs
@@ -429,6 +444,7 @@ BEGIN
             --fragment = potential pixel
             x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
+            z_pos           <= std_logic_vector(zPosShort);                   --technically not a short but it follows naming conventions.
 
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             --multiple [0, 1.0] by 255 in Q16.16, output to a Q32.32.
@@ -437,11 +453,79 @@ BEGIN
             g_color <= input_fragment_array(1)(2) * x"00FF0000";
             r_color <= input_fragment_array(1)(3) * x"00FF0000";
 
-            IF (x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) THEN
-              state <= WRITE_ADDRESS; --in bounds
-            ELSE
-              state <= WAIT_FOR_FRAGMENT; --dump fragment 
-            END IF;
+            
+            IF(x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) THEN
+              IF((renderoutput_depthEna(0) = '0') or (renderoutput_depthcrtl(2 downto 0) = GL_ALWAYS)) THEN
+                state <= WRITE_ADDRESS;
+              elsif DepthCtrl = GL_ALWAYS then
+                state <= WAIT_FOR_FRAGMENT;
+              else                
+                mem_rd <= '1';
+                mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15)) * 7680) + signed(4 * input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15)));
+                state <= WAIT_LOAD_DEPTH;
+              end if;
+            else
+              state <= WAIT_FOR_FRAGMENT;
+            end if;
+
+          -- WHEN LOAD_DEPTH =>
+          --   --set mem addr and mem req
+          --   mem_rd <= '1';
+          --   mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
+          --   state =>WAIT_LOAD_DEPTH;
+          
+          WHEN WAIT_LOAD_DEPTH =>
+            mem_rd <= '0';
+            if(mem_ack = '1')then
+              mem_rd_data_stored <= mem_data_rd;
+              state <= CALC_DEPTH;
+            end if;
+            --wait for req done
+              
+
+          WHEN CALC_DEPTH =>
+            --note never and always are accounted for already,
+            --mildy sphaget but also mildy more efficient
+            CASE BlendCtrl IS
+              when GL_LESS =>
+                if(z_pos < mem_rd_data_stored)then
+                  state <= WRITE_ADDRESS;
+                else
+                  state <= WAIT_FOR_FRAGMENT;
+                end if;
+              when GL_EQUAL =>
+                if(z_pos = mem_rd_data_stored)then
+                  state <= WRITE_ADDRESS;
+                else
+                  state <= WAIT_FOR_FRAGMENT;
+                end if;
+              when GL_LEQUAL =>
+                if(z_pos <= mem_rd_data_stored)then
+                  state <= WRITE_ADDRESS;
+                else
+                  state <= WAIT_FOR_FRAGMENT;
+                end if;
+              when GL_GREATER =>
+                if(z_pos > mem_rd_data_stored)then
+                  state <= WRITE_ADDRESS;
+                else
+                  state <= WAIT_FOR_FRAGMENT;
+                end if;
+              when GL_NOTEQUAL =>
+                if(z_pos /= mem_rd_data_stored)then
+                  state <= WRITE_ADDRESS;
+                else
+                  state <= WAIT_FOR_FRAGMENT;
+                end if;
+              when GL_GEQUAL =>
+                if(z_pos > mem_rd_data_stored)then
+                  state <= WRITE_ADDRESS;
+                else
+                  state <= WAIT_FOR_FRAGMENT;
+                end if;
+              when others=>
+                state <= WAIT_FOR_FRAGMENT;
+              END CASE;
 
           WHEN WRITE_ADDRESS =>
             mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
