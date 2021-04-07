@@ -206,6 +206,14 @@ int SGP_glCompileShader(GLuint gl_shaderID) {
 	lua_pushinteger(L, SGP_graphicsstate.gpu_mem_free_ptr);
 	lua_setglobal(L, "memoryBase");
 
+	// sjb start
+	lua_pushboolean(L, SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_VERTEX_SHADER ? 1 : 0);
+	lua_setglobal(L, "isVertexShader");	
+
+	lua_pushboolean(L, SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_FRAGMENT_SHADER ? 1 : 0);
+	lua_setglobal(L, "isFragmentShader");	
+    // sjb end
+ 
 	if (SGPconfig->driverMode & SGP_STDOUT) {
 		lua_pushboolean(L, 1);
 		lua_setglobal(L, "debugValue");
@@ -307,6 +315,51 @@ int SGP_glCompileShader(GLuint gl_shaderID) {
 		}
 
 	}
+
+	    // sjb start
+    lua_getglobal(L, "outs");
+    size_t num_outs = lua_rawlen(L, -1);
+    if (num_outs) {
+		if (SGPconfig->driverMode & SGP_STDOUT) {
+			printf("SGP Outs:             name |   location \n");
+		}
+        for (int i = 1; i <= num_outs; i++) {
+            lua_geti(L, -1, i);
+            lua_getfield(L, -1, "name");
+        	const char *out_name = lua_tostring(L, -1);
+			lua_getfield(L, -2, "location");
+			const uint32_t out_location = lua_tointeger(L, -1);
+            lua_pop(L, 3);
+			if (SGPconfig->driverMode & SGP_STDOUT) {
+    	        printf("              %16s | %d\n", out_name, out_location);
+			}
+			
+            // TODO
+			// Copy the data into the shader state
+			// uint32_t uniform_index = SGP_shadersstate.num_uniforms;
+			// SGP_shadersstate.num_uniforms++;
+			// if (SGP_shadersstate.num_uniforms >= SGP_SHADERS_MAX_UNIFORMS) {
+			// 	if (SGPconfig->driverMode & SGP_STDOUT) {
+			// 		printf("SGP_glCompileShader: error compiling shader\n");
+			// 		printf("\tMaximum uniform count reached\n");
+			// 	}
+			// 	return 1; 				
+			// }
+
+			// SGP_shadersstate.uniforms[uniform_index].status = SGP_SHADERS_UNIFORM_VALID;
+			// strcpy(SGP_shadersstate.uniforms[uniform_index].name, uniform_name);
+			// SGP_shadersstate.uniforms[uniform_index].size = uniform_size;
+			// SGP_shadersstate.uniforms[uniform_index].gl_uniformID = 0;
+			// SGP_shadersstate.uniforms[uniform_index].sgp_loc = uniform_index;
+			// SGP_shadersstate.uniforms[uniform_index].baseaddr = uniform_baseaddr;
+        }
+		if (SGPconfig->driverMode & SGP_STDOUT) {
+			printf("\n");
+		}
+    }
+    // sjb end
+
+
 
 	// Update the gpu_mem_free_ptr if we allocated buffer memory for the shader
 	lua_getglobal(L, "memoryBase");
