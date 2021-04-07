@@ -421,7 +421,15 @@ int SGP_glUseProgram(GLuint gl_programID) {
 			}
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_VERTEXSHADER_PC, SGP_shadersstate.shaders[cur_shader_index].baseaddr);
 			break;
+		} else if (SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_FRAGMENT_SHADER) {
+			uint32_t baseaddr = SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr;
+			if (SGPconfig->driverMode & SGP_STDOUT) {
+				printf("SGP_glUseProgram: setting fragmento shader starting PC to 0x%08x\n", SGP_shadersstate.shaders[cur_shader_index].baseaddr);
+			}
+			SGP_write32(SGPconfig, baseaddr + SGP_AXI_FRAGMENTSHADER_PC, SGP_shadersstate.shaders[cur_shader_index].baseaddr);
+			break;
 		}
+		
 	}
 
 	SGP_shadersstate.programs[cur_program_index].status |= SGP_SHADERS_PROGRAM_USED;

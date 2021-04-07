@@ -56,6 +56,9 @@
 #define SGP_AXI_RASTERIZER_STATUS       0x0038
 #define SGP_AXI_RASTERIZER_DEBUG        0x003C
 
+// sgp_fragmentshader registers
+#define SGP_AXI_FRAGMENTSHADER_PC       0x0000
+
 
 
 // Uniform data structure
