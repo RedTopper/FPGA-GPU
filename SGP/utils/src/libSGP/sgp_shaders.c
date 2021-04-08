@@ -208,12 +208,12 @@ int SGP_glCompileShader(GLuint gl_shaderID) {
 
 	// sjb start
 	lua_pushboolean(L, SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_VERTEX_SHADER ? 1 : 0);
-	lua_setglobal(L, "isVertexShader");	
+	lua_setglobal(L, "isVertexShader");
 
 	lua_pushboolean(L, SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_FRAGMENT_SHADER ? 1 : 0);
-	lua_setglobal(L, "isFragmentShader");	
-    // sjb end
- 
+	lua_setglobal(L, "isFragmentShader");
+	// sjb end
+
 	if (SGPconfig->driverMode & SGP_STDOUT) {
 		lua_pushboolean(L, 1);
 		lua_setglobal(L, "debugValue");
@@ -316,25 +316,25 @@ int SGP_glCompileShader(GLuint gl_shaderID) {
 
 	}
 
-	    // sjb start
-    lua_getglobal(L, "outs");
-    size_t num_outs = lua_rawlen(L, -1);
-    if (num_outs) {
+	// sjb start
+	lua_getglobal(L, "outs");
+	size_t num_outs = lua_rawlen(L, -1);
+	if (num_outs) {
 		if (SGPconfig->driverMode & SGP_STDOUT) {
 			printf("SGP Outs:             name |   location \n");
 		}
-        for (int i = 1; i <= num_outs; i++) {
-            lua_geti(L, -1, i);
-            lua_getfield(L, -1, "name");
-        	const char *out_name = lua_tostring(L, -1);
+		for (int i = 1; i <= num_outs; i++) {
+			lua_geti(L, -1, i);
+			lua_getfield(L, -1, "name");
+			const char* out_name = lua_tostring(L, -1);
 			lua_getfield(L, -2, "location");
 			const uint32_t out_location = lua_tointeger(L, -1);
-            lua_pop(L, 3);
+			lua_pop(L, 3);
 			if (SGPconfig->driverMode & SGP_STDOUT) {
-    	        printf("              %16s | %d\n", out_name, out_location);
+				printf("              %16s | %d\n", out_name, out_location);
 			}
-			
-            // TODO
+
+			// TODO
 			// Copy the data into the shader state
 			// uint32_t uniform_index = SGP_shadersstate.num_uniforms;
 			// SGP_shadersstate.num_uniforms++;
@@ -352,12 +352,12 @@ int SGP_glCompileShader(GLuint gl_shaderID) {
 			// SGP_shadersstate.uniforms[uniform_index].gl_uniformID = 0;
 			// SGP_shadersstate.uniforms[uniform_index].sgp_loc = uniform_index;
 			// SGP_shadersstate.uniforms[uniform_index].baseaddr = uniform_baseaddr;
-        }
+		}
 		if (SGPconfig->driverMode & SGP_STDOUT) {
 			printf("\n");
 		}
-    }
-    // sjb end
+	}
+	// sjb end
 
 
 
@@ -474,16 +474,21 @@ int SGP_glUseProgram(GLuint gl_programID) {
 			}
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_VERTEXSHADER_PC, SGP_shadersstate.shaders[cur_shader_index].baseaddr);
 			break;
-		} else if (SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_FRAGMENT_SHADER) {
+		}
+	}
+	for (int i = 0; i < SGP_shadersstate.programs[cur_program_index].num_shaders; i++) {
+		int32_t cur_shader_index = SGP_shadersstate.programs[cur_program_index].attached_shader_index[i];
+		if (SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_FRAGMENT_SHADER) {
 			uint32_t baseaddr = SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr;
 			if (SGPconfig->driverMode & SGP_STDOUT) {
-				printf("SGP_glUseProgram: setting fragmento shader starting PC to 0x%08x\n", SGP_shadersstate.shaders[cur_shader_index].baseaddr);
+				printf("SGP_glUseProgram: setting fragment shader starting PC to 0x%08x\n", SGP_shadersstate.shaders[cur_shader_index].baseaddr);
 			}
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_FRAGMENTSHADER_PC, SGP_shadersstate.shaders[cur_shader_index].baseaddr);
 			break;
 		}
-		
 	}
+
+
 
 	SGP_shadersstate.programs[cur_program_index].status |= SGP_SHADERS_PROGRAM_USED;
 
