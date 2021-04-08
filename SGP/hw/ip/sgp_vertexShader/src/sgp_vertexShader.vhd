@@ -200,7 +200,8 @@ architecture behavioral of sgp_vertexShader is
 	    SGP_AXI_VERTEXSHADER_VAL2           : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
         SGP_AXI_VERTEXSHADER_VAL3           : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
         SGP_AXI_VERTEXSHADER_FLUSH          : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-        sgp_axi_vertexshader_iflush         : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
+        sgp_axi_vertexshader_iflush         : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+        SGP_AXI_PASSTHROUGH                 : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);       
         SGP_AXI_VERTEXSHADER_STATUS	        : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);	        
         SGP_AXI_VERTEXSHADER_DEBUG          : in std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0)	    
 		
@@ -307,7 +308,8 @@ architecture behavioral of sgp_vertexShader is
          outputVertex     : out vertexArray_t;
          vertexStart      : in std_logic; 
          vertexDone       : out std_logic;
-    
+         passthroughena   : in std_logic;
+        
          dmem_addr        : out std_logic_vector(31 downto 0);
          dmem_wdata       : out std_logic_vector(31 downto 0);
          dmem_rdata       : in std_logic_vector(31 downto 0);
@@ -329,7 +331,8 @@ architecture behavioral of sgp_vertexShader is
   signal vertexshader_val2 	        : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_val3          : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_flush         : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
-  signal vertexshader_iflush         : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+  signal vertexshader_passthrough   : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+  signal vertexshader_iflush        : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_status        : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
   signal vertexshader_debug 	    : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 
@@ -418,7 +421,8 @@ begin
         SGP_AXI_VERTEXSHADER_VAL2 => vertexshader_val2,
         SGP_AXI_VERTEXSHADER_VAL3    => vertexshader_val3,
         SGP_AXI_VERTEXSHADER_FLUSH  => vertexshader_flush,
-        SGP_AXI_VERTEXSHADER_IFLUSH  => vertexshader_iflush,	    		
+        SGP_AXI_VERTEXSHADER_IFLUSH  => vertexshader_iflush,
+        SGP_AXI_PASSTHROUGH         => vertexshader_passthrough,	    		
         SGP_AXI_VERTEXSHADER_STATUS    => vertexshader_status,	    		
         SGP_AXI_VERTEXSHADER_DEBUG => vertexshader_debug
 	);
@@ -528,6 +532,7 @@ begin
                 inputVertex => vertexShader_core_inputVertex,
                 outputVertex => vertexShader_core_outputVertex,
                 vertexStart => vertexShader_core_Start,
+                passthroughena => vertexshader_passthrough(0),
                 vertexDone => vertexShader_core_Done,
                 dmem_addr => mem_addr,
                 dmem_wdata => mem_data_wr,

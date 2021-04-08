@@ -29,6 +29,8 @@ ENTITY vertexShader_core IS
         outputVertex : OUT vertexArray_t;
         vertexStart : IN STD_LOGIC;
         vertexDone : OUT STD_LOGIC;
+        passthroughena : IN STD_LOGIC;
+
 
         dmem_addr : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
         dmem_wdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -181,7 +183,11 @@ BEGIN
                         --Wait to fetch until the icache is ready
                         --set address to pc, and set the read flag high.
                     WHEN FETCH =>
-                        IF imem_rdy = '1' THEN
+                        IF passthroughena = '1' THEN
+                            outputVertex <= inputVertex;
+                            vertexDone <= '1';
+                            state <= WAIT_TO_START;
+                        ELSIF imem_rdy = '1' THEN
                             -- imem_addr <= std_logic_vector(pc); -- This is already done above
                             imem_rd_req <= '1';
                             state <= FETCH2;

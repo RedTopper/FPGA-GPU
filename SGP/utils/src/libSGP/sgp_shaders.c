@@ -451,8 +451,8 @@ int SGP_glLinkProgram(GLuint gl_programID) {
 // Let the vertex and fragment shader cores know to get started
 int SGP_glUseProgram(GLuint gl_programID) {
 
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_VERTEXSHADER_IFLUSH, 69);
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_VERTEXSHADER_IFLUSH, 0);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_IFLUSH, 69);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_IFLUSH, 0);
 
 	int32_t cur_program_index;
 
@@ -476,6 +476,7 @@ int SGP_glUseProgram(GLuint gl_programID) {
 			break;
 		}
 	}
+
 	for (int i = 0; i < SGP_shadersstate.programs[cur_program_index].num_shaders; i++) {
 		int32_t cur_shader_index = SGP_shadersstate.programs[cur_program_index].attached_shader_index[i];
 		if (SGP_shadersstate.shaders[cur_shader_index].gl_type == GL_FRAGMENT_SHADER) {
@@ -488,7 +489,10 @@ int SGP_glUseProgram(GLuint gl_programID) {
 		}
 	}
 
-
+	uint32_t baseaddr = SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr;
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_SHADER_PASS, 0x1); //enable passthrough
+	baseaddr = SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr;
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_SHADER_PASS, 0x0); //enable passthrough
 
 	SGP_shadersstate.programs[cur_program_index].status |= SGP_SHADERS_PROGRAM_USED;
 
