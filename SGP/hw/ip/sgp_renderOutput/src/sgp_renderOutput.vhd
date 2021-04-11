@@ -200,7 +200,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_ADDRESS, WAIT_FOR_RESPONSE); -- WAIT_FOR_FLUSH, WAIT_FOR_FIFO, FLUSH, WAIT_FOR_LOW);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
   SIGNAL state : STATE_TYPE;
   SIGNAL flush_state : STATE_TYPE;
   -- User register values
@@ -254,7 +254,14 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL r_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL g_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL b_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
+  TYPE STATE_TYPE IS (PREPARE, SOURCE_SCALE, DEST_SCALE, CALC, MIN_VALS);
+  SIGNAL BlendingState : STATE_TYPE;
   
+  SIGNAL factorValue, sourceFactor, destinationVal : fixed_t(3 downto 0);
+  SIGNAL calcValR, calcValB, calcValG, calcValA : wfixed_t;
+  SIGNAL outputValR, outputValB, outputValG, outputValA : wfixed_t;
+  SIGNAL rgbaCounter : INTEGER RANGE 0 TO 4;
   
   
   CONSTANT GL_LESS      :  std_logic_vector(2 downto 0) := "000";
@@ -265,6 +272,22 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   CONSTANT GL_GREATER   :  std_logic_vector(2 downto 0) := "101";
   CONSTANT GL_NOTEQUAL  :  std_logic_vector(2 downto 0) := "110";
   CONSTANT GL_GEQUAL	:  std_logic_vector(2 downto 0) := "111";
+
+  CONSTANT GL_ZERO                :  std_logic_vector(3 downto 0) := "0000";
+  CONSTANT GL_ONE                 :  std_logic_vector(3 downto 0) := "0001";
+  CONSTANT GL_SRC_COLOR           :  std_logic_vector(3 downto 0) := "0010";
+  CONSTANT GL_ONE_MINUS_SRC_COLOR :  std_logic_vector(3 downto 0) := "0011";
+  CONSTANT GL_DST_COLOR           :  std_logic_vector(3 downto 0) := "0100";
+  CONSTANT GL_ONE_MINUS_DST_COLOR :  std_logic_vector(3 downto 0) := "0101";
+  CONSTANT GL_SRC_ALPHA           :  std_logic_vector(3 downto 0) := "0110";
+  CONSTANT GL_ONE_MINUS_SRC_ALPHA :  std_logic_vector(3 downto 0) := "0111";
+  CONSTANT GL_DST_ALPHA           :  std_logic_vector(3 downto 0) := "1000";
+  CONSTANT GL_ONE_MINUS_DST_ALPHA :  std_logic_vector(3 downto 0) := "1001";
+
+  CONSTANT BLEND_MAX_R : unsigned(7 downto 0) := "11111111";
+  CONSTANT BLEND_MAX_B : unsigned(7 downto 0) := "11111111";
+  CONSTANT BLEND_MAX_G : unsigned(7 downto 0) := "11111111";
+  CONSTANT BLEND_MAX_A : unsigned(7 downto 0) := "11111111";
 
   ALIAS XPosShort   : signed(15 DOWNTO 0) is input_fragment_array(0)(0)(31 DOWNTO 16);
   ALIAS YPosShort   : signed(15 DOWNTO 0) is input_fragment_array(0)(1)(31 DOWNTO 16);
@@ -413,6 +436,7 @@ BEGIN
 
         -- Start at WAIT_FOR_FRAGMENT and initialize all other registers
         state <= WAIT_FOR_FRAGMENT;
+        BlendingState <= GL_ZERO;
         mem_addr <= (OTHERS => '0');
         mem_data_wr <= (OTHERS => '0');
         mem_rd <= '0';
@@ -426,6 +450,8 @@ BEGIN
         g_color_reg <= (OTHERS => '0');
         mem_flush <= '0';
         renderoutput_status <= (OTHERS => '0');
+        destinationVal <= (OTHERS => '0');
+        rgbaCounter <= 0;
       ELSE
         CASE state IS
             --(WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
@@ -468,6 +494,8 @@ BEGIN
               state <= WAIT_FOR_FRAGMENT;
             end if;
 
+          
+
           -- WHEN LOAD_DEPTH =>
           --   --set mem addr and mem req
           --   mem_rd <= '1';
@@ -481,45 +509,46 @@ BEGIN
               state <= CALC_DEPTH;
             end if;
             --wait for req done
-              
 
           WHEN CALC_DEPTH =>
             --note never and always are accounted for already,
             --mildy sphaget but also mildy more efficient
+
+            -- Dawson: Is this meant to be called DepthCtrl or something?
             CASE BlendCtrl IS
               when GL_LESS =>
                 if(z_pos < mem_rd_data_stored)then
-                  state <= WRITE_ADDRESS;
+                  state <= BLENDING;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_EQUAL =>
                 if(z_pos = mem_rd_data_stored)then
-                  state <= WRITE_ADDRESS;
+                  state <= BLENDING;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_LEQUAL =>
                 if(z_pos <= mem_rd_data_stored)then
-                  state <= WRITE_ADDRESS;
+                  state <= BLENDING;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_GREATER =>
                 if(z_pos > mem_rd_data_stored)then
-                  state <= WRITE_ADDRESS;
+                  state <= BLENDING;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_NOTEQUAL =>
                 if(z_pos /= mem_rd_data_stored)then
-                  state <= WRITE_ADDRESS;
+                  state <= BLENDING;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_GEQUAL =>
                 if(z_pos > mem_rd_data_stored)then
-                  state <= WRITE_ADDRESS;
+                  state <= BLENDING;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
@@ -527,9 +556,104 @@ BEGIN
                 state <= WAIT_FOR_FRAGMENT;
               END CASE;
 
+          WHEN LOAD_RGBA =>
+              
+            IF (rgbaCounter == 4) THEN
+              rgbaCounter <= 0;
+              state <= BLENDING;
+            ELSE
+              IF (mem_accept = '1') THEN
+                mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg) + unsigned(rgbaCounter));
+                state <= WAIT_FOR_RGBA;
+              END IF;
+            END IF;
+
+          WHEN WAIT_FOR_RGBA =>
+            IF (mem_ack = '1') THEN
+              destinationVal(rgbaCounter) <= mem_data_rd;
+              state <= LOAD_RGBA;
+            END IF;
+
+          WHEN BLENDING =>
+            CASE BlendingState is
+              WHEN SOURCE_SCALE => 
+                factor <= -- Value that comes from function call, sfactor value
+                state <= FACTOR_FUNC;
+                BlendingState <= DEST_SCALE;
+
+              WHEN DEST_SCALE =>
+                sourceFactor <= factorValue;
+                factor <= -- Value that comes from function call, dfactor value
+                state <= FACTOR_FUNC;
+                BlendingState <= CALC;
+
+              WHEN CALC =>
+                calcValR <= r_color * sourceFactor(3) + bufferValueR * factorValue(3);
+                calcValG <= g_color * sourceFactor(2) + bufferValueG * factorValue(2);
+                calcValB <= b_color * sourceFactor(1) + bufferValueB * factorValue(1);
+                calcValA <= a_color * sourceFactor(0) + bufferValueA * factorValue(0);
+                BlendingState <= MIN_VALS;
+                
+              WHEN MIN_VALS =>
+                BlendingState <= PREPARE;
+
+                IF (calcValR > BLEND_MAX_R) THEN
+                  outputValR <= BLEND_MAX_R;
+                else
+                  outputValR <= calcValR;
+                END IF;
+
+                IF (calcValG > BLEND_MAX_G) THEN
+                  outputValG <= BLEND_MAX_G;
+                else
+                  outputValG <= calcValG;
+                END IF;
+
+                IF (calcValB > BLEND_MAX_B) THEN
+                  outputValB <= BLEND_MAX_B;
+                else
+                  outputValB <= calcValB;
+                END IF;
+
+                IF (calcValA > BLEND_MAX_A) THEN
+                  outputValA <= BLEND_MAX_A;
+                else
+                  outputValA <= calcValA;
+                END IF;
+                
+                state <= WRITE_ADDRESS;
+              WHEN OTHERS =>
+                state <= WAIT_FOR_FRAGMENT;
+              END CASE;
+
+          WHEN FACTOR_FUNC =>
+            CASE factor is
+              WHEN GL_ZERO =>
+                factorValue(3) <= "0";
+                factorValue(2) <= "0";
+                factorValue(1) <= "0";
+                factorValue(0) <= "0";
+              WHEN GL_ONE =>
+                factorValue(3) <= "1";
+                factorValue(2) <= "1";
+                factorValue(1) <= "1";
+                factorValue(0) <= "1";
+              WHEN GL_SRC_COLOR =>
+                factorValue(3) <= r_color / BLEND_MAX_R;
+                factorValue(2) <= b_color / BLEND_MAX_G;
+                factorValue(1) <= g_color / BLEND_MAX_B;
+                factorValue(0) <= a_color / BLEND_MAX_A;
+              WHEN GL_ONE_MINUS_SRC_COLOR =>
+                factorValue(3) <= 1 - (r_color / BLEND_MAX_R);
+                factorValue(2) <= 1 - (g_color / BLEND_MAX_G);
+                factorValue(1) <= 1 - (b_color / BLEND_MAX_B);
+                factorValue(0) <= 1 - (a_color / BLEND_MAX_A);
+            END CASE;
+            state <= BLENDING;
+
           WHEN WRITE_ADDRESS =>
             mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
-            mem_data_wr <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)) & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
+            mem_data_wr <= STD_LOGIC_VECTOR(outputValR(39 DOWNTO 32)) & STD_LOGIC_VECTOR(outputValA(39 DOWNTO 32)) & STD_LOGIC_VECTOR(outputValG(39 DOWNTO 32)) & STD_LOGIC_VECTOR(outputValG(39 DOWNTO 32));
 
             --wait for mem_accept to go high. then write to the dcache.
             IF (mem_accept = '1') THEN
