@@ -487,11 +487,9 @@ BEGIN
             r_color <= input_fragment_array(1)(3) * x"00FF0000";
 
             
-            IF(x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) THEN
+            IF((x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) or DepthCtrl != GL_NEVER) THEN
               IF((renderoutput_depthEna(0) = '0') or (renderoutput_depthcrtl(2 downto 0) = GL_ALWAYS)) THEN
-                state <= WRITE_ADDRESS;
-              elsif DepthCtrl = GL_ALWAYS then
-                state <= WAIT_FOR_FRAGMENT;
+                state <= load_rgba;
               else                
                 mem_rd <= '1';
                 mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15)) * 7680) + signed(4 * input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15)));
@@ -555,8 +553,13 @@ BEGIN
               END CASE;
 
           WHEN LOAD_RGBA =>
-              
-              IF (mem_accept = '1') THEN
+              IF(BlendENA = '0') THEN
+                state <= WRITE_ADDRESS;
+                outputValR <= std_logic_vector(r_color(39 downto 32));
+                outputValG <=  std_logic_vector(g_color(39 downto 32));
+                outputValB <=  std_logic_vector(b_color(39 downto 32));
+                outputValA <=  std_logic_vector(a_color(39 downto 32));
+              ELSIF (mem_accept = '1') THEN
                 mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
                 state <= WAIT_FOR_RGBA;
               END IF;
