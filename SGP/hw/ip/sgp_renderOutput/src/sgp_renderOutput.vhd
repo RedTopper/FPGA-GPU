@@ -487,7 +487,7 @@ BEGIN
             r_color <= input_fragment_array(1)(3) * x"00FF0000";
 
             
-            IF((x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) or DepthCtrl != GL_NEVER) THEN
+            IF((x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) or DepthCtrl /= GL_NEVER) THEN
               IF((renderoutput_depthEna(0) = '0') or (renderoutput_depthcrtl(2 downto 0) = GL_ALWAYS)) THEN
                 state <= load_rgba;
               else                
