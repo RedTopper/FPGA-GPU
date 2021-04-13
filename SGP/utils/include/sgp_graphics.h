@@ -184,6 +184,14 @@ void SGP_glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
 void SGP_setprimtype(GLenum mode);
 
+
+void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor);
+void SGP_glClearDepth(GLfloat depth);
+void SGP_glDepthFunc(GLenum func);
+void SGP_glEnable(GLenum cap);
+void SGP_glDisable(GLenum cap);
+
+
 // Helper functions. These should probably go in SGLU but that codebase is a bit of a mess. 
 typedef uint32_t sglu_fixed_t;
 uint32_t sglu_color_float_to_int(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);

@@ -31,7 +31,7 @@ SGP_graphicsmap_t SGP_graphicsmap[SGP_GRAPHICS_NUMCOMPONENTS] = {
 [SGP_UNIFORMS] =      { 0x06F8D000, 0x0778CFFC, "SGP_UNIFORMS      " , "Shader uniform data memory region     ", SGP_GRAPHICS_MEMORY_OFFSET, SGP_GRAPHICS_NO_DEBUG      , SGP_GRAPHICS_NO_STATUS },
 [SGP_VERTEX_FETCH] =  { 0x44A50000, 0x44A5FFFC, "SGP_VERTEX_FETCH  " , "Vertex fetch unit config and FIFOs    ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_GRAPHICS_NO_DEBUG      , SGP_AXI_VERTEXFETCH_STATUS },
 [SGP_VIEWPORT] =      { 0x44A80000, 0x44A8FFFC, "SGP_VIEWPORT      " , "Viewport transformation config        ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_AXI_VIEWPORT_DEBUG     , SGP_GRAPHICS_NO_STATUS },
-[SGP_RENDER_OUTPUT] = { 0x44A90000, 0x44A9FFFC, "SGP_RENDER_OUTPUT " , "Render Output (ROP) config            ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_AXI_RENDEROUTPUT_DEBUG , SGP_GRAPHICS_NO_STATUS },
+[SGP_RENDER_OUTPUT] = { 0x44A90000, 0x44A9FFFC, "SGP_RENDER_OUTPUT " , "Render Output (ROP) config            ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_AXI_RENDEROUTPUT_DEBUG , SGP_AXI_RENDEROUTPUT_STATUS},
 [SGP_RASTERIZER]  =   { 0x44AA0000, 0x44AAFFFC, "SGP_RASTERIZER    " , "Rasterization unit config             ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_AXI_RASTERIZER_DEBUG	, SGP_AXI_RASTERIZER_STATUS},
 [SGP_VERTEXSHADER]  = { 0x44AB0000, 0x44ABFFFC, "SGP_VERTEXSHADER  " , "Vertex shader control and config      ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_GRAPHICS_NO_DEBUG	    , SGP_GRAPHICS_NO_STATUS},
 [SGP_FRAGMENTSHADER] ={ 0x44AC0000, 0x44ACFFFC, "SGP_FRAGMENTSHADER" , "Fragment shader control and config    ", SGP_GRAPHICS_SYSTEM_OFFSET, SGP_GRAPHICS_NO_DEBUG	    , SGP_GRAPHICS_NO_STATUS} 
@@ -448,13 +448,19 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 		buffer_addr = SGP_graphicsmap[SGP_COLORBUFFER_2].baseaddr;
 	}
 
-	//TODO
+	//Flush our renderoutput cache
 	uint32_t flags = SGP_read32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL);
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, DCACHE_CTRL_FLUSH_FLAG | flags);
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_CACHECTRL, flags);
 
+	//set the new buffer
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_COLORBUFFER, buffer_addr);
 	
+	//flush the vertexShader
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 99);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 0);
+
+	//flush the fragment shader
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 99);
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 0);
 
@@ -563,3 +569,25 @@ void SGP_print_graphicsmap() {
 
 	return;
 }
+
+void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor){
+	return;
+}
+
+//CLEARS depth to a predefined height, not sure how needed this is but we like to copy
+void SGP_glClearDepth(GLfloat depth){
+	return;
+}
+
+void SGP_glDepthFunc(GLenum func){
+	return;
+}
+
+void SGP_glEnable(GLenum cap){
+	return;
+}
+
+void SGP_glDisable(GLenum cap){
+	return;
+}
+
