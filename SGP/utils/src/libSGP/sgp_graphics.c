@@ -591,3 +591,6 @@ void SGP_glDisable(GLenum cap){
 	return;
 }
 
+void SGP_glDepthRange(GLenum zNear, GLenum zFar){
+	return;
+}
