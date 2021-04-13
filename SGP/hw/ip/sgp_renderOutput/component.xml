@@ -3,7 +3,7 @@
   <spirit:vendor>xilinx.com</spirit:vendor>
   <spirit:library>user</spirit:library>
   <spirit:name>sgp_renderOutput</spirit:name>
-  <spirit:version>1.46</spirit:version>
+  <spirit:version>1.48</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
       <spirit:name>S_AXIS</spirit:name>
@@ -595,7 +595,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>86cb7485</spirit:value>
+            <spirit:value>0875f509</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -611,7 +611,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>86cb7485</spirit:value>
+            <spirit:value>0875f509</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -625,7 +625,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>bffacea9</spirit:value>
+            <spirit:value>1c62a133</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -1737,7 +1737,7 @@
       <spirit:file>
         <spirit:name>src/sgp_renderOutput.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_52c3bf18</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_055e351e</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -1873,10 +1873,10 @@
       <xilinx:taxonomies>
         <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
       </xilinx:taxonomies>
-      <xilinx:displayName>sgp_renderOutput_v1_46</xilinx:displayName>
+      <xilinx:displayName>sgp_renderOutput_v1_48</xilinx:displayName>
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
-      <xilinx:coreRevision>26</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-03-29T22:11:25Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>27</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-04-13T21:26:03Z</xilinx:coreCreationDateTime>
       <xilinx:tags>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@29c115ad_ARCHIVE_LOCATION">c:/users/zambr/desktop/mp-1/hw/ip/sgp_renderoutput</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@73b379f3_ARCHIVE_LOCATION">c:/users/zambr/desktop/mp-1/hw/ip/sgp_renderoutput</xilinx:tag>
@@ -2115,6 +2115,16 @@
         <xilinx:tag xilinx:name="ui.data.coregen.dd@2b7ecac3_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@16d71e08_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
         <xilinx:tag xilinx:name="ui.data.coregen.dd@406a5c67_ARCHIVE_LOCATION">c:/Users/ajwal/Git/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5ca5ad96_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@2f97a9e9_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@947877a_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@db2a00_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7302e229_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@738a68ee_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@59f7bed9_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5d8559b5_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@5e9863c6_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
+        <xilinx:tag xilinx:name="ui.data.coregen.dd@7e2a0fac_ARCHIVE_LOCATION">e:/HW/FPGA-GPU/SGP/hw/ip/sgp_renderOutput</xilinx:tag>
       </xilinx:tags>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
@@ -2122,7 +2132,7 @@
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="8c73dc12"/>
       <xilinx:checksum xilinx:scope="addressSpaces" xilinx:value="341053d0"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="a869f448"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="049f9847"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="55600ad4"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="cdb66564"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="7c4a9b26"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="a6d62b27"/>

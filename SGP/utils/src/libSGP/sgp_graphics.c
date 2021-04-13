@@ -391,15 +391,15 @@ void SGP_glClear(GLbitfield mask) {
 
 
 	if (mask & GL_COLOR_BUFFER_BIT) {
-
 	    // Grab the current backbuffer via the VDMA parkptr and use that frame
     	uint8_t cur_buffer = SGP_getbackbuffer(SGPconfig);
 		uint32_t destaddr = SGP_graphicsmap[SGP_COLORBUFFER_1+cur_buffer].baseaddr;
 
 	    SGP_DMArequest(SGPconfig, SGP_graphicsmap[SGP_CLEARBUFFER_1].baseaddr, destaddr, 1920*1080*4, SGP_DMA_REGULAR);
 
+	}else if(mask & GL_DEPTH_BUFFER_BIT) {
+		SGP_DMArequest(SGPconfig, SGP_graphicsmap[SGP_COLORBUFFER_3].baseaddr, SGP_graphicsmap[SGP_DEPTHBUFFER_1].baseaddr, 1920*1080*4, SGP_DMA_REGULAR);
 	}
-
 }
 
 // Our implementation of glxSwapBuffers
@@ -566,31 +566,91 @@ void SGP_print_graphicsmap() {
 		printf("   %s     0x%08x     0x%08x     %s\n", SGP_graphicsmap[i].name, SGP_graphicsmap[i].baseaddr, SGP_graphicsmap[i].highaddr, SGP_graphicsmap[i].desc);
 	}
 
-
 	return;
 }
 
+//Defines how we will blend
 void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor){
+	uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR, sfactor);
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR, dfactor);
 	return;
 }
 
-//CLEARS depth to a predefined height, not sure how needed this is but we like to copy
-void SGP_glClearDepth(GLfloat depth){
+//Clears depth to a predefined height, not sure how needed this is but we like to copy
+//A blantant copy of proffesor zambrenos SPG_glClearColor
+void SGP_glClearDepth(GLdouble depth){
+
+	uint16_t window_width = 1920;
+	uint16_t window_height = 1080;
+
+    uint32_t baseaddr = SGP_graphicsmap[SGP_COLORBUFFER_3].baseaddr;
+	uint16_t burstlength = 256;
+    for (int i = 0; i < burstlength; i++) {
+    	SGPconfig->writerequest.WDATA[i].AWData.i = depth;
+    }
+
+	for (int row = 0; row < window_height; row++) {
+		burstlength = 256;
+		SGP_AXI_set_writeburstlength(burstlength, &(SGPconfig->writerequest));
+		uint8_t numbursts = window_width/burstlength;
+		for (int col = 0; col < numbursts; col++) {
+    		SGPconfig->writerequest.AWHeader.AxAddr.i = baseaddr+burstlength*4*col+1920*4*row;
+        	SGP_sendWrite(SGPconfig, &(SGPconfig->writerequest), &(SGPconfig->writeresponse), SGP_WAITFORRESPONSE);
+	      }
+		if (window_width % burstlength != 0) {
+        	SGPconfig->writerequest.AWHeader.AxAddr.i = baseaddr+burstlength*4*(numbursts)+1920*4*row;
+        	burstlength = window_width % burstlength;
+        	SGP_AXI_set_writeburstlength(burstlength, &(SGPconfig->writerequest));
+        	SGP_sendWrite(SGPconfig, &(SGPconfig->writerequest), &(SGPconfig->writeresponse), SGP_WAITFORRESPONSE);
+	    }
+	}
+
 	return;
 }
 
+//Defines how we will do depth testing
 void SGP_glDepthFunc(GLenum func){
+	uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHCTRL, func);
 	return;
 }
 
+//Used to enable blending and depth testing
 void SGP_glEnable(GLenum cap){
+	switch (cap)
+	{
+		case GL_BLEND:
+			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 1);
+			break;
+		case GL_DEPTH_TEST:
+			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 1);
+			break;
+	}
 	return;
 }
 
+//Used to disable blending and depth testing
 void SGP_glDisable(GLenum cap){
+	switch (cap)
+	{
+		case GL_BLEND:
+			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 0);
+			break;
+		case GL_DEPTH_TEST:
+			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 0);
+			break;
+	}
 	return;
 }
 
-void SGP_glDepthRange(GLenum zNear, GLenum zFar){
-	return;
+//Used to set the depth at which we will range our depths.
+void SGP_glDepthRange(GLdouble zNear, GLdouble zFar){
+	uint32_t baseaddr = SGP_graphicsmap[SGP_VIEWPORT].baseaddr;
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_NEARVAL_REG, zNear);
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_FARVAL_REG, zFar);
 }

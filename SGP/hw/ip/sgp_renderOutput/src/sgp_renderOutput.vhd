@@ -279,16 +279,18 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   CONSTANT GL_NOTEQUAL  :  std_logic_vector(2 downto 0) := "110";
   CONSTANT GL_GEQUAL	:  std_logic_vector(2 downto 0) := "111";
 
-  CONSTANT GL_ZERO                :  std_logic_vector(3 downto 0) := "0000";
-  CONSTANT GL_ONE                 :  std_logic_vector(3 downto 0) := "0001";
-  CONSTANT GL_SRC_COLOR           :  std_logic_vector(3 downto 0) := "0010";
-  CONSTANT GL_ONE_MINUS_SRC_COLOR :  std_logic_vector(3 downto 0) := "0011";
-  CONSTANT GL_DST_COLOR           :  std_logic_vector(3 downto 0) := "0100";
-  CONSTANT GL_ONE_MINUS_DST_COLOR :  std_logic_vector(3 downto 0) := "0101";
-  CONSTANT GL_SRC_ALPHA           :  std_logic_vector(3 downto 0) := "0110";
-  CONSTANT GL_ONE_MINUS_SRC_ALPHA :  std_logic_vector(3 downto 0) := "0111";
-  CONSTANT GL_DST_ALPHA           :  std_logic_vector(3 downto 0) := "1000";
-  CONSTANT GL_ONE_MINUS_DST_ALPHA :  std_logic_vector(3 downto 0) := "1001";
+  CONSTANT GL_ZERO                :  std_logic_vector(15 downto 0) := x"0000";
+  CONSTANT GL_ONE                 :  std_logic_vector(15 downto 0) := x"0001";
+  CONSTANT GL_SRC_COLOR           :  std_logic_vector(15 downto 0) := x"0300";
+  CONSTANT GL_ONE_MINUS_SRC_COLOR :  std_logic_vector(15 downto 0) := x"0301";
+  CONSTANT GL_DST_COLOR           :  std_logic_vector(15 downto 0) := x"0306";
+  CONSTANT GL_ONE_MINUS_DST_COLOR :  std_logic_vector(15 downto 0) := x"0307";
+  CONSTANT GL_SRC_ALPHA           :  std_logic_vector(15 downto 0) := x"0302";
+  CONSTANT GL_ONE_MINUS_SRC_ALPHA :  std_logic_vector(15 downto 0) := x"0303";
+  CONSTANT GL_DST_ALPHA           :  std_logic_vector(15 downto 0) := x"0304";
+  CONSTANT GL_ONE_MINUS_DST_ALPHA :  std_logic_vector(15 downto 0) := x"0305";
+  CONSTANT GL_SRC_ALPHA_SATURATE  :  std_logic_vector(15 downto 0) := x"0305";
+
 
   CONSTANT BLEND_MAX_R : unsigned(7 downto 0) := "11111111";
   CONSTANT BLEND_MAX_B : unsigned(7 downto 0) := "11111111";
@@ -433,7 +435,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000046";
+  renderoutput_debug <= x"00000048";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -574,17 +576,17 @@ BEGIN
             CASE BlendingState is
               WHEN FACTOR_CALC =>
               --factor
-                CASE renderoutput_blendcrtl_sfactor(3 downto 0) is
+                CASE renderoutput_blendcrtl_sfactor(15 downto 0) is
                   WHEN GL_ZERO =>
                     sourceFactorR <= (others => '0');
                     sourceFactorG <= (others => '0');
                     sourceFactorB <= (others => '0');
                     sourceFactorA <= (others => '0');
                   WHEN GL_ONE =>
-                    sourceFactorR <= (others => '1');
-                    sourceFactorG <= (others => '1');
-                    sourceFactorB <= (others => '1');
-                    sourceFactorA <= (others => '1');
+                    sourceFactorR <= std_logic_vector(oneQ8);
+                    sourceFactorG <= std_logic_vector(oneQ8);
+                    sourceFactorB <= std_logic_vector(oneQ8);
+                    sourceFactorA <= std_logic_vector(oneQ8);
                   WHEN GL_SRC_COLOR =>
                     sourceFactorR <= std_logic_vector(b"00000000" & std_logic_vector(r_color(39 downto 32)));   --max value is 255, shift right by 8 to divide by 255
                     sourceFactorG <= std_logic_vector(b"00000000" & std_logic_vector(b_color(39 downto 32)));   --max value is 255, shift right by 8 to divide by 255
@@ -599,17 +601,17 @@ BEGIN
                     state <= WAIT_FOR_FRAGMENT;
                 END CASE;
 
-                CASE renderoutput_blendcrtl_dfactor(3 downto 0) is
+                CASE renderoutput_blendcrtl_dfactor(15 downto 0) is
                   WHEN GL_ZERO =>
                     destFactorR <= (others => '0');
                     destFactorG <= (others => '0');
                     destFactorB <= (others => '0');
                     destFactorA <= (others => '0');
                   WHEN GL_ONE =>
-                    destFactorR <= (others => '1');
-                    destFactorG <= (others => '1');
-                    destFactorB <= (others => '1');
-                    destFactorA <= (others => '1');
+                    destFactorR <= std_logic_vector(oneQ8);
+                    destFactorG <= std_logic_vector(oneQ8);
+                    destFactorB <= std_logic_vector(oneQ8);
+                    destFactorA <= std_logic_vector(oneQ8);
                   WHEN GL_SRC_COLOR =>
                     destFactorR <= (b"00000000" & mem_rd_data_stored(31 downto 24)); --max value is 255, shift right by 8 to divide by 255
                     destFactorG <= (b"00000000" & mem_rd_data_stored(15 downto 8));  --max value is 255, shift right by 8 to divide by 255
