@@ -135,7 +135,7 @@ xilinx.com:user:axis_tx_tagger:1.0\
 xilinx.com:ip:axis_udp_ethernet:1.0\
 xilinx.com:user:sgp_vertexShader:1.45\
 xilinx.com:user:sgp_rasterizer:1.47\
-xilinx.com:user:sgp_renderOutput:1.55\
+xilinx.com:user:sgp_renderOutput:1.56\
 xilinx.com:user:sgp_viewPort:1.20\
 xilinx.com:ip:system_ila:1.1\
 xilinx.com:ip:mig_7series:4.2\
@@ -1009,7 +1009,7 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   set sgp_rasterizer_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_rasterizer:1.47 sgp_rasterizer_0 ]
 
   # Create instance: sgp_renderOutput, and set properties
-  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.55 sgp_renderOutput ]
+  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.56 sgp_renderOutput ]
   set_property -dict [ list \
    CONFIG.C_M_AXI_ID_WIDTH {4} \
  ] $sgp_renderOutput
@@ -1446,13 +1446,11 @@ proc create_root_design { parentCell } {
   assign_bd_address -offset 0x44A60000 -range 0x00010000 -target_address_space [get_bd_addr_spaces system_intercon/system_dma/Data] [get_bd_addr_segs graphics_subsystem/sgp_vertexFetch/vertex_buffer_FIFO/S_AXI_FULL/Mem1] -force
   assign_bd_address -offset 0x80000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces video_subsystem/axi_vdma_0/Data_MM2S] [get_bd_addr_segs memory_subsystem/mem_interface/memmap/memaddr] -force
 
-  # Exclude Address Segments
-  exclude_bd_addr_seg -offset 0x44AC0000 -range 0x00010000 -target_address_space [get_bd_addr_spaces system_intercon/system_dma/Data] [get_bd_addr_segs graphics_subsystem/sgp_fragmentShader/s_axi_lite/reg0]
-
 
   # Restore current instance
   current_bd_instance $oldCurInst
 
+  validate_bd_design
   save_bd_design
 }
 # End of create_root_design()
@@ -1464,6 +1462,4 @@ proc create_root_design { parentCell } {
 
 create_root_design ""
 
-
-common::send_gid_msg -ssname BD::TCL -id 2053 -severity "WARNING" "This Tcl script was generated from a block design that has not been validated. It is possible that design <$design_name> may result in errors during validation."
 

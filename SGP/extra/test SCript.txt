@@ -1,0 +1,22 @@
+close_sim -force
+launch_simulation
+add_force {/sgp_viewPort/viewport_height_div_2} -radix hex {00010000 0ns}
+add_force {/sgp_viewPort/viewport_width_div_2} -radix hex {00010000 0ns}
+add_force {/sgp_viewPort/viewport_width_reg} -radix hex {00020000 0ns}
+add_force {/sgp_viewPort/viewport_height_reg} -radix hex {00020000 0ns}
+add_force {/sgp_viewPort/S_AXIS_TDATA} -radix hex {000000000000000000000000 0ns}
+add_force {/sgp_viewPort/ACLK} -radix hex {1 0ns} {0 50000ps} -repeat_every 100000ps
+add_force {/sgp_viewPort/ARESETN} -radix hex {0 0ns}
+add_force {/sgp_viewPort/viewport_nearval_reg} -radix hex {0001000 0ns}
+add_force {/sgp_viewPort/viewport_nearval_reg} -radix hex {00000000 0ns}
+add_force {/sgp_viewPort/viewport_farval_reg} -radix hex {00010000 0ns}
+add_force {/sgp_viewPort/S_AXIS_TVALID} -radix hex {1 0ns}
+run 100 ns
+add_force {/sgp_viewPort/ARESETN} -radix hex {1 0ns}
+run 100 ns
+run 100 ns
+run 100 ns
+run 100 ns
+run 100 ns
+run 100 ns
+run 100 ns
