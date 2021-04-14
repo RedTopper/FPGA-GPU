@@ -133,9 +133,9 @@ xilinx.com:ip:axis_data_fifo:2.0\
 xilinx.com:user:axis_rx_tagger:1.0\
 xilinx.com:user:axis_tx_tagger:1.0\
 xilinx.com:ip:axis_udp_ethernet:1.0\
-xilinx.com:user:sgp_vertexShader:1.44\
+xilinx.com:user:sgp_vertexShader:1.45\
 xilinx.com:user:sgp_rasterizer:1.47\
-xilinx.com:user:sgp_renderOutput:1.46\
+xilinx.com:user:sgp_renderOutput:1.55\
 xilinx.com:user:sgp_viewPort:1.20\
 xilinx.com:ip:system_ila:1.1\
 xilinx.com:ip:mig_7series:4.2\
@@ -787,8 +787,8 @@ proc create_hier_cell_system_intercon { parentCell nameHier } {
   connect_bd_intf_net -intf_net system_dma_M_AXI [get_bd_intf_pins periph_intercon/S02_AXI] [get_bd_intf_pins system_dma/M_AXI]
 
   # Create port connections
-  connect_bd_net -net ARESETN_1 [get_bd_pins ARESETN] [get_bd_pins periph_intercon/ARESETN] [get_bd_pins periph_intercon/M00_ARESETN] [get_bd_pins periph_intercon/M01_ARESETN] [get_bd_pins periph_intercon/M02_ARESETN] [get_bd_pins periph_intercon/M03_ARESETN] [get_bd_pins periph_intercon/M04_ARESETN] [get_bd_pins periph_intercon/M05_ARESETN] [get_bd_pins periph_intercon/M06_ARESETN] [get_bd_pins periph_intercon/M07_ARESETN] [get_bd_pins periph_intercon/M08_ARESETN] [get_bd_pins periph_intercon/M09_ARESETN] [get_bd_pins periph_intercon/M10_ARESETN] [get_bd_pins periph_intercon/M11_ARESETN] [get_bd_pins periph_intercon/M12_ARESETN] [get_bd_pins periph_intercon/M13_ARESETN] [get_bd_pins periph_intercon/S00_ARESETN] [get_bd_pins periph_intercon/S01_ARESETN] [get_bd_pins periph_intercon/S02_ARESETN] [get_bd_pins system_dma/s_axi_lite_aresetn]
-  connect_bd_net -net mem_interface_ui_clk [get_bd_pins ACLK] [get_bd_pins periph_intercon/ACLK] [get_bd_pins periph_intercon/M00_ACLK] [get_bd_pins periph_intercon/M01_ACLK] [get_bd_pins periph_intercon/M02_ACLK] [get_bd_pins periph_intercon/M03_ACLK] [get_bd_pins periph_intercon/M04_ACLK] [get_bd_pins periph_intercon/M05_ACLK] [get_bd_pins periph_intercon/M06_ACLK] [get_bd_pins periph_intercon/M07_ACLK] [get_bd_pins periph_intercon/M08_ACLK] [get_bd_pins periph_intercon/M09_ACLK] [get_bd_pins periph_intercon/M10_ACLK] [get_bd_pins periph_intercon/M11_ACLK] [get_bd_pins periph_intercon/M12_ACLK] [get_bd_pins periph_intercon/M13_ACLK] [get_bd_pins periph_intercon/S00_ACLK] [get_bd_pins periph_intercon/S01_ACLK] [get_bd_pins periph_intercon/S02_ACLK] [get_bd_pins system_dma/m_axi_aclk] [get_bd_pins system_dma/s_axi_lite_aclk]
+  connect_bd_net -net ARESETN_1 [get_bd_pins ARESETN] [get_bd_pins periph_intercon/ARESETN] [get_bd_pins periph_intercon/M00_ARESETN] [get_bd_pins periph_intercon/M01_ARESETN] [get_bd_pins periph_intercon/M02_ARESETN] [get_bd_pins periph_intercon/M03_ARESETN] [get_bd_pins periph_intercon/M04_ARESETN] [get_bd_pins periph_intercon/M05_ARESETN] [get_bd_pins periph_intercon/M06_ARESETN] [get_bd_pins periph_intercon/M07_ARESETN] [get_bd_pins periph_intercon/M08_ARESETN] [get_bd_pins periph_intercon/M09_ARESETN] [get_bd_pins periph_intercon/M10_ARESETN] [get_bd_pins periph_intercon/M11_ARESETN] [get_bd_pins periph_intercon/M12_ARESETN] [get_bd_pins periph_intercon/M13_ARESETN] [get_bd_pins periph_intercon/M14_ARESETN] [get_bd_pins periph_intercon/S00_ARESETN] [get_bd_pins periph_intercon/S01_ARESETN] [get_bd_pins periph_intercon/S02_ARESETN] [get_bd_pins system_dma/s_axi_lite_aresetn]
+  connect_bd_net -net mem_interface_ui_clk [get_bd_pins ACLK] [get_bd_pins periph_intercon/ACLK] [get_bd_pins periph_intercon/M00_ACLK] [get_bd_pins periph_intercon/M01_ACLK] [get_bd_pins periph_intercon/M02_ACLK] [get_bd_pins periph_intercon/M03_ACLK] [get_bd_pins periph_intercon/M04_ACLK] [get_bd_pins periph_intercon/M05_ACLK] [get_bd_pins periph_intercon/M06_ACLK] [get_bd_pins periph_intercon/M07_ACLK] [get_bd_pins periph_intercon/M08_ACLK] [get_bd_pins periph_intercon/M09_ACLK] [get_bd_pins periph_intercon/M10_ACLK] [get_bd_pins periph_intercon/M11_ACLK] [get_bd_pins periph_intercon/M12_ACLK] [get_bd_pins periph_intercon/M13_ACLK] [get_bd_pins periph_intercon/M14_ACLK] [get_bd_pins periph_intercon/S00_ACLK] [get_bd_pins periph_intercon/S01_ACLK] [get_bd_pins periph_intercon/S02_ACLK] [get_bd_pins system_dma/m_axi_aclk] [get_bd_pins system_dma/s_axi_lite_aclk]
 
   # Restore current instance
   current_bd_instance $oldCurInst
@@ -1003,13 +1003,13 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
  ] $raserizer_fifo
 
   # Create instance: sgp_fragmentShader, and set properties
-  set sgp_fragmentShader [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.44 sgp_fragmentShader ]
+  set sgp_fragmentShader [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.45 sgp_fragmentShader ]
 
   # Create instance: sgp_rasterizer_0, and set properties
   set sgp_rasterizer_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_rasterizer:1.47 sgp_rasterizer_0 ]
 
   # Create instance: sgp_renderOutput, and set properties
-  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.46 sgp_renderOutput ]
+  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.55 sgp_renderOutput ]
   set_property -dict [ list \
    CONFIG.C_M_AXI_ID_WIDTH {4} \
  ] $sgp_renderOutput
@@ -1018,7 +1018,7 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   create_hier_cell_sgp_vertexFetch $hier_obj sgp_vertexFetch
 
   # Create instance: sgp_vertexShader_0, and set properties
-  set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.44 sgp_vertexShader_0 ]
+  set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.45 sgp_vertexShader_0 ]
 
   # Create instance: sgp_viewPort, and set properties
   set sgp_viewPort [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_viewPort:1.20 sgp_viewPort ]
@@ -1026,8 +1026,9 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   # Create instance: system_ila_0, and set properties
   set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
   set_property -dict [ list \
-   CONFIG.C_BRAM_CNT {21} \
-   CONFIG.C_NUM_MONITOR_SLOTS {1} \
+   CONFIG.C_BRAM_CNT {23.5} \
+   CONFIG.C_DATA_DEPTH {4096} \
+   CONFIG.C_NUM_MONITOR_SLOTS {3} \
    CONFIG.C_SLOT {0} \
    CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
    CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
@@ -1053,14 +1054,17 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   connect_bd_intf_net -intf_net s_axi_lite4_1 [get_bd_intf_pins s_axi_lite4] [get_bd_intf_pins sgp_vertexShader_0/s_axi_lite]
   connect_bd_intf_net -intf_net s_axi_lite5_1 [get_bd_intf_pins s_axi_lite5] [get_bd_intf_pins sgp_fragmentShader/s_axi_lite]
   connect_bd_intf_net -intf_net sgp_fragmentShader_M_AXIS [get_bd_intf_pins fragmentShader_fifo/S_AXIS] [get_bd_intf_pins sgp_fragmentShader/M_AXIS]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets sgp_fragmentShader_M_AXIS] [get_bd_intf_pins sgp_fragmentShader/M_AXIS] [get_bd_intf_pins system_ila_0/SLOT_1_AXIS]
   connect_bd_intf_net -intf_net sgp_fragmentShader_m1_axi [get_bd_intf_pins fragmentShader_dcache_M1_AXI] [get_bd_intf_pins sgp_fragmentShader/m1_axi]
   connect_bd_intf_net -intf_net sgp_fragmentShader_m2_axi [get_bd_intf_pins fragmentShader_icache_M2_AXI] [get_bd_intf_pins sgp_fragmentShader/m2_axi]
   connect_bd_intf_net -intf_net sgp_rasterizer_0_M_AXIS [get_bd_intf_pins raserizer_fifo/S_AXIS] [get_bd_intf_pins sgp_rasterizer_0/M_AXIS]
   connect_bd_intf_net -intf_net sgp_renderOutput_m_axi [get_bd_intf_pins renderOutput_dcache_0_M0_AXI] [get_bd_intf_pins sgp_renderOutput/m_axi]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets sgp_renderOutput_m_axi] [get_bd_intf_pins renderOutput_dcache_0_M0_AXI] [get_bd_intf_pins system_ila_0/SLOT_0_AXI]
   connect_bd_intf_net -intf_net sgp_vertexShader_0_M_AXIS [get_bd_intf_pins sgp_vertexShader_0/M_AXIS] [get_bd_intf_pins vertexshader_fifo/S_AXIS]
   connect_bd_intf_net -intf_net sgp_vertexShader_0_m1_axi [get_bd_intf_pins vertexShader_dcache_M1_AXI] [get_bd_intf_pins sgp_vertexShader_0/m1_axi]
   connect_bd_intf_net -intf_net sgp_vertexShader_0_m2_axi [get_bd_intf_pins vertexShader_icache_M2_AXI] [get_bd_intf_pins sgp_vertexShader_0/m2_axi]
   connect_bd_intf_net -intf_net sgp_viewPort_0_M_AXIS [get_bd_intf_pins sgp_viewPort/M_AXIS] [get_bd_intf_pins viewport_fifo/S_AXIS]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets sgp_viewPort_0_M_AXIS] [get_bd_intf_pins sgp_viewPort/M_AXIS] [get_bd_intf_pins system_ila_0/SLOT_2_AXIS]
   connect_bd_intf_net -intf_net system_intercon_M07_AXI [get_bd_intf_pins S_AXI] [get_bd_intf_pins sgp_vertexFetch/S_AXI]
   connect_bd_intf_net -intf_net system_intercon_M08_AXI [get_bd_intf_pins s_axi_lite2] [get_bd_intf_pins sgp_vertexFetch/s_axi_lite]
   connect_bd_intf_net -intf_net system_intercon_M09_AXI [get_bd_intf_pins s_axi_lite1] [get_bd_intf_pins sgp_viewPort/s_axi_lite]
@@ -1071,8 +1075,8 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   connect_bd_intf_net -intf_net viewport_fifo_M_AXIS [get_bd_intf_pins sgp_rasterizer_0/S_AXIS] [get_bd_intf_pins viewport_fifo/M_AXIS]
 
   # Create port connections
-  connect_bd_net -net ARESETN_1 [get_bd_pins s_axis_aresetn] [get_bd_pins raserizer_fifo/s_axis_aresetn] [get_bd_pins sgp_fragmentShader/ARESETN] [get_bd_pins sgp_rasterizer_0/ARESETN] [get_bd_pins sgp_renderOutput/ARESETN] [get_bd_pins sgp_vertexFetch/m_axi_aresetn] [get_bd_pins sgp_vertexShader_0/ARESETN] [get_bd_pins sgp_viewPort/ARESETN] [get_bd_pins system_ila_0/resetn] [get_bd_pins vertexfetch_fifo/s_axis_aresetn] [get_bd_pins vertexshader_fifo/s_axis_aresetn] [get_bd_pins viewport_fifo/s_axis_aresetn]
-  connect_bd_net -net mem_interface_ui_clk [get_bd_pins s_axis_aclk] [get_bd_pins raserizer_fifo/s_axis_aclk] [get_bd_pins sgp_fragmentShader/ACLK] [get_bd_pins sgp_rasterizer_0/ACLK] [get_bd_pins sgp_renderOutput/ACLK] [get_bd_pins sgp_vertexFetch/m_axis_aclk] [get_bd_pins sgp_vertexShader_0/ACLK] [get_bd_pins sgp_viewPort/ACLK] [get_bd_pins system_ila_0/clk] [get_bd_pins vertexfetch_fifo/s_axis_aclk] [get_bd_pins vertexshader_fifo/s_axis_aclk] [get_bd_pins viewport_fifo/s_axis_aclk]
+  connect_bd_net -net ARESETN_1 [get_bd_pins s_axis_aresetn] [get_bd_pins fragmentShader_fifo/s_axis_aresetn] [get_bd_pins raserizer_fifo/s_axis_aresetn] [get_bd_pins sgp_fragmentShader/ARESETN] [get_bd_pins sgp_rasterizer_0/ARESETN] [get_bd_pins sgp_renderOutput/ARESETN] [get_bd_pins sgp_vertexFetch/m_axi_aresetn] [get_bd_pins sgp_vertexShader_0/ARESETN] [get_bd_pins sgp_viewPort/ARESETN] [get_bd_pins system_ila_0/resetn] [get_bd_pins vertexfetch_fifo/s_axis_aresetn] [get_bd_pins vertexshader_fifo/s_axis_aresetn] [get_bd_pins viewport_fifo/s_axis_aresetn]
+  connect_bd_net -net mem_interface_ui_clk [get_bd_pins s_axis_aclk] [get_bd_pins fragmentShader_fifo/s_axis_aclk] [get_bd_pins raserizer_fifo/s_axis_aclk] [get_bd_pins sgp_fragmentShader/ACLK] [get_bd_pins sgp_rasterizer_0/ACLK] [get_bd_pins sgp_renderOutput/ACLK] [get_bd_pins sgp_vertexFetch/m_axis_aclk] [get_bd_pins sgp_vertexShader_0/ACLK] [get_bd_pins sgp_viewPort/ACLK] [get_bd_pins system_ila_0/clk] [get_bd_pins vertexfetch_fifo/s_axis_aclk] [get_bd_pins vertexshader_fifo/s_axis_aclk] [get_bd_pins viewport_fifo/s_axis_aclk]
 
   # Restore current instance
   current_bd_instance $oldCurInst
