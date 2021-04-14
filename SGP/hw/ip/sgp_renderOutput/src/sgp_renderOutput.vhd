@@ -435,7 +435,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000052";
+  renderoutput_debug <= x"00000055";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -491,7 +491,7 @@ BEGIN
             
             IF((x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) or DepthCtrl /= GL_NEVER) THEN
               IF((renderoutput_depthEna(0) = '0') or (renderoutput_depthcrtl(2 downto 0) = GL_ALWAYS)) THEN
-                state <= load_rgba;
+                state <= LOAD_RGBA;
               else                
                 mem_rd <= '1';
                 mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15)) * 7680) + signed(4 * input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15)));
@@ -516,37 +516,37 @@ BEGIN
             CASE DepthCtrl IS
               when GL_LESS =>
                 if(z_pos < mem_rd_data_stored)then
-                  state <= BLEND;
+                  state <= LOAD_RGBA;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_EQUAL =>
                 if(z_pos = mem_rd_data_stored)then
-                  state <= BLEND;
+                  state <= LOAD_RGBA;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_LEQUAL =>
                 if(z_pos <= mem_rd_data_stored)then
-                  state <= BLEND;
+                  state <= LOAD_RGBA;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_GREATER =>
                 if(z_pos > mem_rd_data_stored)then
-                  state <= BLEND;
+                  state <= LOAD_RGBA;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_NOTEQUAL =>
                 if(z_pos /= mem_rd_data_stored)then
-                  state <= BLEND;
+                  state <= LOAD_RGBA;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_GEQUAL =>
                 if(z_pos > mem_rd_data_stored)then
-                  state <= BLEND;
+                  state <= LOAD_RGBA;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
@@ -562,14 +562,17 @@ BEGIN
                 outputValB <=  std_logic_vector(b_color(39 downto 32));
                 outputValA <=  std_logic_vector(a_color(39 downto 32));
               ELSIF (mem_accept = '1') THEN
+                mem_rd <= '1';
                 mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
                 state <= WAIT_FOR_RGBA;
               END IF;
 
           WHEN WAIT_FOR_RGBA =>
+            mem_rd <= '0';
             IF (mem_ack = '1') THEN
               mem_rd_data_stored <= mem_data_rd;
               state <= BLEND;
+              BlendingState <= FACTOR_CALC;
             END IF;
 
           WHEN BLEND =>
@@ -665,6 +668,7 @@ BEGIN
               WHEN OTHERS =>
                 state <= WAIT_FOR_FRAGMENT;
               END CASE;
+
           WHEN WRITE_ADDRESS =>
             mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
             mem_data_wr <= STD_LOGIC_VECTOR(outputValR) & STD_LOGIC_VECTOR(outputValA) & STD_LOGIC_VECTOR(outputValG) & STD_LOGIC_VECTOR(outputValB);
