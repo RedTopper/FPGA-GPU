@@ -308,7 +308,7 @@ architecture behavioral of sgp_vertexShader is
          outputVertex     : out vertexArray_t;
          vertexStart      : in std_logic; 
          vertexDone       : out std_logic;
-         passthroughena   : in std_logic;
+         passthroughena   : in std_logic_vector(31 downto 0);
         
          dmem_addr        : out std_logic_vector(31 downto 0);
          dmem_wdata       : out std_logic_vector(31 downto 0);
@@ -532,7 +532,7 @@ begin
                 inputVertex => vertexShader_core_inputVertex,
                 outputVertex => vertexShader_core_outputVertex,
                 vertexStart => vertexShader_core_Start,
-                passthroughena => vertexshader_passthrough(0),
+                passthroughena => vertexshader_passthrough(31 downto 0),
                 vertexDone => vertexShader_core_Done,
                 dmem_addr => mem_addr,
                 dmem_wdata => mem_data_wr,
@@ -593,7 +593,7 @@ begin
 
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  vertexshader_debug <= x"00000045";
+  vertexshader_debug <= x"00000046";
   vertexshader_status <= x"00000000";
 
  -- vertexshader_flush_latch <= '1' when vertexshader_flush /= x"00000000" else 
