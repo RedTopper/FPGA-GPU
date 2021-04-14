@@ -571,6 +571,7 @@ void SGP_print_graphicsmap() {
 
 //Defines how we will blend
 void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor){
+	printf("Inside blend func!");
 	uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR, sfactor);
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR, dfactor);
@@ -580,7 +581,7 @@ void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor){
 //Clears depth to a predefined height, not sure how needed this is but we like to copy
 //A blantant copy of proffesor zambrenos SPG_glClearColor
 void SGP_glClearDepth(GLdouble depth){
-
+	printf("Inside clear depth!!\n");
 	uint16_t window_width = 1920;
 	uint16_t window_height = 1080;
 
@@ -611,6 +612,7 @@ void SGP_glClearDepth(GLdouble depth){
 
 //Defines how we will do depth testing
 void SGP_glDepthFunc(GLenum func){
+	printf("Inside depth Func!!\n");
 	uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHCTRL, func);
 	return;
@@ -618,6 +620,7 @@ void SGP_glDepthFunc(GLenum func){
 
 //Used to enable blending and depth testing
 void SGP_glEnable(GLenum cap){
+	printf("Inside enable!!\n");
 	uint32_t baseaddr;
 	switch (cap)
 	{
@@ -635,6 +638,7 @@ void SGP_glEnable(GLenum cap){
 
 //Used to disable blending and depth testing
 void SGP_glDisable(GLenum cap){
+	printf("Inside disable!!\n");
 	uint32_t baseaddr;
 	switch (cap)
 	{
