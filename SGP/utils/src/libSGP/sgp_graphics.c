@@ -618,14 +618,15 @@ void SGP_glDepthFunc(GLenum func){
 
 //Used to enable blending and depth testing
 void SGP_glEnable(GLenum cap){
+	uint32_t baseaddr;
 	switch (cap)
 	{
 		case GL_BLEND:
-			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 1);
 			break;
 		case GL_DEPTH_TEST:
-			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 1);
 			break;
 	}
@@ -634,14 +635,15 @@ void SGP_glEnable(GLenum cap){
 
 //Used to disable blending and depth testing
 void SGP_glDisable(GLenum cap){
+	uint32_t baseaddr;
 	switch (cap)
 	{
 		case GL_BLEND:
-			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 0);
 			break;
 		case GL_DEPTH_TEST:
-			uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+			baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDENA, 0);
 			break;
 	}

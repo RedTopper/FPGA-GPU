@@ -186,11 +186,11 @@ void SGP_setprimtype(GLenum mode);
 
 
 void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor);
-void SGP_glClearDepth(GLfloat depth);
+void SGP_glClearDepth(GLdouble depth);
 void SGP_glDepthFunc(GLenum func);
 void SGP_glEnable(GLenum cap);
 void SGP_glDisable(GLenum cap);
-void SGP_glDepthRange(GLenum zNear, GLenum zFar);
+void SGP_glDepthRange(GLdouble zNear, GLdouble zFar);
 
 
 // Helper functions. These should probably go in SGLU but that codebase is a bit of a mess. 

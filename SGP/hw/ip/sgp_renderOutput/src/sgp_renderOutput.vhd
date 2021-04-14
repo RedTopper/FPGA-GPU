@@ -435,7 +435,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000048";
+  renderoutput_debug <= x"00000052";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -628,10 +628,10 @@ BEGIN
                 
                 BlendingState <= CALC;
               WHEN CALC =>
-                calcValR <= std_logic_vector(unsigned(r_color) * unsigned(sourceFactorR) + unsigned(mem_rd_data_stored(31 downto 24))  * unsigned(destFactorR));
-                calcValG <= std_logic_vector(unsigned(g_color) * unsigned(sourceFactorG) + unsigned(mem_rd_data_stored(15 downto 8) )  * unsigned(destFactorG));
-                calcValB <= std_logic_vector(unsigned(b_color) * unsigned(sourceFactorB) + unsigned(mem_rd_data_stored(7 downto 0)  )  * unsigned(destFactorB));
-                calcValA <= std_logic_vector(unsigned(a_color) * unsigned(sourceFactorA) + unsigned(mem_rd_data_stored(23 downto 16))  * unsigned(destFactorA));
+                calcValR <= std_logic_vector(((b"0000" & (unsigned(r_color(39 downto 32))) & b"0000") * unsigned(sourceFactorR)) + ((b"0000" & (unsigned(mem_rd_data_stored(31 downto 24)) & b"0000"))  * unsigned(destFactorR)));
+                calcValG <= std_logic_vector(((b"0000" & (unsigned(g_color(39 downto 32))) & b"0000") * unsigned(sourceFactorG)) + ((b"0000" & (unsigned(mem_rd_data_stored(15 downto 8) ) & b"0000"))  * unsigned(destFactorG)));
+                calcValB <= std_logic_vector(((b"0000" & (unsigned(b_color(39 downto 32))) & b"0000") * unsigned(sourceFactorB)) + ((b"0000" & (unsigned(mem_rd_data_stored(7 downto 0)  ) & b"0000"))  * unsigned(destFactorB)));
+                calcValA <= std_logic_vector(((b"0000" & (unsigned(a_color(39 downto 32))) & b"0000") * unsigned(sourceFactorA)) + ((b"0000" & (unsigned(mem_rd_data_stored(23 downto 16)) & b"0000"))  * unsigned(destFactorA)));
                 BlendingState <= MIN_VALS;
 
               WHEN MIN_VALS =>
