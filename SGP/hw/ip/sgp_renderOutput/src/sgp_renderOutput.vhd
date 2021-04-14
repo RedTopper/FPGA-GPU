@@ -201,7 +201,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH,WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
   SIGNAL state : STATE_TYPE;
 
   TYPE BLEND_STATE_TYPE IS (FACTOR_CALC, CALC, MIN_VALS);
@@ -516,37 +516,37 @@ BEGIN
             CASE DepthCtrl IS
               when GL_LESS =>
                 if(z_pos < mem_rd_data_stored)then
-                  state <= LOAD_RGBA;
+                  state <= WRITE_DEPTH;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_EQUAL =>
                 if(z_pos = mem_rd_data_stored)then
-                  state <= LOAD_RGBA;
+                  state <= WRITE_DEPTH;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_LEQUAL =>
                 if(z_pos <= mem_rd_data_stored)then
-                  state <= LOAD_RGBA;
+                  state <= WRITE_DEPTH;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_GREATER =>
                 if(z_pos > mem_rd_data_stored)then
-                  state <= LOAD_RGBA;
+                  state <= WRITE_DEPTH;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_NOTEQUAL =>
                 if(z_pos /= mem_rd_data_stored)then
-                  state <= LOAD_RGBA;
+                  state <= WRITE_DEPTH;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
               when GL_GEQUAL =>
                 if(z_pos > mem_rd_data_stored)then
-                  state <= LOAD_RGBA;
+                  state <= WRITE_DEPTH;
                 else
                   state <= WAIT_FOR_FRAGMENT;
                 end if;
@@ -554,6 +554,22 @@ BEGIN
                 state <= WAIT_FOR_FRAGMENT;
               END CASE;
 
+          WHEN WRITE_DEPTH =>
+            mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
+            mem_data_wr <= STD_LOGIC_VECTOR(z_pos);
+
+            --wait for mem_accept to go high. then write to the dcache.
+            IF (mem_accept = '1') THEN
+              mem_wr <= b"1111";
+              state <= WAIT_DEPTH_RESPONSE;
+            END IF;
+          
+          WHEN WAIT_DEPTH_RESPONSE =>
+            mem_wr <= b"0000";
+            IF (mem_ack = '1') THEN
+              state <= LOAD_RGBA;
+            END IF;
+          
           WHEN LOAD_RGBA =>
               IF(BlendENA = '0') THEN
                 state <= WRITE_ADDRESS;
