@@ -569,7 +569,7 @@ BEGIN
           WHEN WAIT_FOR_RGBA =>
             IF (mem_ack = '1') THEN
               mem_rd_data_stored <= mem_data_rd;
-              state <= LOAD_RGBA;
+              state <= BLEND;
             END IF;
 
           WHEN BLEND =>
