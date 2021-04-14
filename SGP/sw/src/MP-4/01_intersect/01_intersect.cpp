@@ -40,7 +40,7 @@ int main() {
 	glBindVertexArray(VertexArrayID);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "../common/shaders/vertexshifter.vert", "../common/shaders/passthrough.frag" );
+	GLuint programID = LoadShaders( "../common/shaders/vertexshifter.vert", "../common/shaders/color.frag");
 	glUseProgram(programID);
 
 	// Just a single triangle for GL_TRIANGLES to test. Add to this to draw more points
@@ -81,6 +81,7 @@ int main() {
 	GLuint yoffsetID = glGetUniformLocation(programID, "yoffset");
 	GLuint xscaleID = glGetUniformLocation(programID, "xscale"); 
 	GLuint yscaleID = glGetUniformLocation(programID, "yscale"); 
+	GLuint colorID = glGetUniformLocation(programID, "inColor");
 
 	int frame_count = 0;
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0 ) {
@@ -105,6 +106,12 @@ int main() {
 		glUniform1f(yoffsetID, yoffset);
 		glUniform1f(xscaleID, xscale);
 		glUniform1f(yscaleID, yscale);
+		glUniform3f(
+				colorID,
+				xoffset > 0 ? xoffset : 0,
+				xoffset < 0 ? -xoffset : 0,
+				yoffset / 2.0 + 1.0
+		);
 
     	glClear(GL_COLOR_BUFFER_BIT);
 
