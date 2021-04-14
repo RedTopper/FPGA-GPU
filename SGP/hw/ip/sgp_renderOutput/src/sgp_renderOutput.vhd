@@ -264,26 +264,26 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL oneQ8 : unsigned(15 DOWNTO 0) := b"0000000100000000";
   SIGNAL outputValR, outputValB, outputValG, outputValA : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL rgbaCounter : INTEGER RANGE 0 TO 4;
-  CONSTANT GL_LESS : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
-  CONSTANT GL_ALWAYS : STD_LOGIC_VECTOR(2 DOWNTO 0) := "001";
-  CONSTANT GL_NEVER : STD_LOGIC_VECTOR(2 DOWNTO 0) := "010";
-  CONSTANT GL_EQUAL : STD_LOGIC_VECTOR(2 DOWNTO 0) := "011";
-  CONSTANT GL_LEQUAL : STD_LOGIC_VECTOR(2 DOWNTO 0) := "100";
-  CONSTANT GL_GREATER : STD_LOGIC_VECTOR(2 DOWNTO 0) := "101";
-  CONSTANT GL_NOTEQUAL : STD_LOGIC_VECTOR(2 DOWNTO 0) := "110";
-  CONSTANT GL_GEQUAL : STD_LOGIC_VECTOR(2 DOWNTO 0) := "111";
+  CONSTANT GL_LESS :    STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0201";
+  CONSTANT GL_ALWAYS :  STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0207";
+  CONSTANT GL_NEVER :   STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0200";
+  CONSTANT GL_EQUAL :   STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0202";
+  CONSTANT GL_LEQUAL :  STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0203";
+  CONSTANT GL_GREATER : STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0204";
+  CONSTANT GL_NOTEQUAL :STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0205";
+  CONSTANT GL_GEQUAL :  STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0206";
 
-  CONSTANT GL_ZERO : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0000";
-  CONSTANT GL_ONE : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0001";
-  CONSTANT GL_SRC_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0300";
+  CONSTANT GL_ZERO : STD_LOGIC_VECTOR(15 DOWNTO 0)                := x"0000";
+  CONSTANT GL_ONE : STD_LOGIC_VECTOR(15 DOWNTO 0)                 := x"0001";
+  CONSTANT GL_SRC_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0300";
   CONSTANT GL_ONE_MINUS_SRC_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0301";
-  CONSTANT GL_DST_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0306";
+  CONSTANT GL_DST_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0306";
   CONSTANT GL_ONE_MINUS_DST_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0307";
-  CONSTANT GL_SRC_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0302";
+  CONSTANT GL_SRC_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0302";
   CONSTANT GL_ONE_MINUS_SRC_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0303";
-  CONSTANT GL_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0304";
+  CONSTANT GL_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0304";
   CONSTANT GL_ONE_MINUS_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0305";
-  CONSTANT GL_SRC_ALPHA_SATURATE : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0305";
+  CONSTANT GL_SRC_ALPHA_SATURATE : STD_LOGIC_VECTOR(15 DOWNTO 0)  := x"0305";
   CONSTANT BLEND_MAX_R : unsigned(7 DOWNTO 0) := "11111111";
   CONSTANT BLEND_MAX_B : unsigned(7 DOWNTO 0) := "11111111";
   CONSTANT BLEND_MAX_G : unsigned(7 DOWNTO 0) := "11111111";
@@ -296,7 +296,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   ALIAS zPosShort : signed(31 DOWNTO 0) IS input_fragment_array(0)(2)(31 DOWNTO 0);
 
   ALIAS DepthENA : STD_LOGIC IS renderoutput_depthEna(0);
-  ALIAS DepthCtrl : STD_LOGIC_VECTOR(2 DOWNTO 0) IS renderoutput_depthcrtl(2 DOWNTO 0);
+  ALIAS DepthCtrl : STD_LOGIC_VECTOR(15 DOWNTO 0) IS renderoutput_depthcrtl(15 DOWNTO 0);
   ALIAS BlendENA : STD_LOGIC IS renderoutput_blendEna(0);
 BEGIN
   -- Instantiation of Axi Bus Interface S_AXI_LITE
@@ -421,7 +421,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000056";
+  renderoutput_debug <= x"00000057";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -474,12 +474,12 @@ BEGIN
             g_color <= input_fragment_array(1)(2) * x"00FF0000";
             r_color <= input_fragment_array(1)(3) * x"00FF0000";
             IF (x_pos_short_reg >= 0 AND x_pos_short_reg < 1920 AND y_pos_short_reg >= 0 AND y_pos_short_reg < 1080) THEN
-              IF ((renderoutput_depthEna(0) = '0')) THEN
+              IF ((renderoutput_depthEna = x"00000000")) THEN
                 state <= LOAD_RGBA;
               ELSE
-                IF (renderoutput_depthcrtl(2 DOWNTO 0) = GL_ALWAYS) THEN
+                IF (renderoutput_depthcrtl(15 DOWNTO 0) = GL_ALWAYS) THEN
                   state <= LOAD_RGBA;
-                ELSIF (renderoutput_depthcrtl(2 DOWNTO 0) = GL_NEVER) THEN
+                ELSIF (renderoutput_depthcrtl(15 DOWNTO 0) = GL_NEVER) THEN
                   state <= WAIT_FOR_FRAGMENT;
                 ELSE
                   mem_rd <= '1';
