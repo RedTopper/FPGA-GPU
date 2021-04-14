@@ -74,8 +74,6 @@ function split(str, pat)
  
  local op_fpow		= 40
  
- local op_texfetch   = 254
- 
  local op_done		= 255
  
  
@@ -277,11 +275,6 @@ function split(str, pat)
  function Avenge_fpow(rd, ra, rb)
      AvengeBinary(op_fpow, rd, ra, rb)
      AvengeAssembler3op("fpow", rd, ra, rb)
- end
- 
- function Avenge_texfetch(rd, ra, rb)
-     AvengeBinary(op_texfetch, rd, ra, rb)
-     AvengeAssembler3op("texfetch", rd, ra, rb)
  end
  
  function Avenge_done()
@@ -774,7 +767,7 @@ function split(str, pat)
      elseif node.op == "OpTypeSampler" then
          return 0
      elseif node.op == "OpTypeSampledImage" then
-         return 1
+         return 0
      end
  end
  
@@ -925,20 +918,6 @@ function split(str, pat)
          end
  
          node.register = dest
-     elseif typeNode.op == "OpTypeSampledImage" then
-         local dest = AllocateRegister()
- 
-         if storageClass == "Input" then
-             SourceError("OpLoad: Loading sampled image 'in' variables not currently supported")
-         elseif storageClass == "Output" then
-             SourceError("OpLoad: Loading sampled image 'out' variables not currently supported")
-         else
-             local p = pointerNode.register
-             AvengeComment("load variable " .. name)
-             Avenge_ld(dest, p, 0)
-         end
- 
-         node.register = dest
      elseif typeNode.op == "OpTypeVector" then
          local dest = AllocateRegister()
  
@@ -1029,15 +1008,6 @@ function split(str, pat)
          if storageClass == "Input" then
              SourceError("OpStore: Storing to an 'in' variable not supported")
          elseif storageClass == "Output" then
-             if pointerNode.base then
-                 local baseNode = GetId(pointerNode.base)
-                 local baseResultTypeNode = GetId(baseNode.resultType)
-                 if names[baseResultTypeNode.type] == "gl_PerVertex" then
-                     print("Ignoring write to gl_PointSize.")
-                     return
-                 end
-             end
- 
              local realName = names[pointer]
              local location = decorations[pointer]["Location"] or AllocateOutLocation(realName)
  
@@ -1621,15 +1591,9 @@ function split(str, pat)
  
      -- generate asm
      local dest = AllocateRegister()
- 
-     local sampledImageNode = GetId(sampledImage)
-     local sampledImageRegister = sampledImageNode.register
- 
-     local coordinateNode = GetId(coordinate)
-     local coordinateRegister = coordinateNode.register
      
-     AvengeComment("texture look up")
-     Avenge_texfetch(dest, sampledImageRegister, coordinateRegister)
+     AvengeComment("OpImageSampleImplicitLod just returns the current color as a placeholder")
+     Avenge_swizzle(dest, 0, SwizzleByte(0, 1, 2, 3))
      
      node.register = dest;
  end
