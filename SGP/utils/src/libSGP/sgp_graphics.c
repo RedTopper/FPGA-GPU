@@ -515,7 +515,7 @@ int SGP_graphicsInit(sgp_config* config) {
 	}
 
 	//Set the initial value of the depth buffer
-	SGP_write32(SGP_config, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHBUFFER, SGP_graphicsmap[SGP_DEPTHBUFFER_1].baseaddr);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHBUFFER, SGP_graphicsmap[SGP_DEPTHBUFFER_1].baseaddr);
 
 
 	// Set the renderOutput to point to the initial backbuffer and configure it's cache
