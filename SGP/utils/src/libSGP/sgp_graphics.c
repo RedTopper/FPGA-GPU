@@ -383,9 +383,13 @@ void SGP_glClear(GLbitfield mask) {
 		uint8_t cur_buffer = SGP_getbackbuffer(SGPconfig);
 		uint32_t destaddr = SGP_graphicsmap[SGP_COLORBUFFER_1 + cur_buffer].baseaddr;
 
+		SGP_DMAwaitidle(SGPconfig); //wait for any previous DMA requests to finish
 		SGP_DMArequest(SGPconfig, SGP_graphicsmap[SGP_CLEARBUFFER_1].baseaddr, destaddr, 1920 * 1080 * 4, SGP_DMA_REGULAR);
 
-	} else if (mask & GL_DEPTH_BUFFER_BIT) {
+	// this could maybe be an if instaead, if we want to clear both, glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+	}
+	if (mask & GL_DEPTH_BUFFER_BIT) {
+		SGP_DMAwaitidle(SGPconfig); //wait for any previous DMA requests to finish
 		SGP_DMArequest(SGPconfig, SGP_graphicsmap[SGP_COLORBUFFER_3].baseaddr, SGP_graphicsmap[SGP_DEPTHBUFFER_1].baseaddr, 1920 * 1080 * 4, SGP_DMA_REGULAR);
 	}
 }
