@@ -199,7 +199,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH,WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
   SIGNAL state : STATE_TYPE;
 
   TYPE BLEND_STATE_TYPE IS (FACTOR_CALC, CALC, MIN_VALS);
@@ -421,7 +421,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000064";
+  renderoutput_debug <= x"00000065";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -509,40 +509,40 @@ BEGIN
             --note never and always are accounted for already,
             --mildy sphaget but also mildy more efficient
             CASE DepthCtrl IS
-              when GL_LESS =>
-                if(z_pos < mem_rd_data_stored)then
+              WHEN GL_LESS =>
+                IF (z_pos < mem_rd_data_stored) THEN
                   state <= WRITE_DEPTH;
-                else
+                ELSE
                   state <= WAIT_FOR_FRAGMENT;
-                end if;
-              when GL_EQUAL =>
-                if(z_pos = mem_rd_data_stored)then
+                END IF;
+              WHEN GL_EQUAL =>
+                IF (z_pos = mem_rd_data_stored) THEN
                   state <= WRITE_DEPTH;
-                else
+                ELSE
                   state <= WAIT_FOR_FRAGMENT;
-                end if;
-              when GL_LEQUAL =>
-                if(z_pos <= mem_rd_data_stored)then
+                END IF;
+              WHEN GL_LEQUAL =>
+                IF (z_pos <= mem_rd_data_stored) THEN
                   state <= WRITE_DEPTH;
-                else
+                ELSE
                   state <= WAIT_FOR_FRAGMENT;
-                end if;
-              when GL_GREATER =>
-                if(z_pos > mem_rd_data_stored)then
+                END IF;
+              WHEN GL_GREATER =>
+                IF (z_pos > mem_rd_data_stored) THEN
                   state <= WRITE_DEPTH;
-                else
+                ELSE
                   state <= WAIT_FOR_FRAGMENT;
-                end if;
-              when GL_NOTEQUAL =>
-                if(z_pos /= mem_rd_data_stored)then
+                END IF;
+              WHEN GL_NOTEQUAL =>
+                IF (z_pos /= mem_rd_data_stored) THEN
                   state <= WRITE_DEPTH;
-                else
+                ELSE
                   state <= WAIT_FOR_FRAGMENT;
-                end if;
-              when GL_GEQUAL =>
-                if(z_pos > mem_rd_data_stored)then
+                END IF;
+              WHEN GL_GEQUAL =>
+                IF (z_pos > mem_rd_data_stored) THEN
                   state <= WRITE_DEPTH;
-                else
+                ELSE
                   state <= WAIT_FOR_FRAGMENT;
                 END IF;
               WHEN OTHERS =>
@@ -558,13 +558,13 @@ BEGIN
               mem_wr <= b"1111";
               state <= WAIT_DEPTH_RESPONSE;
             END IF;
-          
+
           WHEN WAIT_DEPTH_RESPONSE =>
             mem_wr <= b"0000";
             IF (mem_ack = '1') THEN
               state <= LOAD_RGBA;
             END IF;
-          
+
           WHEN LOAD_RGBA =>
             IF (BlendENA = '0') THEN
               state <= WRITE_ADDRESS;

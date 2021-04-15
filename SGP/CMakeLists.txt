@@ -41,6 +41,7 @@ add_subdirectory(sw/src/MP-3/03_flexseal)
 add_subdirectory(sw/src/MP-4/00_primitive)
 add_subdirectory(sw/src/MP-4/01_fragment)
 add_subdirectory(sw/src/MP-4/02_intersect)
+add_subdirectory(sw/src/MP-4/03_blend)
 
 # Utilities
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/utils/bin)

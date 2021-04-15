@@ -26,7 +26,7 @@ int main() {
 		return 1;
 	}
 
-	window = glfwCreateWindow(1280, 1024, "Intersection", nullptr, nullptr);
+	window = glfwCreateWindow(1280, 1024, "Blender", nullptr, nullptr);
 	if (!window) {
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
@@ -42,42 +42,42 @@ int main() {
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	// Dark blue background
-	glClearColor(0.68f, 0.85f, 0.90f, 0.0f);
+	glClearColor(1, 1, 1, 1);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
 	glDepthFunc(GL_LESS);
+	glEnable(GL_BLEND);
 	glDepthRange(0.0, 1.0);
 
-	glBlendFunc(GL_SRC_COLOR, GL_SRC_COLOR);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders("../common/shaders/passthrough.vert", "../common/shaders/passthrough.frag");
+	GLuint programID = LoadShaders("../common/shaders/passthrougha.vert", "../common/shaders/passthrough.frag");
 
 	// Just a single triangle for GL_TRIANGLES to test. Add to this to draw more points
 	static const GLfloat g_vertex_buffer_data[] = {
-			-0.9f, -0.9f, 0.0f, //bl
-			 0.0f,  0.9f, 1.0f, //top
-			 0.9f, -0.9f, 0.0f, //br
+			-0.6f, -0.6f, 1.0f, //bl
+			 0.0f,  0.6f, 0.0f, //top
+			 0.6f, -0.6f, 1.0f, //br
 
-			-0.7f,  0.9f, 0.0f, //tl
-			 0.7f,  0.9f, 0.0f, //tr
-			 0.0f, -0.9f, 1.0f, //bot
+			-0.95f,  0.95f, 1.0f, //tl
+			 0.95f,  0.95f, 1.0f, //tr
+			 0.0f, -0.95f, 0.0f, //bot
 	};
 
 	// One color (RGB for this) for each vertex.
 	static const GLfloat g_color_buffer_data[] = {
-			1.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 0.0f, 1,
+			0.0f, 1.0f, 0.0f, 1,
+			0.0f, 0.0f, 1.0f, 1,
 
-			0.57f, 0.08f, 0.47f,
-			0.57f, 0.08f, 0.47f,
-			0.57f, 0.08f, 0.47f,
+			0.57f, 0.08f, 0.47f, 0,
+			0.57f, 0.08f, 0.47f, 0,
+			0, 0, 0, 1,
 	};
 
 	GLuint vertexbuffer;
@@ -104,7 +104,7 @@ int main() {
 		// 2nd attribute buffer : colors
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) nullptr);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*) nullptr);
 
 		// Draw the triangle!
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 3 index starting at 0
