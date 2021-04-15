@@ -284,10 +284,10 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   CONSTANT GL_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0304";
   CONSTANT GL_ONE_MINUS_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0305";
   CONSTANT GL_SRC_ALPHA_SATURATE : STD_LOGIC_VECTOR(15 DOWNTO 0)  := x"0305";
-  CONSTANT BLEND_MAX_R : unsigned(7 DOWNTO 0) := "11111111";
-  CONSTANT BLEND_MAX_B : unsigned(7 DOWNTO 0) := "11111111";
-  CONSTANT BLEND_MAX_G : unsigned(7 DOWNTO 0) := "11111111";
-  CONSTANT BLEND_MAX_A : unsigned(7 DOWNTO 0) := "11111111";
+  CONSTANT BLEND_MAX_R : unsigned(31 DOWNTO 0) := "00000000111111110000000000000000";
+  CONSTANT BLEND_MAX_B : unsigned(31 DOWNTO 0) := "00000000111111110000000000000000";
+  CONSTANT BLEND_MAX_G : unsigned(31 DOWNTO 0) := "00000000111111110000000000000000";
+  CONSTANT BLEND_MAX_A : unsigned(31 DOWNTO 0) := "00000000111111110000000000000000";
 
   ALIAS XPosShort : signed(15 DOWNTO 0) IS input_fragment_array(0)(0)(31 DOWNTO 16);
   ALIAS YPosShort : signed(15 DOWNTO 0) IS input_fragment_array(0)(1)(31 DOWNTO 16);
@@ -421,7 +421,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000057";
+  renderoutput_debug <= x"00000064";
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
@@ -621,6 +621,26 @@ BEGIN
                     sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(15 DOWNTO 8))));
                     sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(7 DOWNTO 0))));
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                  WHEN GL_SRC_ALPHA =>
+                    sourceFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    sourceFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    sourceFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    sourceFactorA <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                  WHEN GL_ONE_MINUS_SRC_ALPHA =>
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                  WHEN GL_DST_ALPHA =>
+                    sourceFactorR <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                    sourceFactorG <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                    sourceFactorB <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                    sourceFactorA <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                  WHEN GL_ONE_MINUS_DST_ALPHA =>
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
                   WHEN OTHERS =>
                     state <= WAIT_FOR_FRAGMENT;
                 END CASE;
@@ -656,6 +676,26 @@ BEGIN
                     destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(15 DOWNTO 8)));
                     destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(7 DOWNTO 0)));
                     destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(23 DOWNTO 16)));
+                  WHEN GL_SRC_ALPHA =>
+                    destFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorA <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                  WHEN GL_ONE_MINUS_SRC_ALPHA =>
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                  WHEN GL_DST_ALPHA =>
+                    destFactorR <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                    destFactorG <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                    destFactorB <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                    destFactorA <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                  WHEN GL_ONE_MINUS_DST_ALPHA =>
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
                   WHEN OTHERS =>
                     state <= WAIT_FOR_FRAGMENT;
                 END CASE;
@@ -670,26 +710,26 @@ BEGIN
                 BlendingState <= MIN_VALS;
 
               WHEN MIN_VALS =>
-                IF (unsigned(calcValR(23 DOWNTO 16)) > BLEND_MAX_R) THEN
-                  outputValR <= STD_LOGIC_VECTOR(BLEND_MAX_R);
+                IF (unsigned(calcValR) > BLEND_MAX_R) THEN
+                  outputValR <= STD_LOGIC_VECTOR(BLEND_MAX_R(23 DOWNTO 16));
                 ELSE
                   outputValR <= calcValR(23 DOWNTO 16);
                 END IF;
 
-                IF (unsigned(calcValG(23 DOWNTO 16)) > BLEND_MAX_G) THEN
-                  outputValG <= STD_LOGIC_VECTOR(BLEND_MAX_G);
+                IF (unsigned(calcValG) > BLEND_MAX_G) THEN
+                  outputValG <= STD_LOGIC_VECTOR(BLEND_MAX_G(23 DOWNTO 16));
                 ELSE
                   outputValG <= calcValG(23 DOWNTO 16);
                 END IF;
 
-                IF (unsigned(calcValB(23 DOWNTO 16)) > BLEND_MAX_B) THEN
-                  outputValB <= STD_LOGIC_VECTOR(BLEND_MAX_B);
+                IF (unsigned(calcValB) > BLEND_MAX_B) THEN
+                  outputValB <= STD_LOGIC_VECTOR(BLEND_MAX_B(23 DOWNTO 16));
                 ELSE
                   outputValB <= calcValB(23 DOWNTO 16);
                 END IF;
 
-                IF (unsigned(calcValA(23 DOWNTO 16)) > BLEND_MAX_A) THEN
-                  outputValA <= STD_LOGIC_VECTOR(BLEND_MAX_A);
+                IF (unsigned(calcValA) > BLEND_MAX_A) THEN
+                  outputValA <= STD_LOGIC_VECTOR(BLEND_MAX_A(23 DOWNTO 16));
                 ELSE
                   outputValA <= calcValA(23 DOWNTO 16);
                 END IF;
