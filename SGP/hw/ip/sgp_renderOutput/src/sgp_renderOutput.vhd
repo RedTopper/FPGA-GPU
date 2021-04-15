@@ -466,9 +466,9 @@ BEGIN
             x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
             z_pos <= STD_LOGIC_VECTOR(zPosShort); --technically not a short but it follows naming conventions.
-            STATE => GEN_ADDRESS_2;
+            STATE <= GEN_ADDRESS_2;
 
-        WHEN GEN_ADDRESS_2 =>
+          WHEN GEN_ADDRESS_2 =>
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             --multiple [0, 1.0] by 255 in Q16.16, output to a Q32.32.
             a_color <= input_fragment_array(1)(0) * x"00FF0000";
@@ -484,13 +484,13 @@ BEGIN
                 ELSIF (renderoutput_depthcrtl(15 DOWNTO 0) = GL_NEVER) THEN
                   state <= WAIT_FOR_FRAGMENT;
                 ELSE
-                --ELSIF (mem_accept = '1') THEN
-                  mem_rd <= '1';
-                  mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15)) * 7680) + signed(4 * input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15)));
                   IF (mem_accept = '1') THEN
+                    mem_rd <= '1';
+                    mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_depthbuffer) + unsigned((1079 - unsigned(y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg)));
                     state <= WAIT_LOAD_DEPTH;
                   ELSE
-                    state <= GEN_ADDRESS;
+                    state <= GEN_ADDRESS_2;
+                  END IF;
                 END IF;
               END IF;
             ELSE
@@ -550,7 +550,7 @@ BEGIN
             END CASE;
 
           WHEN WRITE_DEPTH =>
-            mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
+            mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_depthbuffer) + unsigned((1079 - y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg));
             mem_data_wr <= STD_LOGIC_VECTOR(z_pos);
 
             --wait for mem_accept to go high. then write to the dcache.
@@ -574,7 +574,7 @@ BEGIN
               outputValA <= STD_LOGIC_VECTOR(a_color(39 DOWNTO 32));
             ELSIF (mem_accept = '1') THEN
               mem_rd <= '1';
-              mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
+              mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_colorbuffer) + unsigned((1079 - y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg));
               state <= WAIT_FOR_RGBA;
             END IF;
 
@@ -681,7 +681,7 @@ BEGIN
             END CASE;
 
           WHEN WRITE_ADDRESS =>
-            mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_colorbuffer) + signed((1079 - y_pos_short_reg) * 7680) + signed(4 * x_pos_short_reg));
+            mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_colorbuffer) + unsigned((1079 - y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg));
             mem_data_wr <= STD_LOGIC_VECTOR(outputValR) & STD_LOGIC_VECTOR(outputValA) & STD_LOGIC_VECTOR(outputValG) & STD_LOGIC_VECTOR(outputValB);
 
             --wait for mem_accept to go high. then write to the dcache.
