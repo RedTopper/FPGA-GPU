@@ -449,8 +449,8 @@ void SGP_glxSwapBuffers(uint32_t flag) {
 	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 0);
 
 	//flush the fragment shader
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 99);
-	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_VERTEXSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 0);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 99);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr + SGP_AXI_SHADER_FLUSH, 0);
 
 	framecount++;
 	if (framecount % 100 == 0) {
@@ -557,7 +557,7 @@ void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor) {
 	printf("Inside blend func!");
 	uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR, sfactor);
-	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR, dfactor);
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR, dfactor);
 }
 
 //Clears depth to a predefined height, not sure how needed this is but we like to copy
