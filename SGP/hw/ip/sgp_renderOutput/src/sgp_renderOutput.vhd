@@ -199,7 +199,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH,WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH,WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
   SIGNAL state : STATE_TYPE;
 
   TYPE BLEND_STATE_TYPE IS (FACTOR_CALC, CALC, MIN_VALS);
@@ -466,7 +466,9 @@ BEGIN
             x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
             z_pos <= STD_LOGIC_VECTOR(zPosShort); --technically not a short but it follows naming conventions.
+            STATE => GEN_ADDRESS_2;
 
+        WHEN GEN_ADDRESS_2 =>
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             --multiple [0, 1.0] by 255 in Q16.16, output to a Q32.32.
             a_color <= input_fragment_array(1)(0) * x"00FF0000";
@@ -482,9 +484,13 @@ BEGIN
                 ELSIF (renderoutput_depthcrtl(15 DOWNTO 0) = GL_NEVER) THEN
                   state <= WAIT_FOR_FRAGMENT;
                 ELSE
+                --ELSIF (mem_accept = '1') THEN
                   mem_rd <= '1';
                   mem_addr <= STD_LOGIC_VECTOR(signed(renderoutput_depthbuffer) + signed((1079 - input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15)) * 7680) + signed(4 * input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15)));
-                  state <= WAIT_LOAD_DEPTH;
+                  IF (mem_accept = '1') THEN
+                    state <= WAIT_LOAD_DEPTH;
+                  ELSE
+                    state <= GEN_ADDRESS;
                 END IF;
               END IF;
             ELSE
