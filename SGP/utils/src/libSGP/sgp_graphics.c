@@ -643,8 +643,8 @@ void SGP_glDisable(GLenum cap) {
 //Used to set the depth at which we will range our depths.
 void SGP_glDepthRange(GLdouble zNear, GLdouble zFar) {
 
-	sglu_fixed_t fNear = sglu_float_to_fixed((float) zNear);
-	sglu_fixed_t fFar = sglu_float_to_fixed((float) zFar);
+	sglu_fixed_t fNear = sglu_float_to_fixed((float) zNear, 16);
+	sglu_fixed_t fFar = sglu_float_to_fixed((float) zFar, 16);
 
 	uint32_t baseaddr = SGP_graphicsmap[SGP_VIEWPORT].baseaddr;
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_NEARVAL_REG, fNear);
