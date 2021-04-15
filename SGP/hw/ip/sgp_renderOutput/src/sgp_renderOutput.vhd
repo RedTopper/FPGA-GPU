@@ -468,7 +468,7 @@ BEGIN
             z_pos <= STD_LOGIC_VECTOR(zPosShort); --technically not a short but it follows naming conventions.
             STATE <= GEN_ADDRESS_2;
 
-          WHEN GEN_ADDRESS_2 =>
+        WHEN GEN_ADDRESS_2 =>
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             --multiple [0, 1.0] by 255 in Q16.16, output to a Q32.32.
             a_color <= input_fragment_array(1)(0) * x"00FF0000";
@@ -611,6 +611,16 @@ BEGIN
                     sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
                     sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
+                  WHEN GL_DST_COLOR =>
+                    sourceFactorR <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24)); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorG <= (b"00000000" & mem_rd_data_stored(15 DOWNTO 8)); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorB <= (b"00000000" & mem_rd_data_stored(7 DOWNTO 0));
+                    sourceFactorA <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
+                  WHEN GL_ONE_MINUS_DST_COLOR =>
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(15 DOWNTO 8))));
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(7 DOWNTO 0))));
+                    sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
                   WHEN OTHERS =>
                     state <= WAIT_FOR_FRAGMENT;
                 END CASE;
@@ -627,11 +637,21 @@ BEGIN
                     destFactorB <= STD_LOGIC_VECTOR(oneQ8);
                     destFactorA <= STD_LOGIC_VECTOR(oneQ8);
                   WHEN GL_SRC_COLOR =>
+                    destFactorR <= (b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
+                    destFactorG <= (b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
+                    destFactorB <= (b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)));
+                    destFactorA <= (b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                  WHEN GL_ONE_MINUS_SRC_COLOR =>
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))));
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32))));
+                    destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                  WHEN GL_DST_COLOR =>
                     destFactorR <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24)); --max value is 255, shift right by 8 to divide by 255
                     destFactorG <= (b"00000000" & mem_rd_data_stored(15 DOWNTO 8)); --max value is 255, shift right by 8 to divide by 255
                     destFactorB <= (b"00000000" & mem_rd_data_stored(7 DOWNTO 0));
                     destFactorA <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
-                  WHEN GL_ONE_MINUS_SRC_COLOR =>
+                  WHEN GL_ONE_MINUS_DST_COLOR =>
                     destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(31 DOWNTO 24)));
                     destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(15 DOWNTO 8)));
                     destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(7 DOWNTO 0)));
@@ -643,10 +663,10 @@ BEGIN
                 BlendingState <= CALC;
 
               WHEN CALC =>
-                calcValR <= STD_LOGIC_VECTOR(((b"0000" & (unsigned(r_color(39 DOWNTO 32))) & b"0000") * unsigned(sourceFactorR)) + ((b"0000" & (unsigned(mem_rd_data_stored(31 DOWNTO 24)) & b"0000")) * unsigned(destFactorR)));
-                calcValG <= STD_LOGIC_VECTOR(((b"0000" & (unsigned(g_color(39 DOWNTO 32))) & b"0000") * unsigned(sourceFactorG)) + ((b"0000" & (unsigned(mem_rd_data_stored(15 DOWNTO 8)) & b"0000")) * unsigned(destFactorG)));
-                calcValB <= STD_LOGIC_VECTOR(((b"0000" & (unsigned(b_color(39 DOWNTO 32))) & b"0000") * unsigned(sourceFactorB)) + ((b"0000" & (unsigned(mem_rd_data_stored(7 DOWNTO 0)) & b"0000")) * unsigned(destFactorB)));
-                calcValA <= STD_LOGIC_VECTOR(((b"0000" & (unsigned(a_color(39 DOWNTO 32))) & b"0000") * unsigned(sourceFactorA)) + ((b"0000" & (unsigned(mem_rd_data_stored(23 DOWNTO 16)) & b"0000")) * unsigned(destFactorA)));
+                calcValR <= STD_LOGIC_VECTOR(((unsigned(r_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorR)) + ((unsigned(mem_rd_data_stored(31 DOWNTO 24)) & b"00000000") * unsigned(destFactorR)));
+                calcValG <= STD_LOGIC_VECTOR(((unsigned(g_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorG)) + ((unsigned(mem_rd_data_stored(15 DOWNTO 8)) & b"00000000") * unsigned(destFactorG)));
+                calcValB <= STD_LOGIC_VECTOR(((unsigned(b_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorB)) + ((unsigned(mem_rd_data_stored(7 DOWNTO 0)) & b"00000000") * unsigned(destFactorB)));
+                calcValA <= STD_LOGIC_VECTOR(((unsigned(a_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorA)) + ((unsigned(mem_rd_data_stored(23 DOWNTO 16)) & b"00000000") * unsigned(destFactorA)));
                 BlendingState <= MIN_VALS;
 
               WHEN MIN_VALS =>
