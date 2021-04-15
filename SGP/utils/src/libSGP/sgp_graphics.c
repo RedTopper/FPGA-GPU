@@ -515,7 +515,7 @@ int SGP_graphicsInit(sgp_config* config) {
 	}
 
 	//Set the initial value of the depth buffer
-	//SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHBUFFER, SGP_graphicsmap[SGP_DEPTHBUFFER_1].baseaddr);
+	SGP_write32(SGPconfig, SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHBUFFER, SGP_graphicsmap[SGP_DEPTHBUFFER_1].baseaddr);
 
 
 	// Set the renderOutput to point to the initial backbuffer and configure it's cache
@@ -567,6 +567,9 @@ void SGP_glBlendFunc(GLenum sfactor, GLenum dfactor) {
 //Clears depth to a predefined height, not sure how needed this is but we like to copy
 //A blantant copy of proffesor zambrenos SPG_glClearColor
 void SGP_glClearDepth(GLdouble depth) {
+	// this woudla been a 64 bit IEEE format and needed to be converted to fixed-point
+	uint32_t depth_fixed = sglu_float_to_fixed((float)depth , 16);
+
 	printf("Inside clear depth!!\n");
 	uint16_t window_width = 1920;
 	uint16_t window_height = 1080;
@@ -574,7 +577,7 @@ void SGP_glClearDepth(GLdouble depth) {
 	uint32_t baseaddr = SGP_graphicsmap[SGP_COLORBUFFER_3].baseaddr;
 	uint16_t burstlength = 256;
 	for (int i = 0; i < burstlength; i++) {
-		SGPconfig->writerequest.WDATA[i].AWData.i = depth;
+		SGPconfig->writerequest.WDATA[i].AWData.i = depth_fixed;
 	}
 
 	for (int row = 0; row < window_height; row++) {
@@ -639,7 +642,11 @@ void SGP_glDisable(GLenum cap) {
 
 //Used to set the depth at which we will range our depths.
 void SGP_glDepthRange(GLdouble zNear, GLdouble zFar) {
+
+	sglu_fixed_t fNear = sglu_float_to_fixed((float) zNear);
+	sglu_fixed_t fFar = sglu_float_to_fixed((float) zFar);
+
 	uint32_t baseaddr = SGP_graphicsmap[SGP_VIEWPORT].baseaddr;
-	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_NEARVAL_REG, zNear);
-	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_FARVAL_REG, zFar);
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_NEARVAL_REG, fNear);
+	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_FARVAL_REG, fFar);
 }
