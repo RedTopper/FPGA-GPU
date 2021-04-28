@@ -246,7 +246,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL y_pos_fixed : fixed_t;
   SIGNAL y_pos_short : signed(15 DOWNTO 0);
   SIGNAL y_pos_short_reg : signed(15 DOWNTO 0);
-  SIGNAL z_pos : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL z_pos : signed(31 DOWNTO 0);
   SIGNAL frag_address : signed(31 DOWNTO 0);
   SIGNAL frag_color : STD_LOGIC_VECTOR(31 DOWNTO 0);
   SIGNAL a_color : wfixed_t;
@@ -421,10 +421,12 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000065";
+  renderoutput_debug <= x"00000068";
+  
 
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
+  --! fsm_extract
   PROCESS (ACLK) IS
   BEGIN
     IF rising_edge(ACLK) THEN
@@ -447,6 +449,7 @@ BEGIN
         mem_flush <= '0';
         renderoutput_status <= (OTHERS => '0');
         rgbaCounter <= 0;
+
       ELSE
         CASE state IS
             --(WAIT_FOR_FRAGMENT, GEN_ADDRESS, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
@@ -465,7 +468,7 @@ BEGIN
             --fragment = potential pixel
             x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
-            z_pos <= STD_LOGIC_VECTOR(zPosShort); --technically not a short but it follows naming conventions.
+            z_pos <= signed(zPosShort); --technically not a short but it follows naming conventions.
             STATE <= GEN_ADDRESS_2;
 
         WHEN GEN_ADDRESS_2 =>
@@ -486,7 +489,7 @@ BEGIN
                 ELSE
                   IF (mem_accept = '1') THEN
                     mem_rd <= '1';
-                    mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_depthbuffer) + unsigned((1079 - unsigned(y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg)));
+                    mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_depthbuffer) + unsigned((1079 - y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg));
                     state <= WAIT_LOAD_DEPTH;
                   ELSE
                     state <= GEN_ADDRESS_2;
@@ -510,37 +513,37 @@ BEGIN
             --mildy sphaget but also mildy more efficient
             CASE DepthCtrl IS
               WHEN GL_LESS =>
-                IF (z_pos < mem_rd_data_stored) THEN
+                IF (z_pos < signed(mem_rd_data_stored)) THEN
                   state <= WRITE_DEPTH;
                 ELSE
                   state <= WAIT_FOR_FRAGMENT;
                 END IF;
               WHEN GL_EQUAL =>
-                IF (z_pos = mem_rd_data_stored) THEN
+                IF (z_pos = signed(mem_rd_data_stored)) THEN
                   state <= WRITE_DEPTH;
                 ELSE
                   state <= WAIT_FOR_FRAGMENT;
                 END IF;
               WHEN GL_LEQUAL =>
-                IF (z_pos <= mem_rd_data_stored) THEN
+                IF (z_pos <= signed(mem_rd_data_stored)) THEN
                   state <= WRITE_DEPTH;
                 ELSE
                   state <= WAIT_FOR_FRAGMENT;
                 END IF;
               WHEN GL_GREATER =>
-                IF (z_pos > mem_rd_data_stored) THEN
+                IF (z_pos > signed(mem_rd_data_stored)) THEN
                   state <= WRITE_DEPTH;
                 ELSE
                   state <= WAIT_FOR_FRAGMENT;
                 END IF;
               WHEN GL_NOTEQUAL =>
-                IF (z_pos /= mem_rd_data_stored) THEN
+                IF (z_pos /= signed(mem_rd_data_stored)) THEN
                   state <= WRITE_DEPTH;
                 ELSE
                   state <= WAIT_FOR_FRAGMENT;
                 END IF;
               WHEN GL_GEQUAL =>
-                IF (z_pos > mem_rd_data_stored) THEN
+                IF (z_pos > signed(mem_rd_data_stored)) THEN
                   state <= WRITE_DEPTH;
                 ELSE
                   state <= WAIT_FOR_FRAGMENT;

@@ -603,7 +603,7 @@ void SGP_glClearDepth(GLdouble depth) {
 
 //Defines how we will do depth testing
 void SGP_glDepthFunc(GLenum func) {
-	printf("Inside depth Func!!\n");
+	printf("Inside depth Func!! %d\n", func);
 	uint32_t baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_DEPTHCTRL, func);
 }

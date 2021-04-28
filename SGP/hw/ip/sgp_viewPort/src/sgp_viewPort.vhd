@@ -137,6 +137,7 @@ architecture behavioral of sgp_viewPort is
     signal viewport_height_div_2        : fixed_t;
     signal viewport_xmult               : wfixed_t;
     signal viewport_ymult               : wfixed_t;
+	signal viewport_zmult               : wfixed_t;
 
 
     -- Input and output of viewport transformation. Keep in Q16.16 format and if input is normalized, there should be no overflow. 
@@ -147,8 +148,13 @@ architecture behavioral of sgp_viewPort is
     signal y_vp_coords  : fixed_t;
 	signal z_vp_coords  : fixed_t;
 
+	signal z_far_near_diff : fixed_t;
+    signal z_near_far_sum : fixed_t;
+    signal z_diff_div_2 : fixed_t;
+    signal z_sum_div_2 : fixed_t;
 
-    type STATE_TYPE is (WAIT_FOR_VERTEX, CALC_XMULT, CALC_YMULT, CALC_VPCOORDS, VERTEX_WRITE);
+
+    type STATE_TYPE is (WAIT_FOR_VERTEX, CALC_XMULT, CALC_YMULT, CALC_ZMULT,CALC_VPCOORDS, VERTEX_WRITE);
     signal state        : STATE_TYPE;
    
 
@@ -216,9 +222,14 @@ begin
    viewport_height_div_2 <= signed('0' & viewport_height_reg(15 downto 0) & "000000000000000");
 
 
+   z_far_near_diff <= signed(viewport_farval_reg) - signed(viewport_nearval_reg);
+   z_near_far_sum  <= signed(viewport_farval_reg) + signed(viewport_nearval_reg);
+   z_diff_div_2 	<= signed('0' & z_far_near_diff(31 downto 1));
+   z_sum_div_2 		<= signed('0' & z_near_far_sum(31 downto 1));
+   
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  viewport_debug <= x"00000020";
+  viewport_debug <= x"00000021";
 
 
    
@@ -251,7 +262,7 @@ begin
                      -- Our incoming vertices are in Q16.16 format, and will be in the range [-1, 1] 
                     x_ndc_coords <= signed(S_AXIS_TDATA(31 downto 0)) + fixed_t_one;
                     y_ndc_coords <= signed(S_AXIS_TDATA(63 downto 32)) + fixed_t_one;
-					z_ndc_coords <= shift_right(signed(S_AXIS_TDATA(95 downto 64)) + fixed_t_one,1);
+					z_ndc_coords <= signed(S_AXIS_TDATA(95 downto 64)) + fixed_t_one;
                     state <= CALC_XMULT;
                 end if;
 
@@ -262,32 +273,16 @@ begin
 
 			when CALC_YMULT =>
 				viewport_ymult <= viewport_height_div_2 * (y_ndc_coords);
+				state <= CALC_ZMULT;
+
+			when CALC_ZMULT =>
+				viewport_zmult <= z_diff_div_2 * (z_ndc_coords);
 				state <= CALC_VPCOORDS;
-				
+
 			when CALC_VPCOORDS =>
 				x_vp_coords <= wfixed_t_to_fixed_t(viewport_xmult) + viewport_x;
-				y_vp_coords <= wfixed_t_to_fixed_t(viewport_ymult) + viewport_y; 
-
-				if (viewport_farval_reg <= viewport_nearval_reg) then
-					if (std_logic_vector(z_ndc_coords) <= viewport_farval_reg) then
-						z_vp_coords <= fixed_t(viewport_farval_reg);
-					elsif (std_logic_vector(z_ndc_coords) > viewport_nearval_reg) then
-						z_vp_coords <= fixed_t(viewport_nearval_reg);
-					else
-						z_vp_coords <= fixed_t(z_ndc_coords);
-					end if;	
-				elsif (viewport_farval_reg > viewport_nearval_reg) then
-					if (std_logic_vector(z_ndc_coords) <= viewport_nearval_reg) then
-						z_vp_coords <= fixed_t(viewport_nearval_reg);
-					elsif (std_logic_vector(z_ndc_coords) > viewport_farval_reg) then
-						z_vp_coords <= fixed_t(viewport_farval_reg);
-					else
-						z_vp_coords <= fixed_t(z_ndc_coords);
-					end if;	
-				else
-					z_vp_coords <= fixed_t(z_ndc_coords);
-				end if;
-
+				y_vp_coords <= wfixed_t_to_fixed_t(viewport_ymult) + viewport_y;
+				z_vp_coords <= wfixed_t_to_fixed_t(viewport_zmult) + z_sum_div_2;
 				state <= VERTEX_WRITE;
 				
 			when VERTEX_WRITE =>
