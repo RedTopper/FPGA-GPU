@@ -647,16 +647,6 @@ void SGP_glDisable(GLenum cap) {
 //Used to set the depth at which we will range our depths.
 void SGP_glDepthRange(GLdouble zNear, GLdouble zFar) {
 
-	const GLdouble clampLo = 0.0;
-	const GLdouble clampHi = 1.0;
-
-	if(zNear < clampLo) zNear = clampLo;
-	else if(zNear > clampHi) zNear = clampHi;
-
-	if(zFar < clampLo) zFar = clampLo;
-	else if(zFar > clampHi) zFar = clampHi;
-
-
 	sglu_fixed_t fNear = sglu_float_to_fixed((float) zNear, 16);
 	sglu_fixed_t fFar = sglu_float_to_fixed((float) zFar, 16);
 
