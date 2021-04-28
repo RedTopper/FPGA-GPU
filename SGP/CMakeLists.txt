@@ -42,6 +42,7 @@ add_subdirectory(sw/src/MP-4/00_primitive)
 add_subdirectory(sw/src/MP-4/01_fragment)
 add_subdirectory(sw/src/MP-4/02_intersect)
 add_subdirectory(sw/src/MP-4/03_blend)
+add_subdirectory(sw/src/MP-4/04_texture)
 
 # Utilities
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/utils/bin)
