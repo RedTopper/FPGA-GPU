@@ -135,8 +135,8 @@ xilinx.com:user:axis_tx_tagger:1.0\
 xilinx.com:ip:axis_udp_ethernet:1.0\
 xilinx.com:user:sgp_vertexShader:1.46\
 xilinx.com:user:sgp_rasterizer:1.47\
-xilinx.com:user:sgp_renderOutput:1.65\
-xilinx.com:user:sgp_viewPort:1.20\
+xilinx.com:user:sgp_renderOutput:1.73\
+xilinx.com:user:sgp_viewPort:1.21\
 xilinx.com:ip:system_ila:1.1\
 xilinx.com:ip:mig_7series:4.2\
 xilinx.com:ip:axi_cdma:4.1\
@@ -1009,7 +1009,7 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   set sgp_rasterizer_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_rasterizer:1.47 sgp_rasterizer_0 ]
 
   # Create instance: sgp_renderOutput, and set properties
-  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.65 sgp_renderOutput ]
+  set sgp_renderOutput [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_renderOutput:1.73 sgp_renderOutput ]
   set_property -dict [ list \
    CONFIG.C_M_AXI_ID_WIDTH {4} \
  ] $sgp_renderOutput
@@ -1021,15 +1021,15 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   set sgp_vertexShader_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_vertexShader:1.46 sgp_vertexShader_0 ]
 
   # Create instance: sgp_viewPort, and set properties
-  set sgp_viewPort [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_viewPort:1.20 sgp_viewPort ]
+  set sgp_viewPort [ create_bd_cell -type ip -vlnv xilinx.com:user:sgp_viewPort:1.21 sgp_viewPort ]
 
   # Create instance: system_ila_0, and set properties
   set system_ila_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:system_ila:1.1 system_ila_0 ]
   set_property -dict [ list \
-   CONFIG.C_BRAM_CNT {23.5} \
+   CONFIG.C_BRAM_CNT {139} \
    CONFIG.C_DATA_DEPTH {4096} \
-   CONFIG.C_NUM_MONITOR_SLOTS {3} \
-   CONFIG.C_SLOT {0} \
+   CONFIG.C_NUM_MONITOR_SLOTS {4} \
+   CONFIG.C_SLOT {3} \
    CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
    CONFIG.C_SLOT_2_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
  ] $system_ila_0
@@ -1070,6 +1070,7 @@ proc create_hier_cell_graphics_subsystem { parentCell nameHier } {
   connect_bd_intf_net -intf_net system_intercon_M09_AXI [get_bd_intf_pins s_axi_lite1] [get_bd_intf_pins sgp_viewPort/s_axi_lite]
   connect_bd_intf_net -intf_net system_intercon_M10_AXI [get_bd_intf_pins S_AXI_FULL] [get_bd_intf_pins sgp_vertexFetch/S_AXI_FULL]
   connect_bd_intf_net -intf_net system_intercon_M11_AXI [get_bd_intf_pins s_axi_lite] [get_bd_intf_pins sgp_renderOutput/s_axi_lite]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets system_intercon_M11_AXI] [get_bd_intf_pins s_axi_lite] [get_bd_intf_pins system_ila_0/SLOT_3_AXI]
   connect_bd_intf_net -intf_net vertexFetch_core_0_M_AXIS [get_bd_intf_pins sgp_vertexFetch/M_AXIS] [get_bd_intf_pins vertexfetch_fifo/S_AXIS]
   connect_bd_intf_net -intf_net vertexfetch_fifo_M_AXIS [get_bd_intf_pins sgp_vertexShader_0/S_AXIS] [get_bd_intf_pins vertexfetch_fifo/M_AXIS]
   connect_bd_intf_net -intf_net viewport_fifo_M_AXIS [get_bd_intf_pins sgp_rasterizer_0/S_AXIS] [get_bd_intf_pins viewport_fifo/M_AXIS]

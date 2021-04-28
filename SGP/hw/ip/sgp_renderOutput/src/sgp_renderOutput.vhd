@@ -264,25 +264,25 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL oneQ8 : unsigned(15 DOWNTO 0) := b"0000000100000000";
   SIGNAL outputValR, outputValB, outputValG, outputValA : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL rgbaCounter : INTEGER RANGE 0 TO 4;
-  CONSTANT GL_LESS :    STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0201";
-  CONSTANT GL_ALWAYS :  STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0207";
-  CONSTANT GL_NEVER :   STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0200";
-  CONSTANT GL_EQUAL :   STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0202";
-  CONSTANT GL_LEQUAL :  STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0203";
-  CONSTANT GL_GREATER : STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0204";
-  CONSTANT GL_NOTEQUAL :STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0205";
-  CONSTANT GL_GEQUAL :  STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0206";
+  CONSTANT GL_LESS : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0201";
+  CONSTANT GL_ALWAYS : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0207";
+  CONSTANT GL_NEVER : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0200";
+  CONSTANT GL_EQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0202";
+  CONSTANT GL_LEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0203";
+  CONSTANT GL_GREATER : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0204";
+  CONSTANT GL_NOTEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0205";
+  CONSTANT GL_GEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0206";
 
-  CONSTANT GL_ZERO : STD_LOGIC_VECTOR(15 DOWNTO 0)                := x"0000";
-  CONSTANT GL_ONE : STD_LOGIC_VECTOR(15 DOWNTO 0)                 := x"0001";
-  CONSTANT GL_SRC_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0300";
+  CONSTANT GL_ZERO : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0000";
+  CONSTANT GL_ONE : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0001";
+  CONSTANT GL_SRC_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0300";
   CONSTANT GL_ONE_MINUS_SRC_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0301";
-  CONSTANT GL_SRC_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0302";
+  CONSTANT GL_SRC_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0302";
   CONSTANT GL_ONE_MINUS_SRC_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0303";
-  CONSTANT GL_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0304";
+  CONSTANT GL_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0304";
   CONSTANT GL_ONE_MINUS_DST_ALPHA : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0305";
-  CONSTANT GL_SRC_ALPHA_SATURATE : STD_LOGIC_VECTOR(15 DOWNTO 0)  := x"0305";
-  CONSTANT GL_DST_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0)           := x"0306";
+  CONSTANT GL_SRC_ALPHA_SATURATE : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0305";
+  CONSTANT GL_DST_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0306";
   CONSTANT GL_ONE_MINUS_DST_COLOR : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0307";
   CONSTANT BLEND_MAX_R : unsigned(31 DOWNTO 0) := "00000000111111110000000000000000";
   CONSTANT BLEND_MAX_B : unsigned(31 DOWNTO 0) := "00000000111111110000000000000000";
@@ -421,9 +421,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-git   renderoutput_debug <= x"00000072";
-  
-
+  renderoutput_debug <= x"00000073";
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
   --! fsm_extract
@@ -471,7 +469,7 @@ git   renderoutput_debug <= x"00000072";
             z_pos <= signed(zPosShort); --technically not a short but it follows naming conventions.
             STATE <= GEN_ADDRESS_2;
 
-        WHEN GEN_ADDRESS_2 =>
+          WHEN GEN_ADDRESS_2 =>
             --we will say the order is argb, I don't think it matters as long as we are consistent.
             --multiple [0, 1.0] by 255 in Q16.16, output to a Q32.32.
             a_color <= input_fragment_array(1)(3) * x"00FF0000";
@@ -571,10 +569,10 @@ git   renderoutput_debug <= x"00000072";
           WHEN LOAD_RGBA =>
             IF (BlendENA = '0') THEN
               state <= WRITE_ADDRESS;
-              outputValR <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32));
-              outputValG <= STD_LOGIC_VECTOR(g_color(39 DOWNTO 32));
-              outputValB <= STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
               outputValA <= STD_LOGIC_VECTOR(a_color(39 DOWNTO 32));
+              outputValR <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32));
+              outputValB <= STD_LOGIC_VECTOR(b_color(39 DOWNTO 32));
+              outputValG <= STD_LOGIC_VECTOR(g_color(39 DOWNTO 32));
             ELSIF (mem_accept = '1') THEN
               mem_rd <= '1';
               mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_colorbuffer) + unsigned((1079 - y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg));
@@ -595,123 +593,130 @@ git   renderoutput_debug <= x"00000072";
                 --factor
                 CASE renderoutput_blendcrtl_sfactor(15 DOWNTO 0) IS
                   WHEN GL_ZERO =>
-                    sourceFactorR <= (OTHERS => '0');
-                    sourceFactorG <= (OTHERS => '0');
-                    sourceFactorB <= (OTHERS => '0');
                     sourceFactorA <= (OTHERS => '0');
+                    sourceFactorR <= (OTHERS => '0');
+                    sourceFactorB <= (OTHERS => '0');
+                    sourceFactorG <= (OTHERS => '0');
                   WHEN GL_ONE =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8);
-                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8);
-                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8);
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8);
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8);
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8);
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8);
                   WHEN GL_SRC_COLOR =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
-                    sourceFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
-                    sourceFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
                     sourceFactorA <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
                   WHEN GL_ONE_MINUS_SRC_COLOR =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
-                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
-                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255    
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32)))); --max value is 255, shift right by 8 to divide by 255
                   WHEN GL_DST_COLOR =>
-                    sourceFactorR <= (b"00000000" & mem_rd_data_stored(7 DOWNTO 0)); --max value is 255, shift right by 8 to divide by 255
-                    sourceFactorG <= (b"00000000" & mem_rd_data_stored(15 DOWNTO 8)); --max value is 255, shift right by 8 to divide by 255
-                    sourceFactorB <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
                     sourceFactorA <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    sourceFactorR <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16)); --max value is 255, shift right by 8 to divide by 255
+                    sourceFactorB <= (b"00000000" & mem_rd_data_stored(15 DOWNTO 8));
+                    sourceFactorG <= (b"00000000" & mem_rd_data_stored(7 DOWNTO 0)); --max value is 255, shift right by 8 to divide by 255
                   WHEN GL_ONE_MINUS_DST_COLOR =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(7 DOWNTO 0))));
-                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(15 DOWNTO 8))));
-                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(23 DOWNTO 16))));
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(15 DOWNTO 8))));
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(7 DOWNTO 0))));
                   WHEN GL_SRC_ALPHA =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
-                    sourceFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
-                    sourceFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
                     sourceFactorA <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    sourceFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    sourceFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    sourceFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
                   WHEN GL_ONE_MINUS_SRC_ALPHA =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
-                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
-                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
                   WHEN GL_DST_ALPHA =>
-                    sourceFactorR <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
-                    sourceFactorG <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
-                    sourceFactorB <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
                     sourceFactorA <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    sourceFactorR <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    sourceFactorB <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    sourceFactorG <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
                   WHEN GL_ONE_MINUS_DST_ALPHA =>
-                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
-                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
-                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
                     sourceFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    sourceFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    sourceFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    sourceFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
                   WHEN OTHERS =>
                     state <= WAIT_FOR_FRAGMENT;
                 END CASE;
 
                 CASE renderoutput_blendcrtl_dfactor(15 DOWNTO 0) IS
                   WHEN GL_ZERO =>
-                    destFactorR <= (OTHERS => '0');
-                    destFactorG <= (OTHERS => '0');
-                    destFactorB <= (OTHERS => '0');
                     destFactorA <= (OTHERS => '0');
+                    destFactorR <= (OTHERS => '0');
+                    destFactorB <= (OTHERS => '0');
+                    destFactorG <= (OTHERS => '0');
                   WHEN GL_ONE =>
-                    destFactorR <= STD_LOGIC_VECTOR(oneQ8);
-                    destFactorG <= STD_LOGIC_VECTOR(oneQ8);
-                    destFactorB <= STD_LOGIC_VECTOR(oneQ8);
                     destFactorA <= STD_LOGIC_VECTOR(oneQ8);
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8);
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8);
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8);
                   WHEN GL_SRC_COLOR =>
-                    destFactorR <= (b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
-                    destFactorG <= (b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
-                    destFactorB <= (b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)));
                     destFactorA <= (b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorR <= (b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
+                    destFactorB <= (b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32)));
+                    destFactorG <= (b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))); --max value is 255, shift right by 8 to divide by 255
                   WHEN GL_ONE_MINUS_SRC_COLOR =>
+                    destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
                     destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(r_color(39 DOWNTO 32))));
-                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))));
                     destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(g_color(39 DOWNTO 32))));
-                    destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(b_color(39 DOWNTO 32))));
                   WHEN GL_DST_COLOR =>
-                    destFactorR <= (b"00000000" & mem_rd_data_stored(7 DOWNTO 0)); --max value is 255, shift right by 8 to divide by 255
-                    destFactorG <= (b"00000000" & mem_rd_data_stored(15 DOWNTO 8)); --max value is 255, shift right by 8 to divide by 255
-                    destFactorB <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16));
                     destFactorA <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    destFactorR <= (b"00000000" & mem_rd_data_stored(23 DOWNTO 16)); --max value is 255, shift right by 8 to divide by 255
+                    destFactorB <= (b"00000000" & mem_rd_data_stored(15 DOWNTO 8));
+                    destFactorG <= (b"00000000" & mem_rd_data_stored(7 DOWNTO 0)); --max value is 255, shift right by 8 to divide by 255
                   WHEN GL_ONE_MINUS_DST_COLOR =>
-                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(7 DOWNTO 0)));
-                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(15 DOWNTO 8)));
-                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(23 DOWNTO 16)));
                     destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(31 DOWNTO 24)));
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(23 DOWNTO 16)));
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(15 DOWNTO 8)));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & mem_rd_data_stored(7 DOWNTO 0)));
                   WHEN GL_SRC_ALPHA =>
-                    destFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
-                    destFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
-                    destFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
                     destFactorA <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorR <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorB <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
+                    destFactorG <= STD_LOGIC_VECTOR(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32)));
                   WHEN GL_ONE_MINUS_SRC_ALPHA =>
-                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
-                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
-                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
                     destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(a_color(39 DOWNTO 32))));
                   WHEN GL_DST_ALPHA =>
-                    destFactorR <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
-                    destFactorG <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
-                    destFactorB <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
                     destFactorA <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    destFactorR <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    destFactorB <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
+                    destFactorG <= (b"00000000" & mem_rd_data_stored(31 DOWNTO 24));
                   WHEN GL_ONE_MINUS_DST_ALPHA =>
-                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
-                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
-                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
                     destFactorA <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    destFactorR <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    destFactorB <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
+                    destFactorG <= STD_LOGIC_VECTOR(oneQ8 - unsigned(b"00000000" & STD_LOGIC_VECTOR(mem_rd_data_stored(31 DOWNTO 24))));
                   WHEN OTHERS =>
                     state <= WAIT_FOR_FRAGMENT;
                 END CASE;
                 BlendingState <= CALC;
 
               WHEN CALC =>
-                calcValR <= STD_LOGIC_VECTOR(((unsigned(r_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorR)) + ((unsigned(mem_rd_data_stored(7 DOWNTO 0)) & b"00000000") * unsigned(destFactorR)));
-                calcValG <= STD_LOGIC_VECTOR(((unsigned(g_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorG)) + ((unsigned(mem_rd_data_stored(15 DOWNTO 8)) & b"00000000") * unsigned(destFactorG)));
-                calcValB <= STD_LOGIC_VECTOR(((unsigned(b_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorB)) + ((unsigned(mem_rd_data_stored(23 DOWNTO 16)) & b"00000000") * unsigned(destFactorB)));
                 calcValA <= STD_LOGIC_VECTOR(((unsigned(a_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorA)) + ((unsigned(mem_rd_data_stored(31 DOWNTO 24)) & b"00000000") * unsigned(destFactorA)));
+                calcValR <= STD_LOGIC_VECTOR(((unsigned(r_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorR)) + ((unsigned(mem_rd_data_stored(23 DOWNTO 16)) & b"00000000") * unsigned(destFactorR)));
+                calcValB <= STD_LOGIC_VECTOR(((unsigned(b_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorB)) + ((unsigned(mem_rd_data_stored(15 DOWNTO 8)) & b"00000000") * unsigned(destFactorB)));
+                calcValG <= STD_LOGIC_VECTOR(((unsigned(g_color(39 DOWNTO 32)) & b"00000000") * unsigned(sourceFactorG)) + ((unsigned(mem_rd_data_stored(7 DOWNTO 0)) & b"00000000") * unsigned(destFactorG)));
                 BlendingState <= MIN_VALS;
 
               WHEN MIN_VALS =>
+
+                IF (unsigned(calcValA) > BLEND_MAX_A) THEN
+                  outputValA <= STD_LOGIC_VECTOR(BLEND_MAX_A(23 DOWNTO 16));
+                ELSE
+                  outputValA <= calcValA(23 DOWNTO 16);
+                END IF;
+
                 IF (unsigned(calcValR) > BLEND_MAX_R) THEN
                   outputValR <= STD_LOGIC_VECTOR(BLEND_MAX_R(23 DOWNTO 16));
                 ELSE
@@ -728,12 +733,6 @@ git   renderoutput_debug <= x"00000072";
                   outputValB <= STD_LOGIC_VECTOR(BLEND_MAX_B(23 DOWNTO 16));
                 ELSE
                   outputValB <= calcValB(23 DOWNTO 16);
-                END IF;
-
-                IF (unsigned(calcValA) > BLEND_MAX_A) THEN
-                  outputValA <= STD_LOGIC_VECTOR(BLEND_MAX_A(23 DOWNTO 16));
-                ELSE
-                  outputValA <= calcValA(23 DOWNTO 16);
                 END IF;
 
                 state <= WRITE_ADDRESS;
