@@ -46,8 +46,10 @@ endif
 # Set up object files
 ###############################################################################
 OBJDIR := $(ROOTOBJDIR)
-OBJS +=  $(patsubst %.c,$(OBJDIR)/%.o,$(notdir $(CFILES)))
-OBJS +=  $(patsubst %.cpp,$(OBJDIR)/%.cpp.o,$(notdir $(CPPFILES)))
+OBJS +=  $(patsubst %.c,$(OBJDIR)/%.o,$(CFILES))
+OBJS +=  $(patsubst %.cpp,$(OBJDIR)/%.cpp.o,$(CPPFILES))
+
+$(info ${OBJS})
 
 LIB += -lglfw -lGLEW -lGLU -lGL -lsimpleGLU 
 
@@ -58,6 +60,20 @@ LINKLINE = $(LINK) -o $(TARGET) $(OBJS) $(LIB_PATH) $(LIB)
 # Additional req files
 ##############################################################################
 REQFILE := $(ROOTUTILDIR)/include/simpleGLU.h
+
+##############################################################################
+# Stuff
+##############################################################################
+define createdirrule
+$(1): | $(dir $(1))
+
+ifndef $(dir $(1))_DIRECTORY_RULE_IS_DEFINED
+$(dir $(1)):
+	@mkdir -p $$@
+
+$(dir $(1))_DIRECTORY_RULE_IS_DEFINED := 1
+endif
+endef
 
 ###############################################################################
 # Rules
@@ -88,3 +104,5 @@ clean:
 
 distclean: clean
 	$(VERBOSE)rm -f $(ROOTBINDIR)/$(EXECUTABLE)
+	
+$(foreach file,$(OBJS),$(eval $(call createdirrule,$(file))))
