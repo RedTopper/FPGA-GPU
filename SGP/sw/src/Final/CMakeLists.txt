@@ -10,6 +10,7 @@ set(SOURCE_FILES
         SGP-Driver/source/AudioPlayerSGP.cpp
         SGP-Driver/source/FontSGP.cpp
         SGP-Driver/source/PlatformSGP.cpp
-        SGP-Driver/source/RenderTarget.cpp)
+        SGP-Driver/source/SurfaceSGP.cpp
+        SGP-Driver/source/SurfaceGameSGP.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
