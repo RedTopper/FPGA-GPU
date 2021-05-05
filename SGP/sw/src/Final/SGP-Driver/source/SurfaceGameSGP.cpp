@@ -79,6 +79,8 @@ namespace SuperHaxagon {
 	}
 
 	void SurfaceGameSGP::drawPolyGame(const Color& color, std::vector<Vec2f>& points) {
+		_surface->drawPolyAbsolute(color, points);
+
 		if (_count + points.size() * 3 - 6 > SIZE) {
 			// We're full, go home.
 			return;
