@@ -137,18 +137,19 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       S_AXI_RREADY : IN STD_LOGIC;
 
       -- Our registers that we need to operate this core. Manually map these in axi_lite_regs
-      SGP_AXI_RENDEROUTPUT_COLORBUFFER : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_DEPTHBUFFER : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_CACHECTRL : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_STRIDE : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_HEIGHT : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_DEPTHENA : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_DEPTHCTRL : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_BLENDENA : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_DEBUG : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-      SGP_AXI_RENDEROUTPUT_STATUS : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
+      SGP_AXI_RENDEROUTPUT_COLORBUFFER        : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_DEPTHBUFFER        : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_CACHECTRL          : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_STRIDE             : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_HEIGHT             : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_DEPTHENA           : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_DEPTHCTRL          : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_BLENDENA           : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_TEXTURE            : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_DEBUG              : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_STATUS             : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
     );
   END COMPONENT sgp_renderOutput_axi_lite_regs;
 
@@ -199,7 +200,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WAIT_LOAD_TEXTURE, TEXTURE WRITE_ADDRESS, WAIT_FOR_RESPONSE);
   SIGNAL state : STATE_TYPE;
 
   TYPE BLEND_STATE_TYPE IS (FACTOR_CALC, CALC, MIN_VALS);
@@ -214,6 +215,9 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL renderoutput_blendEna : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_blendcrtl_sfactor : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_blendcrtl_dfactor : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+  SIGNAL renderoutput_texture           : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+  SIGNAL renderoutput_texture_width     : STD_LOGIC_VECTOR(C_S_AXI_DATA_WDITH - 1 DOWNTO 0);
+  SIGNAL renderoutput_texture_height    : STD_LOGIC_VECTOR(C_S_AXI_DATA_WDITH - 1 DOWNTO 0);
   SIGNAL renderoutput_height : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_debug : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_status : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
@@ -248,15 +252,18 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL y_pos_short_reg : signed(15 DOWNTO 0);
   SIGNAL z_pos : signed(31 DOWNTO 0);
   SIGNAL frag_address : signed(31 DOWNTO 0);
-  SIGNAL frag_color : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL a_color : wfixed_t;
-  SIGNAL r_color : wfixed_t;
-  SIGNAL g_color : wfixed_t;
-  SIGNAL b_color : wfixed_t;
-  SIGNAL a_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL r_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL g_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
-  SIGNAL b_color_reg : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL frag_color   : STD_LOGIC_VECTOR(31 DOWNTO 0);
+  SIGNAL UVX_short    : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL UVY_short    : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL a_color      : wfixed_t;
+  SIGNAL r_color      : wfixed_t;
+  SIGNAL g_color      : wfixed_t;
+  SIGNAL b_color      : wfixed_t;
+  SIGNAL a_color_reg  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL r_color_reg  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL g_color_reg  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+  SIGNAL b_color_reg  : STD_LOGIC_VECTOR(7 DOWNTO 0);
+
 
   SIGNAL sourceFactorR, sourceFactorG, sourceFactorB, sourceFactorA : STD_LOGIC_VECTOR(15 DOWNTO 0);
   SIGNAL destFactorR, destFactorG, destFactorB, destFactorA : STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -264,14 +271,14 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL oneQ8 : unsigned(15 DOWNTO 0) := b"0000000100000000";
   SIGNAL outputValR, outputValB, outputValG, outputValA : STD_LOGIC_VECTOR(7 DOWNTO 0);
   SIGNAL rgbaCounter : INTEGER RANGE 0 TO 4;
-  CONSTANT GL_LESS : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0201";
-  CONSTANT GL_ALWAYS : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0207";
-  CONSTANT GL_NEVER : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0200";
-  CONSTANT GL_EQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0202";
-  CONSTANT GL_LEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0203";
+  CONSTANT GL_LESS : STD_LOGIC_VECTOR(15 DOWNTO 0)    := x"0201";
+  CONSTANT GL_ALWAYS : STD_LOGIC_VECTOR(15 DOWNTO 0)  := x"0207";
+  CONSTANT GL_NEVER : STD_LOGIC_VECTOR(15 DOWNTO 0)   := x"0200";
+  CONSTANT GL_EQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0)   := x"0202";
+  CONSTANT GL_LEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0)  := x"0203";
   CONSTANT GL_GREATER : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0204";
-  CONSTANT GL_NOTEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0205";
-  CONSTANT GL_GEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0206";
+  CONSTANT GL_NOTEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0):= x"0205";
+  CONSTANT GL_GEQUAL : STD_LOGIC_VECTOR(15 DOWNTO 0)  := x"0206";
 
   CONSTANT GL_ZERO : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0000";
   CONSTANT GL_ONE : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0001";
@@ -298,6 +305,8 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   ALIAS DepthENA : STD_LOGIC IS renderoutput_depthEna(0);
   ALIAS DepthCtrl : STD_LOGIC_VECTOR(15 DOWNTO 0) IS renderoutput_depthcrtl(15 DOWNTO 0);
   ALIAS BlendENA : STD_LOGIC IS renderoutput_blendEna(0);
+  ALIAS TextureENA : STD_LOGIC IS input_fragment_array(2)(3)(0);
+
 BEGIN
   -- Instantiation of Axi Bus Interface S_AXI_LITE
   sgp_renderOutput_axi_lite_regs_inst : sgp_renderOutput_axi_lite_regs
@@ -339,6 +348,9 @@ BEGIN
     SGP_AXI_RENDEROUTPUT_BLENDENA => renderoutput_blendEna,
     SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR => renderoutput_blendcrtl_sfactor,
     SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR => renderoutput_blendcrtl_dfactor,
+    SGP_AXI_RENDEROUTPUT_TEXTURE            => renderoutput_texture,
+    SGP_AXI_RENDEROUTPUT_TEXTURE_WIDTH      => renderoutput_texture_width,
+    SGP_AXI_RENDEROUTPUT_TEXTURE_HEIGHT     => renderoutput_texture_height,
     SGP_AXI_RENDEROUTPUT_DEBUG => renderoutput_debug,
     SGP_AXI_RENDEROUTPUT_STATUS => renderoutput_status
   );
@@ -467,6 +479,9 @@ BEGIN
             x_pos_short_reg <= input_fragment_array(0)(0)(31 DOWNTO 16) + input_fragment_array(0)(0)(15 DOWNTO 15); --(rounding)
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
             z_pos <= signed(zPosShort); --technically not a short but it follows naming conventions.
+
+            UVX_short <= input_fragment_array(2)(0)(31 DOWNTO 16);
+            UVY_short <= input_fragment_array(2)(1)(31 DOWNTO 16);
             STATE <= GEN_ADDRESS_2;
 
           WHEN GEN_ADDRESS_2 =>
@@ -567,7 +582,13 @@ BEGIN
             END IF;
 
           WHEN LOAD_RGBA =>
-            IF (BlendENA = '0') THEN
+            IF(TextureENA = '1') THEN 
+              IF(mem_accept = '1') THEN
+                mem_rd <= '1';
+                mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_texture) + unsigned(UVY_short * renderoutput_texture_width) + unsigned(UVX_short * 4)); --it's legit I swear
+                state <= WAIT_FOR_TEXTURE;
+              END IF;
+            ELSIF (BlendENA = '0') THEN
               state <= WRITE_ADDRESS;
               outputValA <= STD_LOGIC_VECTOR(a_color(39 DOWNTO 32));
               outputValR <= STD_LOGIC_VECTOR(r_color(39 DOWNTO 32));
@@ -740,6 +761,25 @@ BEGIN
               WHEN OTHERS =>
                 state <= WAIT_FOR_FRAGMENT;
             END CASE;
+
+          WHEN WAIT_FOR_TEXTURE =>
+          mem_rd <= '0';
+          IF (mem_ack = '1') THEN
+            mem_rd_data_stored <= mem_data_rd;
+            state <= Texture;
+          END IF;
+
+          WHEN TEXTURE =>
+            IF(mem_rd_data_stored(23 DOWNTO 16) = b'00000000') THEN
+              state <= WAIT_FOR_FRAGMENT;
+            ELSE
+              outputValA <= mem_rd_data_stored(31 DOWNTO 24);
+              outputValR <= mem_rd_data_stored(23 DOWNTO 16);
+              outputValG <= mem_rd_data_stored(15 DOWNTO 8);
+              outputValB <= mem_rd_data_stored(7 DOWNTO 0);
+              state <= WRITE_ADDRESS;
+            END IF;
+
 
           WHEN WRITE_ADDRESS =>
             mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_colorbuffer) + unsigned((1079 - y_pos_short_reg) * 7680) + unsigned(4 * x_pos_short_reg));

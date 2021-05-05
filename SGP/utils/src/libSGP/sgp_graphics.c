@@ -107,8 +107,6 @@ void SGP_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
 				}
 				break;
 			}
-
-
 			// Set the TDEST (via the FIFO TDR register) so that we know which attribute this burst corresponds to
 			SGP_write32(SGPconfig, baseaddr + SGP_AXI_VERTEXFETCH_TDR, j);
 
@@ -653,4 +651,41 @@ void SGP_glDepthRange(GLdouble zNear, GLdouble zFar) {
 	uint32_t baseaddr = SGP_graphicsmap[SGP_VIEWPORT].baseaddr;
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_NEARVAL_REG, fNear);
 	SGP_write32(SGPconfig, baseaddr + SGP_AXI_VIEWPORT_FARVAL_REG, fFar);
+}
+
+
+void SGP_glGenTextures(GLsizei n, GLuint * textures) {
+	for (int i = 0; i < n; i++) {
+		textures[i] = i;
+	}
+}
+
+void SGP_glBindTexture(GLenum target, GLuint texture) {
+	if (target == GL_TEXTURE_2D)
+	{
+		SGP_graphicsstate.texture2D = texture;
+	}
+}
+
+void SGP_glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void * data)
+{
+	if (target == GL_TEXTURE_2D)
+	{
+		//yeet the texture into memory
+		uint32_t *data = (uint32_t) data;
+		uint32_t baseaddr = SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr;
+		for (int i = 0; i < width; i++)
+		{
+			for (int j = 0; j < height; j++)
+			{
+				SGP_write32(SGPconfig, baseaddr + (i * width + j), data[i * width + j]);
+			}
+		}
+
+		//also tell renderoutput where to look for the texture
+		baseaddr = SGP_graphicsmap[SGP_RENDER_OUTPUT].baseaddr;
+		SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_TEXTURE, SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr);
+		SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_TEXTURE_WIDTH, width);
+		SGP_write32(SGPconfig, baseaddr + SGP_AXI_RENDEROUTPUT_TEXTURE_HEIGHT, height);
+	}
 }

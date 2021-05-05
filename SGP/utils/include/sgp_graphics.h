@@ -91,18 +91,22 @@ extern SGP_graphicsmap_t SGP_graphicsmap[SGP_GRAPHICS_NUMCOMPONENTS];
 
 
 // renderOutput registers
-#define SGP_AXI_RENDEROUTPUT_COLORBUFFER 0x0000
-#define SGP_AXI_RENDEROUTPUT_DEPTHBUFFER 0x0004
-#define SGP_AXI_RENDEROUTPUT_CACHECTRL   0x0008
-#define SGP_AXI_RENDEROUTPUT_STRIDE      0x000C
-#define SGP_AXI_RENDEROUTPUT_HEIGHT      0x0010
-#define SGP_AXI_RENDEROUTPUT_DEPTHENA    0x0014
-#define SGP_AXI_RENDEROUTPUT_DEPTHCTRL   0x0018
-#define SGP_AXI_RENDEROUTPUT_BLENDENA    0x001C
-#define SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR   0x0020
-#define SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR   0x0024
-#define SGP_AXI_RENDEROUTPUT_STATUS      0x0038
-#define SGP_AXI_RENDEROUTPUT_DEBUG       0x003C
+#define SGP_AXI_RENDEROUTPUT_COLORBUFFER       0x0000
+#define SGP_AXI_RENDEROUTPUT_DEPTHBUFFER       0x0004
+#define SGP_AXI_RENDEROUTPUT_CACHECTRL         0x0008
+#define SGP_AXI_RENDEROUTPUT_STRIDE            0x000C
+#define SGP_AXI_RENDEROUTPUT_HEIGHT            0x0010
+#define SGP_AXI_RENDEROUTPUT_DEPTHENA          0x0014
+#define SGP_AXI_RENDEROUTPUT_DEPTHCTRL         0x0018
+#define SGP_AXI_RENDEROUTPUT_BLENDENA          0x001C
+#define SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR 0x0020
+#define SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR 0x0024
+#define SGP_AXI_RENDEROUTPUT_TEXTURE           0x0028
+#define SGP_AXI_RENDEROUTPUT_TEXTURE_WIDTH     0x002C
+#define SGP_AXI_RENDEROUTPUT_TEXTURE_HEIGHT     0x0030
+#define SGP_AXI_RENDEROUTPUT_STATUS            0x0038
+#define SGP_AXI_RENDEROUTPUT_DEBUG             0x003C
+
 
 
 // cache configuration flags
@@ -161,6 +165,7 @@ typedef struct {
     GLint viewport_y;
     GLsizei viewport_width;
     GLsizei viewport_height;
+    GLuint texture2D;
 
 } SGP_graphicsstate_t;
 
@@ -197,3 +202,6 @@ void SGP_glDepthRange(GLdouble zNear, GLdouble zFar);
 typedef uint32_t sglu_fixed_t;
 uint32_t sglu_color_float_to_int(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 sglu_fixed_t sglu_float_to_fixed(GLfloat float_val, uint8_t fixed_point_frac_bits);
+
+void SGP_glGenTextures(GLsizei n, GLuint * textures);
+void SGP_glBindTexture(GLenum target, GLuint texture);
