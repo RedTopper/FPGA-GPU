@@ -1,0 +1,4 @@
+[submodule "SGP/sw/src/Final/Super-Haxagon"]
+	path = SGP/sw/src/Final/Super-Haxagon
+	url = https://github.com/RedTopper/Super-Haxagon.git
+	branch = surfaces
