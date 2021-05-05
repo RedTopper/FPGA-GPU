@@ -435,7 +435,7 @@ BEGIN
   -- Our framebuffer is currently ARBG, so we have to re-assemble a bit. We only need the integer values now
   -- At least set a unique ID for each synthesis run in the debug register, so we know that we're looking at the most recent IP core
   -- It would also be useful to connect internal signals to this register for software debug purposes
-  renderoutput_debug <= x"00000075";
+  renderoutput_debug <= x"00000076";
   -- A 4-state FSM, where we copy fragments, determine the address and color from the input attributes, 
   -- and generate an AXI Write request based on that data.
   --! fsm_extract
@@ -587,7 +587,7 @@ BEGIN
             IF(TextureENA = '1') THEN 
               IF(mem_accept = '1') THEN
                 mem_rd <= '1';
-                mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_texture) + UVY_short * unsigned(renderoutput_texture_width) + UVX_short * 4); --it's legit I swear
+                mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_texture) + UVY_short * unsigned(renderoutput_texture_width(15 DOWNTO 0)) + UVX_short * 4); --it's legit I swear
                 state <= WAIT_LOAD_TEXTURE;
               END IF;
             ELSIF (BlendENA = '0') THEN
