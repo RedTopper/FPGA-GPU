@@ -45,8 +45,9 @@ CPPFILES := $(EXECUTABLE).cpp \
 	SGP-Driver/source/AudioPlayerSGP.cpp \
 	SGP-Driver/source/FontSGP.cpp \
 	SGP-Driver/source/PlatformSGP.cpp \
-	SGP-Driver/source/SurfaceSGP.cpp
-	
+	SGP-Driver/source/SurfaceSGP.cpp \
+	SGP-Driver/source/SurfaceGameSGP.cpp
+
 
 # Additional include directories
 INCLUDE_PATH := -I../shared/ogldir1/ -ISuper-Haxagon/include -ISGP-Driver/include
