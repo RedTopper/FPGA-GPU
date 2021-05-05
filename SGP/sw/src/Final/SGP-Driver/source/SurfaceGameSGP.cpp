@@ -68,9 +68,11 @@ namespace SuperHaxagon {
 		glUseProgram(_program);
 		glBindVertexArray(_vao);
 
+		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboPos);
 		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(Vec3f)), _pos.data(), GL_DYNAMIC_DRAW);
 
+		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboColor);
 		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(OpenGLColor)), _colors.data(), GL_DYNAMIC_DRAW);
 
