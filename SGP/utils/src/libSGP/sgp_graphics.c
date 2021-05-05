@@ -473,10 +473,10 @@ sglu_fixed_t sglu_float_to_fixed(GLfloat float_val, uint8_t fixed_point_frac_bit
 uint32_t sglu_color_float_to_int(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
 
 	uint32_t pixel_val = 0x00000000;
-	pixel_val |= ((uint8_t) (alpha * 256) << 24);
-	pixel_val |= ((uint8_t) (red * 256) << 16);
-	pixel_val |= ((uint8_t) (blue * 256) << 8);
-	pixel_val |= ((uint8_t) (green * 256) << 0);
+	pixel_val |= ((uint8_t) (alpha * 255) << 24);
+	pixel_val |= ((uint8_t) (red * 255) << 16);
+	pixel_val |= ((uint8_t) (blue * 255) << 8);
+	pixel_val |= ((uint8_t) (green * 255) << 0);
 
 	return pixel_val;
 }
