@@ -33,7 +33,7 @@ namespace SuperHaxagon {
 		// Check up on the audio status
 		if (_bgm && _bgm->isDone()) _bgm->play();
 
-		return glfwGetKey(_window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(_window) == 0;
+		return !(glfwGetKey(_window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(_window) == 0);
 	}
 
 	float PlatformSGP::getDilation() {
