@@ -7,19 +7,26 @@
 #include "AudioLoaderSGP.hpp"
 #include "FontSGP.hpp"
 #include "SurfaceSGP.hpp"
+#include "SurfaceGameSGP.hpp"
 
 #include <GLFW/glfw3.h>
 
+#include <filesystem>
 #include <iostream>
 
 namespace SuperHaxagon {
 	PlatformSGP::PlatformSGP(const Dbg dbg): Platform(dbg) {
+		std::filesystem::create_directory("./sdmc");
 		auto surface = std::make_unique<SurfaceSGP>(*this);
+		auto surfaceGame = std::make_unique<SurfaceGameSGP>(*this, surface.get());
+		surface->addSurface(surfaceGame.get());
+
+		_surfaceUI = std::make_unique<SurfaceUI>(surface.get());
+		//_surfaceGameShadows = std::make_unique<SurfaceGameSGP>(*this, surface.get());
+
 		_window = surface->getWindow();
 		_surface = std::move(surface);
-		_surfaceUI = std::make_unique<SurfaceUI>(_surface.get());
-		_surfaceGame = std::make_unique<SurfaceGame>(_surface.get());
-		_surfaceGameShadows = std::make_unique<SurfaceGame>(_surface.get());
+		_surfaceGame = std::move(surfaceGame);
 		PlatformSGP::message(Dbg::INFO, "platform",  "loaded");
 	}
 

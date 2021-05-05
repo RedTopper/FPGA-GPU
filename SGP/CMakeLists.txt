@@ -43,7 +43,6 @@ add_subdirectory(sw/src/MP-4/01_fragment)
 add_subdirectory(sw/src/MP-4/02_intersect)
 add_subdirectory(sw/src/MP-4/03_blend)
 add_subdirectory(sw/src/MP-4/04_texture)
-add_subdirectory(sw/src/Final/Super-Haxagon)
 add_subdirectory(sw/src/Final)
 
 # Utilities

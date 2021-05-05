@@ -3,15 +3,27 @@
 
 #include "Core/Surface.hpp"
 
+#include <GL/glew.h>
+
+#include <vector>
+
 struct GLFWwindow;
 namespace SuperHaxagon {
+	struct OpenGLColor {
+		float r;
+		float g;
+		float b;
+		float a;
+	};
+
 	struct Vertex {
 		Vec3f pos;
-		Vec3f color;
+		OpenGLColor color;
 		Vec2f uv;
 	};
 
 	class Platform;
+	class SurfaceGameSGP;
 	class SurfaceSGP : public Surface {
 	public:
 		explicit SurfaceSGP(Platform& platform);
@@ -22,10 +34,15 @@ namespace SuperHaxagon {
 		Vec2f getScreenDim() const override;
 		void screenBegin() override;
 		void screenFinalize() override;
+
+		void addSurface(SurfaceGameSGP* surface);
 		GLFWwindow* getWindow() const;
 		float getAndIncrementZ();
 
+		static GLuint compile(Platform& platform, GLenum type, const char* source);
+
 	private:
+		std::vector<SurfaceGameSGP*> _surfaces;
 		GLFWwindow* _window;
 		float _z = 0.0f;
 	};

@@ -1,8 +1,8 @@
 #include "SurfaceSGP.hpp"
 
 #include "PlatformSGP.hpp"
+#include "SurfaceGameSGP.hpp"
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <cstdio>
@@ -39,23 +39,13 @@ namespace SuperHaxagon {
 		glClearColor(0, 0, 1.0f, 0);
 
 		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_GREATER);
-		glDepthRange(0.0f, 1.0f);
-		glClearDepth(12.0f);
-
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, pos)));
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, color)));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv)));
+		//glEnable(GL_DEPTH_TEST);
+		//glDepthFunc(GL_GREATER);
+		//glDepthRange(0.0f, 1.0f);
+		//glClearDepth(0.0f);
 	}
 
-	void SurfaceSGP::drawPolyAbsolute(const Color& color, const std::vector<Vec2f>& points) {
-
-	}
+	void SurfaceSGP::drawPolyAbsolute(const Color& color, const std::vector<Vec2f>& points) {}
 
 	Vec2f SurfaceSGP::getScreenDim() const {
 		int width, height;
@@ -67,10 +57,13 @@ namespace SuperHaxagon {
 	void SurfaceSGP::screenBegin() {
 		_z = 0.0f;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	}
 
 	void SurfaceSGP::screenFinalize() {
+		for(auto surface : _surfaces) {
+			surface->render();
+		}
+
 		glfwPollEvents();
 		glfwSwapBuffers(_window);
 	}
@@ -84,5 +77,33 @@ namespace SuperHaxagon {
 		const auto z = _z;
 		_z += step;
 		return z;
+	}
+
+	void SurfaceSGP::addSurface(SurfaceGameSGP* surface) {
+		_surfaces.push_back(surface);
+	}
+
+	GLuint SurfaceSGP::compile(Platform& platform, const GLenum type, const char* source) {
+		GLint success;
+		GLchar msg[512];
+
+		const auto handle = glCreateShader(type);
+		if (!handle) {
+			platform.message(Dbg::INFO, "compile",  "failed to create shader");
+			return 0;
+		}
+
+		glShaderSource(handle, 1, &source, nullptr);
+		glCompileShader(handle);
+		glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+
+		if (!success) {
+			glGetShaderInfoLog(handle, sizeof(msg), nullptr, msg);
+			platform.message(Dbg::INFO, "compile",  msg);
+			glDeleteShader(handle);
+			return 0;
+		}
+
+		return handle;
 	}
 }
