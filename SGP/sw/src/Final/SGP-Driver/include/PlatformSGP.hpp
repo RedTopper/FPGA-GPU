@@ -36,7 +36,6 @@ namespace SuperHaxagon {
 		void message(Dbg dbg, const std::string& where, const std::string& message) override;
 
 	private:
-		bool _loaded = false;
 		float _z = 0.0f;
 
 		std::ofstream _console;
