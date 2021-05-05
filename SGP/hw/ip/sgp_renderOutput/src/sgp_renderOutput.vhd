@@ -148,6 +148,8 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       SGP_AXI_RENDEROUTPUT_BLENDCTRL_SFACTOR  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_BLENDCTRL_DFACTOR  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_TEXTURE            : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_TEXTURE_WIDTH	  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+      SGP_AXI_RENDEROUTPUT_TEXTURE_HEIGHT	  : OUT STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_DEBUG              : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
       SGP_AXI_RENDEROUTPUT_STATUS             : IN STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0)
     );
@@ -200,7 +202,7 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
       axi_rready_o : OUT STD_LOGIC);
   END COMPONENT dcache;
 
-  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WAIT_LOAD_TEXTURE, TEXTURE WRITE_ADDRESS, WAIT_FOR_RESPONSE);
+  TYPE STATE_TYPE IS (WAIT_FOR_FRAGMENT, GEN_ADDRESS, GEN_ADDRESS_2, LOAD_DEPTH, WAIT_LOAD_DEPTH, CALC_DEPTH, WRITE_DEPTH, WAIT_DEPTH_RESPONSE, LOAD_RGBA, WAIT_FOR_RGBA, BLEND, FACTOR_FUNC, WAIT_LOAD_TEXTURE, TEXTURE, WRITE_ADDRESS, WAIT_FOR_RESPONSE);
   SIGNAL state : STATE_TYPE;
 
   TYPE BLEND_STATE_TYPE IS (FACTOR_CALC, CALC, MIN_VALS);
@@ -216,8 +218,8 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL renderoutput_blendcrtl_sfactor : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_blendcrtl_dfactor : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_texture           : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
-  SIGNAL renderoutput_texture_width     : STD_LOGIC_VECTOR(C_S_AXI_DATA_WDITH - 1 DOWNTO 0);
-  SIGNAL renderoutput_texture_height    : STD_LOGIC_VECTOR(C_S_AXI_DATA_WDITH - 1 DOWNTO 0);
+  SIGNAL renderoutput_texture_width     : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
+  SIGNAL renderoutput_texture_height    : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_height : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_debug : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
   SIGNAL renderoutput_status : STD_LOGIC_VECTOR(C_S_AXI_DATA_WIDTH - 1 DOWNTO 0);
@@ -253,8 +255,8 @@ ARCHITECTURE behavioral OF sgp_renderOutput IS
   SIGNAL z_pos : signed(31 DOWNTO 0);
   SIGNAL frag_address : signed(31 DOWNTO 0);
   SIGNAL frag_color   : STD_LOGIC_VECTOR(31 DOWNTO 0);
-  SIGNAL UVX_short    : STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL UVY_short    : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL UVX_short    : unsigned(15 DOWNTO 0);
+  SIGNAL UVY_short    : unsigned(15 DOWNTO 0);
   SIGNAL a_color      : wfixed_t;
   SIGNAL r_color      : wfixed_t;
   SIGNAL g_color      : wfixed_t;
@@ -480,8 +482,8 @@ BEGIN
             y_pos_short_reg <= input_fragment_array(0)(1)(31 DOWNTO 16) + input_fragment_array(0)(1)(15 DOWNTO 15); --(rounding)
             z_pos <= signed(zPosShort); --technically not a short but it follows naming conventions.
 
-            UVX_short <= input_fragment_array(2)(0)(31 DOWNTO 16);
-            UVY_short <= input_fragment_array(2)(1)(31 DOWNTO 16);
+            UVX_short <= unsigned(input_fragment_array(2)(0)(31 DOWNTO 16));
+            UVY_short <= unsigned(input_fragment_array(2)(1)(31 DOWNTO 16));
             STATE <= GEN_ADDRESS_2;
 
           WHEN GEN_ADDRESS_2 =>
@@ -585,8 +587,8 @@ BEGIN
             IF(TextureENA = '1') THEN 
               IF(mem_accept = '1') THEN
                 mem_rd <= '1';
-                mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_texture) + unsigned(UVY_short * renderoutput_texture_width) + unsigned(UVX_short * 4)); --it's legit I swear
-                state <= WAIT_FOR_TEXTURE;
+                mem_addr <= STD_LOGIC_VECTOR(unsigned(renderoutput_texture) + UVY_short * unsigned(renderoutput_texture_width) + UVX_short * 4); --it's legit I swear
+                state <= WAIT_LOAD_TEXTURE;
               END IF;
             ELSIF (BlendENA = '0') THEN
               state <= WRITE_ADDRESS;
@@ -762,7 +764,7 @@ BEGIN
                 state <= WAIT_FOR_FRAGMENT;
             END CASE;
 
-          WHEN WAIT_FOR_TEXTURE =>
+          WHEN WAIT_LOAD_TEXTURE =>
           mem_rd <= '0';
           IF (mem_ack = '1') THEN
             mem_rd_data_stored <= mem_data_rd;
@@ -770,15 +772,15 @@ BEGIN
           END IF;
 
           WHEN TEXTURE =>
-            IF(mem_rd_data_stored(23 DOWNTO 16) = b'00000000') THEN
-              state <= WAIT_FOR_FRAGMENT;
-            ELSE
+            --IF(mem_rd_data_stored(23 DOWNTO 16) = b"00000000") THEN
+              --state <= WAIT_FOR_FRAGMENT;
+            --ELSE
               outputValA <= mem_rd_data_stored(31 DOWNTO 24);
               outputValR <= mem_rd_data_stored(23 DOWNTO 16);
               outputValG <= mem_rd_data_stored(15 DOWNTO 8);
               outputValB <= mem_rd_data_stored(7 DOWNTO 0);
               state <= WRITE_ADDRESS;
-            END IF;
+            --END IF;
 
 
           WHEN WRITE_ADDRESS =>
