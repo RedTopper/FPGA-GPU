@@ -669,16 +669,17 @@ void SGP_glBindTexture(GLenum target, GLuint texture) {
 
 void SGP_glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void * data)
 {
+	uint32_t* image = (uint32_t*) data;
+
 	if (target == GL_TEXTURE_2D)
 	{
 		//yeet the texture into memory
-		uint32_t *data = (uint32_t) data;
 		uint32_t baseaddr = SGP_graphicsmap[SGP_FRAGMENTSHADER].baseaddr;
 		for (int i = 0; i < width; i++)
 		{
 			for (int j = 0; j < height; j++)
 			{
-				SGP_write32(SGPconfig, baseaddr + (i * width + j), data[i * width + j]);
+				SGP_write32(SGPconfig, baseaddr + (i * width + j), image[i * width + j]);
 			}
 		}
 
