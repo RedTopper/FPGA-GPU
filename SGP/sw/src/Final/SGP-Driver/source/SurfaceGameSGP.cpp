@@ -30,6 +30,9 @@ void main() {
 
 namespace SuperHaxagon {
 	SurfaceGameSGP::SurfaceGameSGP(Platform& platform, Surface* surface) : SurfaceGame(surface) {
+		glGenVertexArrays(1, &_vao);
+		glBindVertexArray(_vao);
+
 		const auto vs = SurfaceSGP::compile(platform, GL_VERTEX_SHADER, vertex_shader);
 		const auto fs = SurfaceSGP::compile(platform, GL_FRAGMENT_SHADER, fragment_shader);
 
@@ -39,25 +42,11 @@ namespace SuperHaxagon {
 		glLinkProgram(_program);
 		glUseProgram(_program);
 
-		glGenVertexArrays(1, &_vao);
-		glBindVertexArray(_vao);
-
-		glEnableVertexAttribArray(0);
 		glGenBuffers(1, &_vboPos);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboPos);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glEnableVertexAttribArray(1);
 		glGenBuffers(1, &_vboColor);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboColor);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-
-		//glEnableVertexAttribArray(2);
-
-
-
-		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv)));
 	}
 
 	SurfaceGameSGP::~SurfaceGameSGP() {
@@ -71,11 +60,15 @@ namespace SuperHaxagon {
 		glUseProgram(_program);
 		glBindVertexArray(_vao);
 
+		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboPos);
 		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(Vec3f)), _pos.data(), GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboColor);
 		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(OpenGLColor)), _colors.data(), GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(_count));
 		_count = 0;
