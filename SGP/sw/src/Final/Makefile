@@ -19,6 +19,7 @@ SHAREDIR := ../shared/ogldir1/
 CFLAGS := -std=gnu++17
 CFILES :=  
 CPPFILES := $(EXECUTABLE).cpp \
+	Super-Haxagon/source/Core/Game.cpp \
 	Super-Haxagon/source/Core/Metadata.cpp \
 	Super-Haxagon/source/Core/Platform.cpp \
 	Super-Haxagon/source/Core/Structs.cpp \

@@ -9,23 +9,6 @@
 #include <cstdlib>
 #include <sstream>
 
-/**
- * Helper function used for debugging OpenGL
- */
-static void callback(const GLenum source, const GLenum type, const GLuint id, const GLenum severity, GLsizei, const GLchar* message, const void* userParam) {
-	// WCGW casting away const-ness?
-	auto* platform = const_cast<SuperHaxagon::PlatformSGP*>(static_cast<const SuperHaxagon::PlatformSGP*>(userParam));
-	const auto error = type == GL_DEBUG_TYPE_ERROR;
-	std::stringstream out;
-	out << std::hex << "Message from OpenGL:" << std::endl;
-	out << "Source: 0x" << source << std::endl;
-	out << "Type: 0x" << type << (error ? " (GL ERROR)" : "") << std::endl;
-	out << "ID: 0x" << id << std::endl;
-	out << "Severity: 0x" << severity << std::endl;
-	out << message;
-	platform->message(error ? SuperHaxagon::Dbg::FATAL : SuperHaxagon::Dbg::INFO, "opengl", out.str());
-}
-
 namespace SuperHaxagon {
 	SurfaceSGP::SurfaceSGP(Platform& platform) {
 		platform.message(Dbg::INFO, "platform", "booting");
@@ -60,7 +43,6 @@ namespace SuperHaxagon {
 		glDepthFunc(GL_GREATER);
 		glDepthRange(0.0f, 1.0f);
 		glClearDepth(12.0f);
-		glDebugMessageCallback(callback, this);
 
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
