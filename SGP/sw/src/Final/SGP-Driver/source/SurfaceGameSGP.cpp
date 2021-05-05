@@ -2,8 +2,6 @@
 
 #include "Core/Platform.hpp"
 
-#include <GL/glew.h>
-
 static const char* vertex_shader = R"text(
 #version 330 core
 
@@ -44,20 +42,27 @@ namespace SuperHaxagon {
 		glGenVertexArrays(1, &_vao);
 		glBindVertexArray(_vao);
 
-		glGenBuffers(1, &_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-
 		glEnableVertexAttribArray(0);
+		glGenBuffers(1, &_vboPos);
+		glBindBuffer(GL_ARRAY_BUFFER, _vboPos);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
 		glEnableVertexAttribArray(1);
+		glGenBuffers(1, &_vboColor);
+		glBindBuffer(GL_ARRAY_BUFFER, _vboColor);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+
 		//glEnableVertexAttribArray(2);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, pos) + offsetof(Vec3f, x)));
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, color)));
+
+
 		//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv)));
 	}
 
 	SurfaceGameSGP::~SurfaceGameSGP() {
-		glDeleteBuffers(1, &_vbo);
+		glDeleteBuffers(1, &_vboPos);
+		glDeleteBuffers(1, &_vboColor);
 		glDeleteBuffers(1, &_vao);
 		glDeleteProgram(_program);
 	}
@@ -65,8 +70,13 @@ namespace SuperHaxagon {
 	void SurfaceGameSGP::render() {
 		glUseProgram(_program);
 		glBindVertexArray(_vao);
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(Vertex)), _vertities.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, _vboPos);
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(Vec3f)), _pos.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, _vboColor);
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(OpenGLColor)), _colors.data(), GL_DYNAMIC_DRAW);
+
 		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(_count));
 		_count = 0;
 	}
@@ -85,14 +95,13 @@ namespace SuperHaxagon {
 		};
 
 		for (size_t i = 1; i < points.size() - 1; i++) {
-			_vertities[_count] = {{points[0].x, points[0].y, 0}, col, {0, 0}};
-			_vertities[_count + 1] = {{points[i].x, points[i].y, 0}, col, {0, 0}};
-			_vertities[_count + 2] = {{points[i + 1].x, points[i + 1].y, 0}, col, {0, 0}};
+			_pos[_count] = {points[0].x, points[0].y, 0};
+			_pos[_count + 1] = {points[i].x, points[i].y, 0};
+			_pos[_count + 2] = {points[i + 1].x, points[i + 1].y, 0};
+			_colors[_count] = col;
+			_colors[_count + 1] = col;
+			_colors[_count + 2] = col;
 			_count += 3;
-
-			if (_count > 800) {
-				printf("huh");
-			}
 		}
 	}
 }

@@ -23,8 +23,10 @@ namespace SuperHaxagon {
 		size_t _count = 0;
 		GLuint _program = 0;
 		GLuint _vao = 0;
-		GLuint _vbo = 0;
-		std::array<Vertex, SIZE> _vertities{};
+		GLuint _vboPos = 0;
+		GLuint _vboColor = 0;
+		std::array<Vec3f, SIZE> _pos{};
+		std::array<OpenGLColor, SIZE> _colors{};
 	};
 }
 

@@ -16,12 +16,6 @@ namespace SuperHaxagon {
 		float a;
 	};
 
-	struct Vertex {
-		Vec3f pos;
-		OpenGLColor color;
-		Vec2f uv;
-	};
-
 	class Platform;
 	class SurfaceGameSGP;
 	class SurfaceSGP : public Surface {
