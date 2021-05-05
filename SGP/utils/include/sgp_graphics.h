@@ -205,3 +205,4 @@ sglu_fixed_t sglu_float_to_fixed(GLfloat float_val, uint8_t fixed_point_frac_bit
 
 void SGP_glGenTextures(GLsizei n, GLuint * textures);
 void SGP_glBindTexture(GLenum target, GLuint texture);
+void SGP_glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void * data);
