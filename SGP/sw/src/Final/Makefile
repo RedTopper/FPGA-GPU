@@ -16,6 +16,7 @@ EXECUTABLE := Main
 SHAREDIR := ../shared/ogldir1/
 
 # C source files (separated by spaces)
+LIB := -lstdc++fs
 CFLAGS := -std=gnu++17
 CFILES :=  
 CPPFILES := $(EXECUTABLE).cpp \
