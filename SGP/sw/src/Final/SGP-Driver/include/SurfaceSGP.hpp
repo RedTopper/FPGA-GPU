@@ -31,14 +31,12 @@ namespace SuperHaxagon {
 
 		void addSurface(SurfaceGameSGP* surface);
 		GLFWwindow* getWindow() const;
-		float getAndIncrementZ();
 
 		static GLuint compile(Platform& platform, GLenum type, const char* source);
 
 	private:
 		std::vector<SurfaceGameSGP*> _surfaces;
 		GLFWwindow* _window;
-		float _z = 0.0f;
 	};
 }
 
