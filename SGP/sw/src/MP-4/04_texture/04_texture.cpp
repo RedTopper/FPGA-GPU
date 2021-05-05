@@ -53,7 +53,7 @@ int main() {
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders("../common/shaders/passthroughuv.vert", "../common/shaders/passthroughuv.frag");
-	GLuint Texture = loadBMP_custom("../common/images/misc/phjones.bmp");
+	GLuint Texture = loadBMP_custom("../common/images/misc/phjones_real.bmp");
 	glUseProgram(programID);
 	GLuint TextureID  = glGetUniformLocation(programID, "_tex");
 	GLenum err = glGetError();
