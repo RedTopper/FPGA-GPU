@@ -66,25 +66,21 @@ namespace SuperHaxagon {
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboPos);
-		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(Vec3f)), _pos.data(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_pos.size() * sizeof(Vec3f)), _pos.data(), GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, _vboColor);
-		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_count * sizeof(OpenGLColor)), _colors.data(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(_colors.size() * sizeof(OpenGLColor)), _colors.data(), GL_DYNAMIC_DRAW);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(_count));
-		_count = 0;
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(_colors.size()));
+		_colors.clear();
+		_pos.clear();
 	}
 
 	void SurfaceGameSGP::drawPolyGame(const Color& color, std::vector<Vec2f>& points) {
 		_surface->drawPolyAbsolute(color, points);
-
-		if (_count + points.size() * 3 - 6 > SIZE) {
-			// We're full, go home.
-			return;
-		}
 
 		const auto screen = _surface->getScreenDim();
 		for(auto& p : points) {
@@ -104,13 +100,12 @@ namespace SuperHaxagon {
 		};
 
 		for (size_t i = 1; i < points.size() - 1; i++) {
-			_pos[_count] = {points[0].x, points[0].y, 0};
-			_pos[_count + 1] = {points[i].x, points[i].y, 0};
-			_pos[_count + 2] = {points[i + 1].x, points[i + 1].y, 0};
-			_colors[_count] = col;
-			_colors[_count + 1] = col;
-			_colors[_count + 2] = col;
-			_count += 3;
+			_pos.emplace_back(points[0].x, points[0].y, 0);
+			_pos.emplace_back(points[i].x, points[i].y, 0);
+			_pos.emplace_back(points[i + 1].x, points[i + 1].y, 0);
+			_colors.push_back(col);
+			_colors.push_back(col);
+			_colors.push_back(col);
 		}
 	}
 }
