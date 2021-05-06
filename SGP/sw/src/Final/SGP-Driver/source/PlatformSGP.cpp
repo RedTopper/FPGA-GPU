@@ -41,7 +41,7 @@ namespace SuperHaxagon {
 	}
 
 	float PlatformSGP::getDilation() {
-		return 1.0;
+		return 4.0;
 	}
 
 	void PlatformSGP::playSFX(AudioLoader& audio) {

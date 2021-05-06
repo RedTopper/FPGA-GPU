@@ -18,7 +18,7 @@ namespace SuperHaxagon {
 			exit(1);
 		}
 
-		_window = glfwCreateWindow(640, 480, "Super Haxagon", nullptr, nullptr);
+		_window = glfwCreateWindow(1900, 1000, "Super Haxagon", nullptr, nullptr);
 
 		if (!_window) {
 			fprintf(stderr, "ERROR: could not open window with GLFW3\n");
@@ -35,17 +35,16 @@ namespace SuperHaxagon {
 		// Ensure we can capture the escape key being pressed below
 		glfwSetInputMode(_window, GLFW_STICKY_KEYS, GL_TRUE);
 
-		// blue background
-		glClearColor(0, 0, 1.0f, 0);
-
-		glEnable(GL_DEBUG_OUTPUT);
+		//glEnable(GL_DEBUG_OUTPUT);
 		//glEnable(GL_DEPTH_TEST);
 		//glDepthFunc(GL_GREATER);
 		//glDepthRange(0.0f, 1.0f);
 		//glClearDepth(0.0f);
 	}
 
-	void SurfaceSGP::drawPolyAbsolute(const Color& color, const std::vector<Vec2f>& points) {}
+	void SurfaceSGP::drawPolyAbsolute(const Color& color, const std::vector<Vec2f>& points) {
+		Surface::drawPolyAbsolute(color, points);
+	}
 
 	Vec2f SurfaceSGP::getScreenDim() const {
 		int width, height;
@@ -55,11 +54,18 @@ namespace SuperHaxagon {
 	}
 
 	void SurfaceSGP::screenBegin() {
-		_z = 0.0f;
+		glClearColor(
+				static_cast<float>(_clear.r) / 255.0f,
+				static_cast<float>(_clear.g) / 255.0f,
+				static_cast<float>(_clear.b) / 255.0f,
+				static_cast<float>(_clear.a) / 255.0f
+		);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void SurfaceSGP::screenFinalize() {
+		Surface::screenFinalize();
 		for(auto surface : _surfaces) {
 			surface->render();
 		}
@@ -70,13 +76,6 @@ namespace SuperHaxagon {
 
 	GLFWwindow* SurfaceSGP::getWindow() const {
 		return _window;
-	}
-
-	float SurfaceSGP::getAndIncrementZ() {
-		const auto step = 0.00001f;
-		const auto z = _z;
-		_z += step;
-		return z;
 	}
 
 	void SurfaceSGP::addSurface(SurfaceGameSGP* surface) {

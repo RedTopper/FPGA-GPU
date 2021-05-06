@@ -3,28 +3,32 @@
 #include "Core/Platform.hpp"
 
 static const char* vertex_shader = R"text(
-#version 330 core
+#version 430 core
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec4 color;
 
-layout(location = 0) in vec3 v_position;
-layout(location = 1) in vec4 v_color;
-
-out vec4 f_color;
+// location 0 is gl_Position
+layout (location = 1) out vec4 vColor;
 
 void main() {
-	gl_Position = vec4(v_position.x, v_position.y, v_position.z, 1.0);
-	f_color = v_color;
+  gl_Position = vec4(position, 1.0);
+  vColor = color;
 }
 )text";
 
 static const char* fragment_shader = R"text(
-#version 330 core
+#version 430 core
 
-layout(location = 0) out vec4 color;
+// location 0 is gl_FragCoord
+layout (location = 1) in vec4 vColor;
 
-in vec4 f_color;
+// By default, OpenGL draws the 0th output
+layout (location = 0) out vec4 fColor;
+layout (location = 1) out vec4 fragCoordOut;
 
 void main() {
-	color = f_color;
+    fragCoordOut = gl_FragCoord;
+    fColor = vColor;
 }
 )text";
 
@@ -75,9 +79,21 @@ namespace SuperHaxagon {
 	}
 
 	void SurfaceGameSGP::drawPolyGame(const Color& color, std::vector<Vec2f>& points) {
+		_surface->drawPolyAbsolute(color, points);
+
 		if (_count + points.size() * 3 - 6 > SIZE) {
 			// We're full, go home.
 			return;
+		}
+
+		const auto screen = _surface->getScreenDim();
+		for(auto& p : points) {
+			// Fix aspect ratio
+			if (screen.x > screen.y) {
+				p.y *= screen.x / screen.y;
+			} else {
+				p.x *= screen.y / screen.x;
+			}
 		}
 
 		OpenGLColor col {
